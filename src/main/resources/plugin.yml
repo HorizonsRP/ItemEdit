@@ -1,0 +1,70 @@
+name: ItemEdit
+version: ${project.version}
+main: net.lordofthecraft.itemedit.ItemEdit
+api-version: 1.13
+depend: [Tythan]
+softdepend: [ArcheCore, Foundation, Obelisk]
+commands:
+  edit:
+    command: /<command>
+    description: "Edit your items with cool names and descriptions!"
+permissions:
+  itemedit.check:
+    default: true
+    description: Check to see one's edit tokens.
+  itemedit.prices:
+    default: op
+    description: Check prices for edit tokens if enabled.
+  itemedit.name:
+    default: true
+    description: Edit names of items.
+  itemedit.desc:
+    default: true
+    description: Edit descriptions of items.
+  itemedit.glow:
+    default: op
+    description: Add a glow to items.
+  itemedit.sign:
+    default: true
+    description: Sign items so they can no longer be edited.
+  itemedit.clear:
+    default: true
+    description: Clears everything from an item so you can start over.
+
+  itemedit.admin:
+    default: op
+    description: Admin Signature
+  itemedit.dev:
+    default: op
+    description: Dev Signature
+  itemedit.mod:
+    default: op
+    description: Allows staff to override signatures and provides the mod signature.
+    children:
+      itemedit.prices: true
+      itemedit.glow: true
+  itemedit.st:
+    default: op
+    description: Story Signature
+  itemedit.world:
+    default: op
+    description: World Signature
+  itemedit.comm:
+    default: op
+    description: Community Signature
+  itemedit.use:
+    default: true
+    description: Base Roleplay and Player signature
+    children:
+      itemedit.name: true
+      itemedit.desc: true
+      itemedit.sign: true
+      itemedit.clear: true
+      itemedit.check: true
+
+  itemedit.vip:
+    default: false
+    description: The amount of VIP tokens one has access to. Build as itemedit.vip.#
+  itemedit.vip.unlimited:
+    default: op
+    description: Gives maximum VIP edits per week.
