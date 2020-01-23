@@ -63,7 +63,7 @@ public class StaffCommands extends BaseCommand {
 				Player editor = Bukkit.getPlayer(UUID.fromString(tag));
 				String playerName = "";
 				if (editor != null) {
-					playerName = editor.getDisplayName();
+					playerName = editor.getName();
 				} else {
 					try {
 						playerName = MojangCommunicator.requestCurrentUsername(UUID.fromString(tag)).replace("\"", "");

@@ -34,7 +34,7 @@ public enum SignType {
 	public static final SignType DEFAULT = PLAYER;
 
 	public static List<String> getSignature(Player p, SignType type, boolean showRealName) {
-		String name = p.getDisplayName();
+		String name = p.getName();
 		if (type.equals(SignType.ROLEPLAY)) {
 			if (ItemEdit.get().getServer().getPluginManager().isPluginEnabled("ArcheCore")) {
 				Persona persona = ArcheCore.getPersona(p);

@@ -6,7 +6,7 @@
 
     <groupId>net.lordofthecraft</groupId>
     <artifactId>ItemEdit</artifactId>
-    <version>1.15.1-R0.1</version>
+    <version>1.14.4-R0.1</version>
     <packaging>jar</packaging>
 
     <name>ItemEdit</name>
@@ -54,14 +54,18 @@
         <dependency>
             <groupId>io.github.archemedes</groupId>
             <artifactId>customitem</artifactId>
-            <version>${version}</version>
+            <version>1.15.1-R0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.luckperms</groupId>
-            <artifactId>api</artifactId>
-            <version>5.0</version>
-            <scope>provided</scope>
+            <groupId>net.lordofthecraft.soulbind</groupId>
+            <artifactId>Soulbind</artifactId>
+            <version>1.15.1-R0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>me.lucko.luckperms</groupId>
+            <artifactId>luckperms-api</artifactId>
+            <version>4.4</version>
         </dependency>
 
 

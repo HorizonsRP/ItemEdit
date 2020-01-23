@@ -9,6 +9,7 @@ import io.github.archemedes.customitem.CustomTag;
 import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
+import net.lordofthecraft.soulbind.SoulbindEnchant;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -81,7 +82,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = transSQL.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
-				if (!hasFlag("mod") && cannotBeEditedBy(item, p)) {
+				if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
 					msg(SIGNED_ALREADY);
 					return;
 				}
@@ -148,7 +149,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = transSQL.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
-				if (!hasFlag("mod") && cannotBeEditedBy(item, p)) {
+				if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
 					msg(SIGNED_ALREADY);
 					return;
 				}
@@ -183,7 +184,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = transSQL.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
-				if (cannotBeEditedBy(item, p)) {
+				if (isSigned(item)) {
 					msg(SIGNED_ALREADY);
 					return;
 				}
@@ -289,7 +290,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = transSQL.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
-				if (!hasFlag("mod") && cannotBeEditedBy(item, p)) {
+				if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
 					msg(SIGNED_ALREADY);
 					return;
 				}
@@ -325,7 +326,7 @@ public class MainCommands extends BaseCommand {
 			validate(p.hasPermission(type.permission), NO_SIGNATURE_PERM);
 			ItemStack item = transSQL.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
-				if (!hasFlag("mod") && cannotBeEditedBy(item, p)) {
+				if (isSigned(item)) {
 					msg(SIGNED_ALREADY);
 					return;
 				}
@@ -362,19 +363,25 @@ public class MainCommands extends BaseCommand {
 	}
 
 	@Cmd(value="Moderator access to edit items.", permission="itemedit.mod")
-	public BaseCommand mod() {
+	public BaseCommand staff() {
 		return staffCommands;
 	}
 
 	// Checks if the item is signed, and if so, if it's by this player. Defaults to true if not signed.
-	private static boolean cannotBeEditedBy(ItemStack item, Player p) {
+	private static boolean isSigned(ItemStack item) {
 		if (transSQL.isItemMonikerSigned(item)) {
 			return true;
-		} else if (CustomTag.hasCustomTag(item, SIGNED_TAG)) {
+		} else {
+			return CustomTag.hasCustomTag(item, SIGNED_TAG);
+		}
+	}
+
+	// Checks if the item was signed by the give player
+	private static boolean notSignedBy(ItemStack item, Player p) {
+		if (CustomTag.hasCustomTag(item, SIGNED_TAG)) {
 			return !CustomTag.getTagValue(item, SIGNED_TAG).equalsIgnoreCase(p.getUniqueId().toString());
 		}
-
-		return false;
+		return true;
 	}
 
 	// Replaces the item in hand with the given edits after applying the appropriate tags and charging the player.
@@ -436,7 +443,7 @@ public class MainCommands extends BaseCommand {
 				ItemStack item = transSQL.getItemInHand(p);
 				if (item != null && item.getType() != Material.AIR) {
 					if (CustomTag.hasCustomTag(item, EDITED_TAG) || transSQL.isItemMonikerSigned(item)) {
-						if (!mod && cannotBeEditedBy(item, p)) {
+						if (!mod && isSigned(item) && notSignedBy(item, p)) {
 							return SIGNED_ALREADY;
 						} else {
 							finalizeEdit(p, createBlankDuplicate(item, descOnly, sigOnly), 0);
@@ -500,7 +507,8 @@ public class MainCommands extends BaseCommand {
 					newMeta.setDisplayName(meta.getDisplayName());
 				}
 				for(Enchantment enc : meta.getEnchants().keySet()) {
-					if (descOnly || sigOnly || !(enc instanceof Glow)) {
+					if (!(enc instanceof SoulbindEnchant) &&
+						(descOnly || sigOnly || !(enc instanceof Glow)) ) {
 						newMeta.addEnchant(enc, meta.getEnchantLevel(enc), true);
 					}
 				}

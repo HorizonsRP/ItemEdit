@@ -9,10 +9,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 
+import me.lucko.luckperms.LuckPerms;
+import me.lucko.luckperms.api.Node;
+import me.lucko.luckperms.api.User;
 import net.lordofthecraft.itemedit.ItemEdit;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.model.user.User;
-import net.luckperms.api.node.Node;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -320,12 +320,12 @@ public class TransactionsSQL {
 	// Gets the total allotted amount of VIP tokens.
 	public int getVipTokensTotal(Player player) {
 		int vipTokensTotal = 0;
-		User user = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId());
+		User user = LuckPerms.getApi().getUser(player.getUniqueId());
 		if (user != null) {
-			for (Node node : user.getDistinctNodes()) {
+			for (Node node : user.getAllNodes()) {
 				if (node.getValue()) {
-					if (node.getKey().startsWith("itemedit.vip")) {
-						String[] split = node.getKey().replace('.', ' ').split(" ");
+					if (node.getPermission().startsWith("itemedit.vip")) {
+						String[] split = node.getPermission().replace('.', ' ').split(" ");
 						if (split.length >= 3) {
 							if (split[2].equalsIgnoreCase("unlimited")) {
 								vipTokensTotal = Integer.MAX_VALUE;
@@ -335,7 +335,7 @@ public class TransactionsSQL {
 								vipTokensTotal = Integer.parseInt(split[2]);
 							}
 						}
-					} else if (node.getKey().equalsIgnoreCase("*")) {
+					} else if (node.getPermission().equalsIgnoreCase("*")) {
 						vipTokensTotal = Integer.MAX_VALUE;
 						break;
 					}
