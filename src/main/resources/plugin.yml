@@ -18,6 +18,9 @@ permissions:
   itemedit.name:
     default: true
     description: Edit names of items.
+  itemedit.color:
+    default: true
+    description: Change the color of an item's name.
   itemedit.desc:
     default: true
     description: Edit descriptions of items.
