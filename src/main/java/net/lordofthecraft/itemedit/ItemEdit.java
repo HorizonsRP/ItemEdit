@@ -27,6 +27,10 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 	public static int getMaxWidth() {
 		return maxWidth;
 	}
+	private static int maxLines;
+	public static int getMaxLines() {
+		return maxLines;
+	}
 	private static int refreshTime;
 	public static int getRefreshTime() {
 		return refreshTime;
@@ -46,14 +50,21 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		saveDefaultConfig();
 
 		// Grab the width of each item.
-		if (this.getConfig().getInt("MAX-WIDTH") != 0) {
+		if (this.getConfig().getInt("MAX-WIDTH") > 10) {
 			maxWidth = this.getConfig().getInt("MAX-WIDTH");
 		} else {
-			maxWidth = 40;
+			maxWidth = 50;
+		}
+
+		// Grab the max lines for descriptions.
+		if (this.getConfig().getInt("MAX-LINES") > 2) {
+			maxLines = this.getConfig().getInt("MAX-LINES");
+		} else {
+			maxLines = 10;
 		}
 
 		// Grab our refresh time for VIP tokens.
-		if (this.getConfig().getInt("REFRESH-TIME-IN-DAYS") != 0) {
+		if (this.getConfig().getInt("REFRESH-TIME-IN-DAYS") >= 0) {
 			refreshTime = this.getConfig().getInt("REFRESH-TIME-IN-DAYS");
 		} else {
 			refreshTime = 7;

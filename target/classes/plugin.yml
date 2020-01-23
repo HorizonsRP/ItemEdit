@@ -1,7 +1,7 @@
 name: ItemEdit
 version: 1.14.4-R0.1
 main: net.lordofthecraft.itemedit.ItemEdit
-api-version: 1.13
+api-version: "1.13"
 depend: [Tythan]
 softdepend: [ArcheCore, Foundation, Obelisk]
 commands:
@@ -18,6 +18,9 @@ permissions:
   itemedit.name:
     default: true
     description: Edit names of items.
+  itemedit.color:
+    default: true
+    description: Change the color of an item's name.
   itemedit.desc:
     default: true
     description: Edit descriptions of items.
@@ -57,14 +60,18 @@ permissions:
     description: Base Roleplay and Player signature
     children:
       itemedit.name: true
+      itemedit.color: true
       itemedit.desc: true
       itemedit.sign: true
       itemedit.clear: true
       itemedit.check: true
 
+  itemedit.length:
+    default: false
+    description: The maximum amount of lines worth of description allowed. Build as itemedit.length.#
   itemedit.vip:
     default: false
     description: The amount of VIP tokens one has access to. Build as itemedit.vip.#
-  itemedit.vip.unlimited:
+  itemedit.unlimited:
     default: op
-    description: Gives maximum VIP edits per week.
+    description: Gives maximum VIP edits per week and unlimited description length.

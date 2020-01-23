@@ -317,32 +317,34 @@ public class TransactionsSQL {
 		}
 	}
 
-	// Gets the total allotted amount of VIP tokens.
-	public int getVipTokensTotal(Player player) {
-		int vipTokensTotal = 0;
-		User user = LuckPerms.getApi().getUser(player.getUniqueId());
-		if (user != null) {
-			for (Node node : user.getAllNodes()) {
-				if (node.getValue()) {
-					if (node.getPermission().startsWith("itemedit.vip")) {
+	public int getVipTokensTotal(Player p) {
+		return getMaxPermission(p, "vip");
+	}
+
+	public int getMaxLines(Player p) {
+		return getMaxPermission(p, "length");
+	}
+
+	// Gets the max value for an itemedit.PERMISSION of the player
+	public int getMaxPermission(Player player, String permission) {
+		int output = 0;
+		if (!player.hasPermission("itemedit.unlimited")) {
+			User user = LuckPerms.getApi().getUser(player.getUniqueId());
+			if (user != null) {
+				String thisPermission = "itemedit." + permission;
+				for (Node node : user.getAllNodes()) {
+					if (node.getValue() && node.getPermission().startsWith(thisPermission)) {
 						String[] split = node.getPermission().replace('.', ' ').split(" ");
-						if (split.length >= 3) {
-							if (split[2].equalsIgnoreCase("unlimited")) {
-								vipTokensTotal = Integer.MAX_VALUE;
-								break;
-							}
-							if (Integer.parseInt(split[2]) > vipTokensTotal) {
-								vipTokensTotal = Integer.parseInt(split[2]);
-							}
+						if (split.length >= 3 && Integer.parseInt(split[2]) > output) {
+							output = Integer.parseInt(split[2]);
 						}
-					} else if (node.getPermission().equalsIgnoreCase("*")) {
-						vipTokensTotal = Integer.MAX_VALUE;
-						break;
 					}
 				}
 			}
+		} else {
+			output = Integer.MAX_VALUE;
 		}
-		return vipTokensTotal;
+		return output;
 	}
 
 	// Returns what type of charge we can apply to this player (doesn't charge yet).

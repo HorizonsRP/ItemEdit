@@ -39,6 +39,7 @@ public class MainCommands extends BaseCommand {
 	private static final String SIGNED_ALREADY = ItemEdit.PREFIX + "This item has already been signed!";
 	private static final String SIGNED_OTHERWISE = ItemEdit.PREFIX + "You were not the one to sign this item!";
 	private static final String NO_SIGNATURE_PERM = ItemEdit.PREFIX + "You do not have permission to use that signature.";
+	private static final String MAX_LENGTH = ItemEdit.PREFIX + "You have reached the maximum length on that item.";
 	private static String nameTooLong; // This one is based on Max Width so it's set on instance creation.
 
 	// Application short-hands
@@ -189,6 +190,13 @@ public class MainCommands extends BaseCommand {
 					return;
 				}
 
+				int maxLines = transSQL.getMaxLines(p);
+				if (item.getItemMeta() != null && item.getItemMeta().getLore() != null &&
+					item.getItemMeta().getLore().size() > maxLines) {
+					msg(MAX_LENGTH);
+					return;
+				}
+
 				int tokensUsed = transSQL.safeToChargePlayer(p);
 				if (CustomTag.hasCustomTag(item, EDITED_TAG)) {
 					tokensUsed = 0;
@@ -197,8 +205,12 @@ public class MainCommands extends BaseCommand {
 					return;
 				}
 
-				applyDesc(item, desc);
-				finalizeEdit(p, item, tokensUsed);
+				if (!applyDesc(item, desc, maxLines)) {
+					msg(MAX_LENGTH);
+					return;
+				} else {
+					finalizeEdit(p, item, tokensUsed);
+				}
 
 				return;
 			}
@@ -206,7 +218,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	public static void applyDesc(ItemStack item, String[] desc) {
+	public static boolean applyDesc(ItemStack item, String[] desc, int maxLines) {
 		ItemMeta meta = item.getItemMeta();
 		List<String> newDesc = null;
 		if (meta != null) {
@@ -238,9 +250,13 @@ public class MainCommands extends BaseCommand {
 			}
 			newDesc.add(DESC_PREFIX + thisString.toString());
 
+			if (newDesc.size() > maxLines) {
+				return false;
+			}
 			meta.setLore(newDesc);
 			item.setItemMeta(meta);
 		}
+		return true;
 	}
 
 	public static String[] processWord(int currentLength, String word) {
