@@ -1,5 +1,6 @@
 package net.lordofthecraft.itemedit.command;
 
+import co.lotc.core.bukkit.util.ItemUtil;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
@@ -89,7 +90,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (CustomTag.hasCustomTag(item, EDITED_TAG)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -158,7 +159,7 @@ public class MainCommands extends BaseCommand {
 				if (meta != null && meta.hasDisplayName()) {
 
 					int tokensUsed = transSQL.safeToChargePlayer(p);
-					if (CustomTag.hasCustomTag(item, EDITED_TAG)) {
+					if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
 						tokensUsed = 0;
 					} else if (tokensUsed == 0) {
 						msg(NO_TOKENS);
@@ -198,7 +199,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (CustomTag.hasCustomTag(item, EDITED_TAG)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -312,7 +313,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (CustomTag.hasCustomTag(item, EDITED_TAG)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -335,6 +336,7 @@ public class MainCommands extends BaseCommand {
 	// Finalization & Clearing //
 	@Cmd(value="Sign an item to lock in the information.", permission="itemedit.sign")
 	@Flag(name="mod", description="Prevents the username from being written.", permission="itemedit.mod")
+	@Flag(name="rp", description="Allows signing with your RP name")
 	public void sign(CommandSender sender,
 					 @Default("ROLEPLAY") SignType type) {
 		if (sender instanceof Player) {
@@ -348,7 +350,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (CustomTag.hasCustomTag(item, EDITED_TAG)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -361,12 +363,18 @@ public class MainCommands extends BaseCommand {
 					if (lore == null) {
 						lore = new ArrayList<>();
 					}
-					lore.addAll(SignType.getSignature(p, type, !hasFlag("mod")));
+					boolean roleplayName = type.equals(SignType.ROLEPLAY);
+					if (!roleplayName && hasFlag("rp")) {
+						roleplayName = type.permission.startsWith("itemedit.signatures");
+					}
+
+					lore.addAll(SignType.getSignature(p, type, roleplayName, !hasFlag("mod")));
 					meta.setLore(lore);
 					item.setItemMeta(meta);
 				}
 
-				finalizeEdit(p, CustomTag.apply(SIGNED_TAG, p.getUniqueId().toString(), item), tokensUsed);
+				ItemUtil.setCustomTag(item, SIGNED_TAG, p.getUniqueId().toString());
+				finalizeEdit(p, item, tokensUsed);
 				return;
 			}
 		}
@@ -388,14 +396,14 @@ public class MainCommands extends BaseCommand {
 		if (transSQL.isItemMonikerSigned(item)) {
 			return true;
 		} else {
-			return CustomTag.hasCustomTag(item, SIGNED_TAG);
+			return ItemUtil.hasCustomTag(item, SIGNED_TAG);
 		}
 	}
 
 	// Checks if the item was signed by the give player
 	private static boolean notSignedBy(ItemStack item, Player p) {
-		if (CustomTag.hasCustomTag(item, SIGNED_TAG)) {
-			return !CustomTag.getTagValue(item, SIGNED_TAG).equalsIgnoreCase(p.getUniqueId().toString());
+		if (ItemUtil.hasCustomTag(item, SIGNED_TAG)) {
+			return !ItemUtil.getCustomTag(item, SIGNED_TAG).equalsIgnoreCase(p.getUniqueId().toString());
 		}
 		return true;
 	}
@@ -404,10 +412,10 @@ public class MainCommands extends BaseCommand {
 	private static void finalizeEdit(Player p, ItemStack item, int tokensUsed) {
 		// If tokensUsed is 0 it's a clearing and doesn't need to be logged.
 		String preString = "";
-		if (CustomTag.hasCustomTag(item, EDITED_TAG)) {
-			preString = CustomTag.getTagValue(item, EDITED_TAG) + "/";
+		if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
+			preString = ItemUtil.getCustomTag(item, EDITED_TAG) + "/";
 		}
-		p.getInventory().setItemInMainHand(CustomTag.apply(EDITED_TAG, preString + p.getUniqueId().toString(), item));
+		ItemUtil.setCustomTag(item, EDITED_TAG, preString + p.getUniqueId().toString() + ":" + System.currentTimeMillis());
 
 		// If the player used an edit token, otherwise the player had to've used a VIP token.
 		if (tokensUsed > 0) {
@@ -445,7 +453,7 @@ public class MainCommands extends BaseCommand {
 		@Cmd(value="Clear the signature from an item.")
 		@Flag(name="mod", description="Overrides signature lock on clearing an item.", permission="itemedit.mod")
 		public void signature(CommandSender sender) {
-			String message = clearTypes(sender, hasFlag("mod"), true, true);
+			String message = clearTypes(sender, hasFlag("mod"), false, true);
 			if (message != null) {
 				msg(message);
 			}
@@ -457,11 +465,12 @@ public class MainCommands extends BaseCommand {
 				Player p = (Player) sender;
 				ItemStack item = transSQL.getItemInHand(p);
 				if (item != null && item.getType() != Material.AIR) {
-					if (CustomTag.hasCustomTag(item, EDITED_TAG) || transSQL.isItemMonikerSigned(item)) {
+					if (ItemUtil.hasCustomTag(item, EDITED_TAG) || transSQL.isItemMonikerSigned(item)) {
 						if (!mod && isSigned(item) && notSignedBy(item, p)) {
 							return SIGNED_ALREADY;
 						} else {
-							finalizeEdit(p, createBlankDuplicate(item, descOnly, sigOnly), 0);
+							clearData(item, descOnly, sigOnly);
+							finalizeEdit(p, item, 0);
 						}
 					}
 					return null;
@@ -470,81 +479,44 @@ public class MainCommands extends BaseCommand {
 			return NO_ITEM;
 		}
 
-		// Creates a duplicate without custom tags on it to refresh tags.
-		private ItemStack createBlankDuplicate(ItemStack item, boolean descOnly, boolean sigOnly) {
-			ItemStack newItem = new ItemStack(item.getType());
-			newItem.setAmount(item.getAmount());
-			newItem.setData(item.getData());
-
+		private void clearData(ItemStack item, boolean descOnly, boolean sigOnly) {
 			ItemMeta meta = item.getItemMeta();
-			ItemMeta newMeta = newItem.getItemMeta();
 
-			if (meta != null && newMeta != null) {
-
-				// Copy non-lore data.
-				if (meta instanceof Damageable) {
-					Damageable first = (Damageable) meta;
-					Damageable second = (Damageable) newMeta;
-					if (first.hasDamage()) {
-						second.setDamage(first.getDamage());
-					}
-
-					newItem.setItemMeta((ItemMeta) second);
-				} else if (meta instanceof BookMeta) {
-					BookMeta first = (BookMeta) meta;
-					BookMeta second = (BookMeta) newMeta;
-					second.setTitle(first.getTitle());
-					second.setAuthor(first.getAuthor());
-					second.setGeneration(first.getGeneration());
-					second.setPages(first.getPages());
-
-					newItem.setItemMeta(second);
-				} else if (meta instanceof BannerMeta) {
-					BannerMeta first = (BannerMeta) meta;
-					BannerMeta second = (BannerMeta) newMeta;
-					second.setPatterns(first.getPatterns());
-
-					newItem.setItemMeta(second);
-				} else if (meta instanceof MapMeta) {
-					MapMeta first = (MapMeta) meta;
-					MapMeta second = (MapMeta) newMeta;
-					second.setMapView(first.getMapView());
-					second.setScaling(first.isScaling());
-					second.setLocationName(first.getLocationName());
-					second.setColor(first.getColor());
-
-					newItem.setItemMeta(second);
-				}
-
-				// Carry over data we wish to keep.
-				newMeta = newItem.getItemMeta();
-				if (descOnly || sigOnly) {
-					newMeta.setDisplayName(meta.getDisplayName());
-				}
-				for(Enchantment enc : meta.getEnchants().keySet()) {
-					if (!(enc instanceof SoulbindEnchant) &&
-						(descOnly || sigOnly || !(enc instanceof Glow)) ) {
-						newMeta.addEnchant(enc, meta.getEnchantLevel(enc), true);
+			if (meta != null) {
+				for (Enchantment enc : meta.getEnchants().keySet()) {
+					if ((enc instanceof SoulbindEnchant) ||
+						(!descOnly && !sigOnly && (enc instanceof Glow))) {
+						meta.removeEnchant(enc);
 					}
 				}
-				if (sigOnly) {
+
+				if (descOnly) {
+					meta.setLore(null);
+				} else if (sigOnly) {
 					List<String> lore = meta.getLore();
 					if (lore != null) {
 						while (lore.size() > 0) {
-							String lastLine = lore.get(lore.size()-1);
-							lore.remove(lore.size()-1);
+							String lastLine = lore.get(lore.size() - 1);
+							lore.remove(lore.size() - 1);
 							if (lastLine.contains("Approved" + ChatColor.RESET) ||
-								(lastLine.contains("Approved") && lastLine.contains(Character.toString((char) 0x2605))) ) {
+								(lastLine.contains("Approved") && lastLine.contains(Character.toString((char) 0x2605)))) {
 								break;
 							}
 						}
 					}
-					newMeta.setLore(lore);
+					meta.setLore(lore);
+				} else {
+					meta.setLore(null);
+					meta.setDisplayName(null);
 				}
-				newItem.setItemMeta(newMeta);
+
+				if (ItemUtil.hasCustomTag(meta, SIGNED_TAG)) {
+					ItemUtil.removeCustomTag(meta, SIGNED_TAG);
+				}
+				item.setItemMeta(meta);
 			}
-			return newItem;
 		}
+
 	}
 
 }

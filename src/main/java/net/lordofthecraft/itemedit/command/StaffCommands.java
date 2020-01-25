@@ -1,5 +1,6 @@
 package net.lordofthecraft.itemedit.command;
 
+import co.lotc.core.bukkit.util.ItemUtil;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Range;
@@ -13,6 +14,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public class StaffCommands extends BaseCommand {
@@ -30,15 +34,15 @@ public class StaffCommands extends BaseCommand {
 			ItemStack item = transSQL.getItemInHand(p);
 			StringBuilder output = new StringBuilder();
 
-			if (CustomTag.hasCustomTag(item, MainCommands.EDITED_TAG)) {
+			if (ItemUtil.hasCustomTag(item, MainCommands.EDITED_TAG)) {
 				output.append(ItemEdit.ALT_COLOR).append("Edited By:").append(tagPlayerInfo(item, MainCommands.EDITED_TAG));
-			} else if (CustomTag.hasCustomTag(item, "renamedusers")) {
+			} else if (ItemUtil.hasCustomTag(item, "renamedusers")) {
 				output.append(ItemEdit.ALT_COLOR).append("Edited By:").append(tagPlayerInfo(item, "renamedusers"));
 			}
 
-			if (CustomTag.hasCustomTag(item, MainCommands.SIGNED_TAG)) {
+			if (ItemUtil.hasCustomTag(item, MainCommands.SIGNED_TAG)) {
 				output.append(ItemEdit.ALT_COLOR).append("Signed By:").append(tagPlayerInfo(item, MainCommands.SIGNED_TAG));
-			} else if (CustomTag.hasCustomTag(item, "signuser")) {
+			} else if (ItemUtil.hasCustomTag(item, "signuser")) {
 				output.append(ItemEdit.ALT_COLOR).append("Signed By:").append(tagPlayerInfo(item, "signuser"));
 			}
 
@@ -50,7 +54,7 @@ public class StaffCommands extends BaseCommand {
 	}
 
 	private String tagPlayerInfo(ItemStack item, String fullTag) {
-		String value = CustomTag.getTagValue(item, fullTag);
+		String value = ItemUtil.getCustomTag(item, fullTag);
 
 		String[] tags = value.replace("/", " ").split(" ");
 		StringBuilder builder = new StringBuilder("\n");
@@ -58,25 +62,37 @@ public class StaffCommands extends BaseCommand {
 
 		for (String tag : tags) {
 			value = tag;
+			String[] thisTag = tag.replace(":", " ").split(" ");
 
-			if (tag.length() == length) {
-				Player editor = Bukkit.getPlayer(UUID.fromString(tag));
+			if (thisTag.length >= 1 && thisTag[0] != null && thisTag[0].length() == length) {
+				value = thisTag[0];
+				String date = "";
 				String playerName = "";
+
+				Player editor = Bukkit.getPlayer(UUID.fromString(thisTag[0]));
 				if (editor != null) {
 					playerName = editor.getName();
 				} else {
 					try {
-						playerName = MojangCommunicator.requestCurrentUsername(UUID.fromString(tag)).replace("\"", "");
+						playerName = MojangCommunicator.requestCurrentUsername(UUID.fromString(thisTag[0])).replace("\"", "");
 					} catch (IOException ignore) {
-
 					}
 				}
-				if (playerName.length() > 0) {
-					value = value + " | " + ItemEdit.ALT_COLOR + playerName;
+
+				if (thisTag.length >= 2 && thisTag[1] != null) {
+					DateFormat format = new SimpleDateFormat("dd MMM yyyy HH:mm Z");
+					date = format.format(new Date(Long.parseLong(thisTag[1])));
 				}
 
-				builder.append(ItemEdit.PREFIX).append(value).append("\n");
+				if (date.length() > 0) {
+					value += "\n" + ItemEdit.ALT_COLOR + date;
+				}
+				if (playerName.length() > 0) {
+					value += ItemEdit.PREFIX + " | " + ItemEdit.ALT_COLOR + playerName;
+				}
+
 			}
+			builder.append(ItemEdit.PREFIX).append(value).append("\n");
 		}
 		return builder.toString();
 	}

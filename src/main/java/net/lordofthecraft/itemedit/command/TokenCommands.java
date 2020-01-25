@@ -67,7 +67,11 @@ public class TokenCommands extends BaseCommand {
 	@Cmd(value="Removes 1-15 tokens from a player.", permission="itemedit.mod")
 	public void remove(CommandSender sender, Player p,
 					 @Arg(value="Tokens")@Range(min=1, max=15)int amount) {
-		transSQL.addEntry(0, p, (transSQL.getTokens(p) - amount));
+		int newAmount = (transSQL.getTokens(p) - amount);
+		if (newAmount < 0) {
+			newAmount = 0;
+		}
+		transSQL.addEntry(0, p, newAmount);
 		msg(ItemEdit.PREFIX + "Successfully updated " + p.getDisplayName() + "'s token count.");
 	}
 

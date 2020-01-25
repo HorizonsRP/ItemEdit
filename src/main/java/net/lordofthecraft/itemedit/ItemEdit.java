@@ -21,6 +21,9 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 
 	public static final String PREFIX = ChatColor.AQUA + "";
 	public static final String ALT_COLOR = ChatColor.GOLD + "";
+	public static final String PERMISSION_START = "itemedit";
+	public static final String BONUS_SIGNATURE_PERM = "signature";
+
 	public static final boolean DEBUGGING = false;
 
 	private static int maxWidth;
@@ -35,6 +38,7 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 	public static int getRefreshTime() {
 		return refreshTime;
 	}
+
 	private static ItemEdit instance;
 	public static ItemEdit get() {
 		return instance;
@@ -93,7 +97,7 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 	private void registerParameters() {
 		Commands.defineArgumentType(SignType.class)
 				.defaultName("Type")
-				.completer(() -> Arrays.asList(SignType.getTypes()))
+				.completer((s,$) -> SignType.getAvailableTypes(s))
 				.mapperWithSender((sender, type) -> SignType.typeFromString(type))
 				.register();
 	}

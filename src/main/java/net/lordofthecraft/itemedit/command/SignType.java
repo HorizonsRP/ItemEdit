@@ -1,9 +1,11 @@
 package net.lordofthecraft.itemedit.command;
 
+import co.lotc.core.agnostic.Sender;
 import net.lordofthecraft.arche.ArcheCore;
 import net.lordofthecraft.arche.interfaces.Persona;
 import net.lordofthecraft.itemedit.ItemEdit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -11,23 +13,43 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum SignType {
-	ADMIN(ChatColor.DARK_RED, "Admin Approved", "❃", "itemedit.admin"),
-	DEV(ChatColor.GOLD, "Developer Approved", "❖", "itemedit.dev"),
-	MOD(ChatColor.BLUE, "Moderator Approved", "✲", "itemedit.mod"),
-	STORY(ChatColor.GREEN, "Story Team Approved", "✺", "itemedit.st"),
-	EVENT(ChatColor.GREEN, "Story Actor Approved", "✺", "itemedit.et"),
-	LORE(ChatColor.GREEN, "Story Writer Approved", "✺", "itemedit.lt"),
-	WORLD(ChatColor.DARK_AQUA, "World Team Approved", "❂", "itemedit.world"),
-	COMMUNITY(ChatColor.LIGHT_PURPLE, "Community Team Approved", "❣", "itemedit.comm"),
-	PLAYER(ChatColor.GRAY, "Player Approved", "○", "itemedit.use"),
-	ROLEPLAY(ChatColor.GRAY, "Player Approved", "◎", "itemedit.use");
 
+	// STAFF AND DEFAULT SIGNATURES
+	ADMIN("ADMIN", ChatColor.DARK_RED, "Admin Approved", "❃", ItemEdit.PERMISSION_START + ".admin"),
+	DEV("DEV", ChatColor.GOLD, "Developer Approved", "❖", ItemEdit.PERMISSION_START + ".dev"),
+	MOD("MOD", ChatColor.BLUE, "Moderator Approved", "✲", ItemEdit.PERMISSION_START + ".mod"),
+	STORY("STORY", ChatColor.GREEN, "Story Team Approved", "✺", ItemEdit.PERMISSION_START + ".st"),
+	EVENT("EVENT", ChatColor.GREEN, "Story Actor Approved", "✺", ItemEdit.PERMISSION_START + ".et"),
+	LORE("LORE", ChatColor.GREEN, "Story Writer Approved", "✺", ItemEdit.PERMISSION_START + ".lt"),
+	WORLD("WORLD", ChatColor.DARK_AQUA, "World Team Approved", "❂", ItemEdit.PERMISSION_START + ".world"),
+	COMMUNITY("COMMUNITY", ChatColor.LIGHT_PURPLE, "Community Team Approved", "❣", ItemEdit.PERMISSION_START + ".comm"),
+	PLAYER("PLAYER", ChatColor.GRAY, "Player Approved", "○", ItemEdit.PERMISSION_START + ".use"),
+	ROLEPLAY("ROLEPLAY", ChatColor.GRAY, "Player Approved", "◎", ItemEdit.PERMISSION_START + ".use"),
+
+	// VIP SIGNATURES TODO :: Add to the store.
+	FLEURDELIS("FLEUR-DE-LIS", ChatColor.GRAY, "Player Approved", "⚜", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".fleurdelis"),
+	SUN("SUN", ChatColor.GRAY, "Player Approved", "☀", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".sun"),
+	TWINKLE("TWINKLE", ChatColor.GRAY, "Player Approved", "✦", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".twinkle"),
+	MUSIC("MUSIC", ChatColor.GRAY, "Player Approved", "♫", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".music"),
+	FLOWER("FLOWER", ChatColor.GRAY, "Player Approved", "❀", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".flower"),
+	TRIDENT("TRIDENT", ChatColor.GRAY, "Player Approved", "♆", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".trident"),
+	SNOWFLAKE("SNOWFLAKE", ChatColor.GRAY, "Player Approved", "❄", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".snowflake"),
+	PLUS("PLUS", ChatColor.GRAY, "Player Approved", "✚", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".plus"),
+	SKULL("SKULL", ChatColor.GRAY, "Player Approved", "☠", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".skull"),
+	PEACE("PEACE", ChatColor.GRAY, "Player Approved", "☮", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".peace"),
+	STAR("STAR", ChatColor.GRAY, "Player Approved", "✪", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".star"),
+	CURRENCY("CURRENCY", ChatColor.GRAY, "Player Approved", "¤", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".currency"),
+	CROWNS("CROWNS", ChatColor.GRAY, "Player Approved", "♚", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".crowns"),
+	DIAMOND("DIAMOND", ChatColor.GRAY, "Player Approved", "◆", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".diamond");
+
+	public final String name;
 	public final ChatColor color;
 	public final String approved;
 	public final String affixes;
 	public final String permission;
 
-	SignType(ChatColor color, String approved, String affixes, String permission) {
+	SignType(String name, ChatColor color, String approved, String affixes, String permission) {
+		this.name = name;
 		this.color = color;
 		this.approved = approved;
 		this.affixes = ChatColor.RESET + "" + ChatColor.RED + affixes + ChatColor.RESET;
@@ -35,15 +57,17 @@ public enum SignType {
 	}
 	public static final SignType DEFAULT = PLAYER;
 
-	public static List<String> getSignature(Player p, SignType type, boolean showRealName) {
+	public static List<String> getSignature(Player p, SignType type, boolean roleplay, boolean showRealName) {
 		String name = p.getName();
-		if (type.equals(SignType.ROLEPLAY)) {
+		if (roleplay) {
+			//Grab Persona name.
 			if (ItemEdit.get().getServer().getPluginManager().isPluginEnabled("ArcheCore")) {
 				Persona persona = ArcheCore.getPersona(p);
-				name = persona.getChatName() + " (" + name + ")";
-			} else {
-				return getSignature(p, SignType.PLAYER, showRealName);
+				name = persona.getName();
 			}
+
+			// Still add this even if we fail to find any persona name.
+			name += " (" + p.getName() + ") ";
 		}
 
 		List<String> output = new ArrayList<>();
@@ -62,7 +86,8 @@ public enum SignType {
 			} else {
 				color = ChatColor.DARK_GRAY + "";
 			}
-			if (i == desc.size()-1 && type.equals(SignType.ROLEPLAY)) {
+
+			if (i == desc.size()-1 && roleplay) {
 				if (showRealName) {
 					color += ChatColor.ITALIC;
 				} else {
@@ -91,39 +116,24 @@ public enum SignType {
 		return output;
 	}
 
-	public static String[] getTypes() {
-		return new String[] {
-				"ADMIN",
-				"DEV",
-				"MOD",
-				"STORY",
-				"WORLD",
-				"COMMUNITY",
-				"PLAYER",
-				"ROLEPLAY"
-		};
-	}
-
 	public static SignType typeFromString(String string) {
-		if (string.equalsIgnoreCase("ADMIN")) {
-			return ADMIN;
-		} else if (string.equalsIgnoreCase("DEV")) {
-			return DEV;
-		} else if (string.equalsIgnoreCase("MOD")) {
-			return MOD;
-		} else if (string.equalsIgnoreCase("STORY")) {
-			return STORY;
-		} else if (string.equalsIgnoreCase("WORLD")) {
-			return WORLD;
-		} else if (string.equalsIgnoreCase("COMMUNITY")) {
-			return COMMUNITY;
-		} else if (string.equalsIgnoreCase("PLAYER")) {
-			return PLAYER;
-		} else if (string.equalsIgnoreCase("ROLEPLAY")) {
-			return ROLEPLAY;
+		for (SignType type : values()) {
+			if (type.name.equalsIgnoreCase(string)) {
+				return type;
+			}
 		}
 
 		return DEFAULT;
+	}
+
+	public static List<String> getAvailableTypes(Sender player) {
+		ArrayList<String> list = new ArrayList<>();
+		for (SignType type : values()) {
+			if (player.hasPermission(type.permission)) {
+				list.add(type.name);
+			}
+		}
+		return list;
 	}
 
 }
