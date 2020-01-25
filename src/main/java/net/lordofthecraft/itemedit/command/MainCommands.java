@@ -334,7 +334,7 @@ public class MainCommands extends BaseCommand {
 
 	// Finalization & Clearing //
 	@Cmd(value="Sign an item to lock in the information.", permission="itemedit.sign")
-	@Flag(name="mod", description="Prevents the username from being written.", permission="itemedit.mod")
+	@Flag(name="mod", description="Prevents the username from being written on player approved signs.", permission="itemedit.mod")
 	@Flag(name="rp", description="Allows signing with your RP name")
 	public void sign(CommandSender sender,
 					 @Default("ROLEPLAY") SignType type) {
@@ -349,11 +349,11 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
-					tokensUsed = 0;
-				} else if (tokensUsed == 0) {
+				if (tokensUsed == 0) {
 					msg(NO_TOKENS);
 					return;
+				} else if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
+					tokensUsed = 0;
 				}
 
 				ItemMeta meta = item.getItemMeta();
@@ -362,17 +362,20 @@ public class MainCommands extends BaseCommand {
 					if (lore == null) {
 						lore = new ArrayList<>();
 					}
-					boolean roleplayName = type.equals(SignType.ROLEPLAY);
-					if (!roleplayName && hasFlag("rp")) {
-						roleplayName = type.permission.startsWith("itemedit.signatures");
+
+					boolean roleplayName = (type.equals(SignType.ROLEPLAY) || hasFlag("rp"));
+
+					if (type.equals(SignType.PLAYER) || type.equals(SignType.ROLEPLAY) || type.permission.startsWith(ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM)) {
+						lore.addAll(SignType.getSignature(p, type, roleplayName, !hasFlag("mod")));
+					} else {
+						lore.addAll(SignType.getSignature(p, type, roleplayName, false));
 					}
 
-					lore.addAll(SignType.getSignature(p, type, roleplayName, !hasFlag("mod")));
 					meta.setLore(lore);
 					item.setItemMeta(meta);
 				}
 
-				ItemUtil.setCustomTag(item, SIGNED_TAG, p.getUniqueId().toString());
+				ItemUtil.setCustomTag(item, SIGNED_TAG, p.getUniqueId().toString() + ":" + System.currentTimeMillis());
 				finalizeEdit(p, item, tokensUsed);
 				return;
 			}
