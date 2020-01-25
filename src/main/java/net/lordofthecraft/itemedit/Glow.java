@@ -17,7 +17,7 @@ public class Glow extends Enchantment {
 
 	@Override
 	public String getName() {
-		return null;
+		return "Glow";
 	}
 
 	@Override
