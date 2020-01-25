@@ -402,19 +402,18 @@ public class MainCommands extends BaseCommand {
 
 	// Replaces the item in hand with the given edits after applying the appropriate tags and charging the player.
 	private static void finalizeEdit(Player p, ItemStack item, int tokensUsed) {
-			// Only receive this on clearing. Doesn't need an edit entry.
-		if (tokensUsed == 0) {
-			p.getInventory().setItemInMainHand(CustomTag.apply(EDITED_TAG, p.getUniqueId().toString(), item));
+		// If tokensUsed is 0 it's a clearing and doesn't need to be logged.
+		String preString = "";
+		if (CustomTag.hasCustomTag(item, EDITED_TAG)) {
+			preString = CustomTag.getTagValue(item, EDITED_TAG) + "/";
+		}
+		p.getInventory().setItemInMainHand(CustomTag.apply(EDITED_TAG, preString + p.getUniqueId().toString(), item));
 
-			// If the player used an edit token.
-		} else if (tokensUsed > 0) {
-			p.getInventory().setItemInMainHand(CustomTag.apply(EDITED_TAG, p.getUniqueId().toString(), item));
+		// If the player used an edit token, otherwise the player had to've used a VIP token.
+		if (tokensUsed > 0) {
 			int tokensLeft = (transSQL.getTokens(p)) - tokensUsed;
 			transSQL.addEntry(0L, p, tokensLeft);
-
-			// Otherwise the player had to've used a VIP token.
-		} else {
-			p.getInventory().setItemInMainHand(CustomTag.apply(EDITED_TAG, p.getUniqueId().toString(), item));
+		} else if (tokensUsed < 0) {
 			transSQL.addEntry(-1L, p, 0);
 		}
 	}

@@ -318,16 +318,16 @@ public class TransactionsSQL {
 	}
 
 	public int getVipTokensTotal(Player p) {
-		return getMaxPermission(p, "vip");
+		return getMaxPermission(p, "vip", 0);
 	}
 
 	public int getMaxLines(Player p) {
-		return getMaxPermission(p, "length");
+		return getMaxPermission(p, "length", ItemEdit.getMaxLines());
 	}
 
 	// Gets the max value for an itemedit.PERMISSION of the player
-	public int getMaxPermission(Player player, String permission) {
-		int output = 0;
+	public int getMaxPermission(Player player, String permission, int defaultAmount) {
+		int output = defaultAmount;
 		if (!player.hasPermission("itemedit.unlimited")) {
 			User user = LuckPerms.getApi().getUser(player.getUniqueId());
 			if (user != null) {
@@ -376,10 +376,8 @@ public class TransactionsSQL {
 			if (Obelisk.getModule("Moniker").isPresent()) {
 				try {
 					Optional<Object> profile = Obelisk.getModule("Moniker").get().getUser(player).getVar("profile");
-					if (profile.isPresent()) {
-						addEntry(0, player, Integer.parseInt(profile.get().toString()) + getTokens(player)); // toString() gets a string of current tokens. A bit jank, but Obelisk be like that.
-						profile.get().equals(0); // Sets current Moniker tokens to 0
-					}
+					// hashCode() gets a string of current tokens. A bit jank, but Obelisk be like that.
+					profile.ifPresent(o -> addEntry(0, player, o.hashCode() + getTokens(player)));
 				} catch (NullPointerException ignored) {
 
 				}

@@ -60,7 +60,7 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		if (this.getConfig().getInt("MAX-LINES") > 2) {
 			maxLines = this.getConfig().getInt("MAX-LINES");
 		} else {
-			maxLines = 10;
+			maxLines = 15;
 		}
 
 		// Grab our refresh time for VIP tokens.

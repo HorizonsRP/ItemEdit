@@ -15,6 +15,8 @@ public enum SignType {
 	DEV(ChatColor.GOLD, "Developer Approved", "❖", "itemedit.dev"),
 	MOD(ChatColor.BLUE, "Moderator Approved", "✲", "itemedit.mod"),
 	STORY(ChatColor.GREEN, "Story Team Approved", "✺", "itemedit.st"),
+	EVENT(ChatColor.GREEN, "Story Actor Approved", "✺", "itemedit.et"),
+	LORE(ChatColor.GREEN, "Story Writer Approved", "✺", "itemedit.lt"),
 	WORLD(ChatColor.DARK_AQUA, "World Team Approved", "❂", "itemedit.world"),
 	COMMUNITY(ChatColor.LIGHT_PURPLE, "Community Team Approved", "❣", "itemedit.comm"),
 	PLAYER(ChatColor.GRAY, "Player Approved", "○", "itemedit.use"),
