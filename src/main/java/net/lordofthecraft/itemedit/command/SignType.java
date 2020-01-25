@@ -40,7 +40,9 @@ public enum SignType {
 	STAR("STAR", ChatColor.GRAY, "Player Approved", "✪", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".star"),
 	CURRENCY("CURRENCY", ChatColor.GRAY, "Player Approved", "¤", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".currency"),
 	CROWNS("CROWNS", ChatColor.GRAY, "Player Approved", "♚", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".crowns"),
-	DIAMOND("DIAMOND", ChatColor.GRAY, "Player Approved", "◆", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".diamond");
+	DIAMOND("DIAMOND", ChatColor.GRAY, "Player Approved", "◆", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".diamond"),
+	ORNATE("ORNATE", ChatColor.GRAY, "Player Approved", "❁", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".ornate"),
+	SNOWMAN("SNOWMAN", ChatColor.GRAY, "Player Approved", "☃", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".snowman");
 
 	public final String name;
 	public final ChatColor color;

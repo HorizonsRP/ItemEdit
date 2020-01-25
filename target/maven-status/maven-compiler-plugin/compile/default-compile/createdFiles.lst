@@ -1,0 +1,10 @@
+net\lordofthecraft\itemedit\command\MainCommands.class
+net\lordofthecraft\itemedit\command\SignType.class
+net\lordofthecraft\itemedit\command\TokenCommands.class
+net\lordofthecraft\itemedit\Glow.class
+net\lordofthecraft\itemedit\command\MainCommands$ClearCommands.class
+net\lordofthecraft\itemedit\command\StaffCommands.class
+net\lordofthecraft\itemedit\ItemEdit.class
+net\lordofthecraft\itemedit\sqlite\TransactionsSQL.class
+net\lordofthecraft\itemedit\command\BaseCommand.class
+net\lordofthecraft\itemedit\sqlite\Errors.class
