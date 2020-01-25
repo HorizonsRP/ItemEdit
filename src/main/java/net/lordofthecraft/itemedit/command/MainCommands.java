@@ -6,7 +6,6 @@ import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
 import co.lotc.core.command.annotate.Flag;
 import io.github.archemedes.customitem.CustomItem;
-import io.github.archemedes.customitem.CustomTag;
 import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
