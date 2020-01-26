@@ -118,7 +118,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Change the color of the name of an item.", permission="itemedit.color")
+	@Cmd(value="Change the color of the name of an item's name.", permission="itemedit.color")
 	@Flag(name="bold", description="Allows bypassing the colour type.", permission="itemedit.mod")
 	@Flag(name="under", description="Allows bypassing the colour type.", permission="itemedit.mod")
 	@Flag(name="strike", description="Allows bypassing the colour type.", permission="itemedit.mod")
@@ -180,7 +180,7 @@ public class MainCommands extends BaseCommand {
 
 	@Cmd(value="Add a custom description for an item.", permission="itemedit.desc")
 	public void desc(CommandSender sender,
-					 @Arg(value="Description", description="The blurb of text you wish to add to the item's lore.") String[] desc) {
+					 @Arg(value="Description", description="The blurb of text you wish to add to the item's lore. Use multiple times to string together more lore.") String[] desc) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			ItemStack item = transSQL.getItemInHand(p);
@@ -299,7 +299,7 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
-	@Cmd(value="Sign an item to lock in the information.", permission="itemedit.glow")
+	@Cmd(value="Add a glowing effect to an item as if it were enchanted.", permission="itemedit.glow")
 	@Flag(name="mod", description="Adds glow to the item regardless of signature.", permission="itemedit.mod")
 	public void glow(CommandSender sender) {
 		if (sender instanceof Player) {
@@ -333,7 +333,7 @@ public class MainCommands extends BaseCommand {
 	}
 
 	// Finalization & Clearing //
-	@Cmd(value="Sign an item to lock in the information.", permission="itemedit.sign")
+	@Cmd(value="Sign an item to lock in the information. Can be cleared later if needed.", permission="itemedit.sign")
 	@Flag(name="mod", description="Prevents the username from being written on player approved signs.", permission="itemedit.mod")
 	@Flag(name="rp", description="Allows signing with your RP name")
 	public void sign(CommandSender sender,
@@ -388,7 +388,7 @@ public class MainCommands extends BaseCommand {
 		return CLEAR_COMMANDS;
 	}
 
-	@Cmd(value="Moderator access to edit items.", permission="itemedit.mod")
+	@Cmd(value="Moderator access to edited items.", permission="itemedit.mod")
 	public BaseCommand staff() {
 		return staffCommands;
 	}

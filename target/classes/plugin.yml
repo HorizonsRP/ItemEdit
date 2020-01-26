@@ -10,77 +10,78 @@ commands:
     description: "Edit your items with cool names and descriptions!"
 permissions:
 
-  #Base Permission
-  itemedit:
+  #Command Access
+  itemedit.check:
+    default: true
+    description: Check to see one's edit tokens.
+  itemedit.prices:
+    default: op
+    description: Check prices for edit tokens if enabled.
+  itemedit.name:
+    default: true
+    description: Edit names of items.
+  itemedit.color:
+    default: true
+    description: Change the color of an item's name.
+  itemedit.desc:
+    default: true
+    description: Edit descriptions of items.
+  itemedit.glow:
+    default: op
+    description: Add a glow to items.
+  itemedit.sign:
+    default: true
+    description: Sign items so they can no longer be edited.
+  itemedit.clear:
+    default: true
+    description: Clears everything from an item so you can start over.
 
-    #Command Access
-    check:
-      default: true
-      description: Check to see one's edit tokens.
-    prices:
-      default: op
-      description: Check prices for edit tokens if enabled.
-    name:
-      default: true
-      description: Edit names of items.
-    color:
-      default: true
-      description: Change the color of an item's name.
-    desc:
-      default: true
-      description: Edit descriptions of items.
-    glow:
-      default: op
-      description: Add a glow to items.
-    sign:
-      default: true
-      description: Sign items so they can no longer be edited.
-    clear:
-      default: true
-      description: Clears everything from an item so you can start over.
-
-    #Staff and base permissions.
-    admin:
+  #Staff and base permissions.
+  itemedit.admin:
       default: op
       description: Allows access to config settings and provides tha dmin signature.
       children:
         itemedit.mod: true
-    dev:
+  itemedit.dev:
       default: op
       description: Dev Signature
-    mod:
-      default: op
-      description: Allows staff to override signatures and provides the mod signature.
-      children:
-        itemedit.prices: true
-        itemedit.glow: true
-    st:
-      default: op
-      description: Story Signature
-    world:
-      default: op
-      description: World Signature
-    comm:
-      default: op
-      description: Community Signature
-    use:
-      default: true
-      description: Base Roleplay and Player signature
-      children:
-        itemedit.name: true
-        itemedit.color: true
-        itemedit.desc: true
-        itemedit.sign: true
-        itemedit.clear: true
-        itemedit.check: true
+  itemedit.mod:
+    default: op
+    description: Allows staff to override signatures and provides the mod signature.
+    children:
+      itemedit.prices: true
+      itemedit.glow: true
+      itemedit.use: true
+  itemedit.st:
+    default: op
+    description: Story Signature
+  itemedit.world:
+    default: op
+    description: World Signature
+  itemedit.comm:
+    default: op
+    description: Community Signature
+  itemedit.use:
+    default: true
+    description: Base Roleplay and Player signature
+    children:
+      itemedit.name: true
+      itemedit.color: true
+      itemedit.desc: true
+      itemedit.sign: true
+      itemedit.clear: true
+      itemedit.check: true
 
-    #Custom values per person/group.
-    length:
-      default: false
-      description: The maximum amount of lines worth of description allowed. Build as itemedit.length.#
-    vip:
-      default: false
-      description: The amount of VIP tokens one has access to. Build as itemedit.vip.#
-    unlimited:
-      default: op
-      description: Gives maximum VIP edits per week and unlimited description length.
+  #Custom values per person/group.
+  itemedit.length:
+    default: false
+    description: The maximum amount of lines worth of description allowed. Build as itemedit.length.#
+  itemedit.vip:
+    default: false
+    description: The amount of VIP tokens one has access to. Build as itemedit.vip.#
+  itemedit.unlimited:
+    default: op
+    description: Gives maximum VIP edits per week and unlimited description length.
+  itemedit.signature:
+    default: false
+    description: Main node for VIP signature types. fleurdelis, sun, twinkle, music, flower, trident, snowflake, plus, skull, peace, star, currency, crowns, diamond, ornate, snowman.
