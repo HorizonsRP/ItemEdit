@@ -410,7 +410,8 @@ public class MainCommands extends BaseCommand {
 	// Checks if the item was signed by the give player
 	private static boolean notSignedBy(ItemStack item, Player p) {
 		if (ItemUtil.hasCustomTag(item, SIGNED_TAG)) {
-			return !ItemUtil.getCustomTag(item, SIGNED_TAG).equalsIgnoreCase(p.getUniqueId().toString());
+			String uuid = ItemUtil.getCustomTag(item, SIGNED_TAG).replace(":", " ").split(":")[0];
+			return !uuid.equalsIgnoreCase(p.getUniqueId().toString());
 		}
 		return true;
 	}
