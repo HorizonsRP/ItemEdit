@@ -179,8 +179,9 @@ public class MainCommands extends BaseCommand {
 	}
 
 	@Cmd(value="Add a custom description for an item.", permission="itemedit.desc")
+	@Flag(name="newline", description="Adds a new line. If a description was entered, adds the new line after.")
 	public void desc(CommandSender sender,
-					 @Arg(value="Description", description="The blurb of text you wish to add to the item's lore. Use multiple times to string together more lore.") String[] desc) {
+					 @Arg(value="Description", description="The blurb of text you wish to add to the item's lore. Use multiple times to string together more lore.")@Default("") String[] desc) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			ItemStack item = transSQL.getItemInHand(p);
@@ -205,7 +206,7 @@ public class MainCommands extends BaseCommand {
 					return;
 				}
 
-				if (!applyDesc(item, desc, maxLines)) {
+				if (!applyDesc(item, desc, maxLines, hasFlag("newline"))) {
 					msg(MAX_LENGTH);
 					return;
 				} else {
@@ -218,7 +219,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	public static boolean applyDesc(ItemStack item, String[] desc, int maxLines) {
+	public static boolean applyDesc(ItemStack item, String[] desc, int maxLines, boolean linebreak) {
 		ItemMeta meta = item.getItemMeta();
 		List<String> newDesc = null;
 		if (meta != null) {
@@ -249,6 +250,10 @@ public class MainCommands extends BaseCommand {
 				thisString.append(result[0]);
 			}
 			newDesc.add(DESC_PREFIX + thisString.toString());
+
+			if (linebreak) {
+				newDesc.add("");
+			}
 
 			if (newDesc.size() > maxLines) {
 				return false;
@@ -512,9 +517,7 @@ public class MainCommands extends BaseCommand {
 					meta.setDisplayName(null);
 				}
 
-				if (ItemUtil.hasCustomTag(meta, SIGNED_TAG)) {
-					ItemUtil.removeCustomTag(meta, SIGNED_TAG);
-				}
+				ItemUtil.removeCustomTag(meta, SIGNED_TAG);
 				item.setItemMeta(meta);
 			}
 		}
