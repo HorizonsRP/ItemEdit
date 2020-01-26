@@ -354,12 +354,13 @@ public class MainCommands extends BaseCommand {
 					return;
 				}
 
+				// Check if it has a tag first and foremost, otherwise check how many tokens it would cost.
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (tokensUsed == 0) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
+					tokensUsed = 0;
+				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
 					return;
-				} else if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
-					tokensUsed = 0;
 				}
 
 				ItemMeta meta = item.getItemMeta();
