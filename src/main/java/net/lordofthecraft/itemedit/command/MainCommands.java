@@ -21,6 +21,7 @@ import org.bukkit.inventory.meta.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MainCommands extends BaseCommand {
 
@@ -410,8 +411,8 @@ public class MainCommands extends BaseCommand {
 	// Checks if the item was signed by the give player
 	private static boolean notSignedBy(ItemStack item, Player p) {
 		if (ItemUtil.hasCustomTag(item, SIGNED_TAG)) {
-			String uuid = ItemUtil.getCustomTag(item, SIGNED_TAG).replace(":", " ").split(":")[0];
-			return !uuid.equalsIgnoreCase(p.getUniqueId().toString());
+			String uuid = ItemUtil.getCustomTag(item, SIGNED_TAG).replace(":", " ").split(" ")[0];
+			return !UUID.fromString(uuid).equals(p.getUniqueId());
 		}
 		return true;
 	}
