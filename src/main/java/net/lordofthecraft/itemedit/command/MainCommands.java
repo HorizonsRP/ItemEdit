@@ -368,7 +368,7 @@ public class MainCommands extends BaseCommand {
 					if (type.equals(SignType.PLAYER) || type.equals(SignType.ROLEPLAY) || type.permission.startsWith(ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM)) {
 						lore.addAll(SignType.getSignature(p, type, roleplayName, !hasFlag("mod")));
 					} else {
-						lore.addAll(SignType.getSignature(p, type, roleplayName, false));
+						lore.addAll(SignType.getSignature(p, type, roleplayName, true));
 					}
 
 					meta.setLore(lore);
