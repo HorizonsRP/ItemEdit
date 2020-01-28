@@ -102,37 +102,37 @@ public class TransactionsSQL {
 
 	// Save info
 	public void addEntry(long time, Player player, int tokens) {
-		if (time != 0 || tokens > 0) {
-			Connection conn = null;
-			PreparedStatement ps = null;
-			String stmt = "INSERT";
-			if (time == 0) {
-				stmt += " OR REPLACE";
-			}
-			stmt += " INTO " + SQLiteTableName + " (TIME,PLAYER,TOKENS) VALUES(?,?,?)";
+		Connection conn = null;
+		PreparedStatement ps = null;
+		String stmt = "INSERT";
+		if (time == 0) {
+			stmt += " OR REPLACE";
+		}
+		stmt += " INTO " + SQLiteTableName + " (TIME,PLAYER,TOKENS) VALUES(?,?,?)";
 
+		try {
+			conn = getSQLConnection();
+			ps = conn.prepareStatement(stmt);
+			if (time == -1) {
+				ps.setLong(1, System.currentTimeMillis());
+			} else {
+				ps.setLong(1, time);
+			}
+			ps.setString(2, player.getUniqueId().toString());
+			ps.setInt(3, tokens);
+			ps.executeUpdate();
+		} catch (SQLException ex) {
+			plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+		} finally {
 			try {
-				conn = getSQLConnection();
-				ps = conn.prepareStatement(stmt);
-				if (time == -1) {
-					ps.setLong(1, System.currentTimeMillis());
-				} else {
-					ps.setLong(1, time);
-				}
-				ps.setString(2, player.getUniqueId().toString());
-				ps.setInt(3, tokens);
-				ps.executeUpdate();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException ex) {
-				plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
-			} finally {
-				try {
-					if (ps != null)
-						ps.close();
-				} catch (SQLException ex) {
-					plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
-				}
+				plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
 			}
 		}
+
+		deleteOutdatedTokenEntries();
 	}
 
 	// Retrieve info
