@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -132,6 +133,7 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		transaction.load();
 	}
 
+	// Config Editors
 	public void setRefreshTime(int i) {
 		refreshTime = i;
 		getConfig().set("REFRESH-TIME-IN-DAYS", i);
@@ -144,7 +146,16 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		saveConfig();
 	}
 
-	// TODO :: Telanir Legacy Garbage
+	// Changes the tokens of a player by a given amount (positive or negative).
+	public static void changeTokens(int amount, Player p) {
+		int newAmount = (transaction.getTokens(p) + amount);
+		if (newAmount < 0) {
+			newAmount = 0;
+		}
+		transaction.addEntry(0, p, newAmount);
+	}
+
+	// TODO :: Moniker Legacy Garbage
 	// Tries to run through all available profiles in Moniker to grab and store their tokens.
 	private void loadLegacyTokens() {
 		for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {

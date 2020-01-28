@@ -74,7 +74,7 @@ public class TokenCommands extends BaseCommand {
 					 @Arg(value="Tokens")@Range(min=1, max=15)int amount) {
 		Player p = getPlayerByName(playerName);
 		if (p != null) {
-			transSQL.addEntry(0, p, (transSQL.getTokens(p) + amount));
+			ItemEdit.changeTokens(amount, p);
 			msg(updateMessage(p));
 		} else {
 			msg(NO_PLAYER);
@@ -87,11 +87,7 @@ public class TokenCommands extends BaseCommand {
 					   @Arg(value="Tokens")@Range(min=1, max=15)int amount) {
 		Player p = getPlayerByName(playerName);
 		if (p != null) {
-			int newAmount = (transSQL.getTokens(p) - amount);
-			if (newAmount < 0) {
-				newAmount = 0;
-			}
-			transSQL.addEntry(0, p, newAmount);
+			ItemEdit.changeTokens(-amount, p);
 			msg(updateMessage(p));
 		} else {
 			msg(NO_PLAYER);
