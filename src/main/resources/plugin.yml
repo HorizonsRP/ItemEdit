@@ -2,7 +2,7 @@ name: ItemEdit
 version: ${project.version}
 main: net.lordofthecraft.itemedit.ItemEdit
 api-version: "1.13"
-depend: [Tythan]
+depend: [Tythan, CustomItem]
 softdepend: [ArcheCore, Foundation, Obelisk]
 commands:
   edit:

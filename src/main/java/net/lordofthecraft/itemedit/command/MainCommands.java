@@ -192,18 +192,18 @@ public class MainCommands extends BaseCommand {
 					return;
 				}
 
+				int tokensUsed = transSQL.safeToChargePlayer(p);
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG) || item.getType() != Material.PAPER) {
+					tokensUsed = 0;
+				} else if (tokensUsed == 0) {
+					msg(NO_TOKENS);
+					return;
+				}
+
 				int maxLines = transSQL.getMaxLines(p);
 				if (item.getItemMeta() != null && item.getItemMeta().getLore() != null &&
 					item.getItemMeta().getLore().size() > maxLines) {
 					msg(MAX_LENGTH);
-					return;
-				}
-
-				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
-					tokensUsed = 0;
-				} else if (tokensUsed == 0) {
-					msg(NO_TOKENS);
 					return;
 				}
 

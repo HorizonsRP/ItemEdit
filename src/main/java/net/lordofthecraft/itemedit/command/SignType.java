@@ -26,7 +26,7 @@ public enum SignType {
 	PLAYER("PLAYER", ChatColor.GRAY, "Player Approved", "○", ItemEdit.PERMISSION_START + ".use"),
 	ROLEPLAY("ROLEPLAY", ChatColor.GRAY, "Player Approved", "◎", ItemEdit.PERMISSION_START + ".use"),
 
-	// VIP SIGNATURES TODO :: Add to the store.
+	// VIP SIGNATURES
 	FLEURDELIS("FLEUR-DE-LIS", ChatColor.GRAY, "Player Approved", "⚜", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".fleurdelis"),
 	SUN("SUN", ChatColor.GRAY, "Player Approved", "☀", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".sun"),
 	TWINKLE("TWINKLE", ChatColor.GRAY, "Player Approved", "✦", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".twinkle"),

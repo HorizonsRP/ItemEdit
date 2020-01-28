@@ -144,7 +144,6 @@ public class TransactionsSQL {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		List<String> output = new ArrayList<>();
 
 		try {
 			conn = getSQLConnection();
@@ -154,11 +153,14 @@ public class TransactionsSQL {
 			ps = conn.prepareStatement(stmt);
 			rs = ps.executeQuery();
 
+			int result = 0;
 			while (rs.next()) {
-				if (rs.getString("PLAYER").equalsIgnoreCase(player.getUniqueId().toString())) {
-					return rs.getInt("TOKENS");
+				if (rs.getString("PLAYER").equalsIgnoreCase(player.getUniqueId().toString()) &&
+					rs.getInt("TOKENS") > result) {
+					result = rs.getInt("TOKENS");
 				}
 			}
+			return result;
 		} catch (SQLException ex) {
 			plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
 		} finally {
@@ -266,7 +268,7 @@ public class TransactionsSQL {
 		try {
 			conn = getSQLConnection();
 			String stmt;
-			stmt = "DELETE FROM " + SQLiteTableName + " WHERE TIME<" + limitToDelete + " AND TIME>0;";
+			stmt = "DELETE FROM " + SQLiteTableName + " WHERE TIME>0 AND TIME<" + limitToDelete + ";";
 
 			ps = conn.prepareStatement(stmt);
 			ps.executeUpdate();
