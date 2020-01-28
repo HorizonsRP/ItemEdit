@@ -3,8 +3,6 @@ package net.lordofthecraft.itemedit.sqlite;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -104,9 +102,7 @@ public class TransactionsSQL {
 
 	// Save info
 	public void addEntry(long time, Player player, int tokens) {
-		if (time == 0 && tokens <= 0) {
-			deleteTokensEntryFromPlayer(player);
-		} else {
+		if (time != 0 || tokens > 0) {
 			Connection conn = null;
 			PreparedStatement ps = null;
 			String stmt = "INSERT";
@@ -145,6 +141,8 @@ public class TransactionsSQL {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
+		deleteOutdatedTokenEntries();
+
 		try {
 			conn = getSQLConnection();
 			String stmt;
@@ -155,8 +153,7 @@ public class TransactionsSQL {
 
 			int result = 0;
 			while (rs.next()) {
-				if (rs.getString("PLAYER").equalsIgnoreCase(player.getUniqueId().toString()) &&
-					rs.getInt("TOKENS") > result) {
+				if (rs.getInt("TOKENS") > result) {
 					result = rs.getInt("TOKENS");
 				}
 			}
@@ -237,14 +234,14 @@ public class TransactionsSQL {
 	}
 
 	// Remove info
-	public void deleteTokensEntryFromPlayer(Player player) {
+	public void deleteOutdatedTokenEntries() {
 		Connection conn = null;
 		PreparedStatement ps = null;
 
 		try {
 			conn = getSQLConnection();
 			String stmt;
-			stmt = "DELETE FROM " + SQLiteTableName + " WHERE TIME=0 AND PLAYER='" + player.getUniqueId().toString() + "';";
+			stmt = "DELETE FROM " + SQLiteTableName + " WHERE TIME=0 AND TOKENS=0;";
 			ps = conn.prepareStatement(stmt);
 			ps.executeUpdate();
 		} catch (SQLException ex) {
