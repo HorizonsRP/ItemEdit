@@ -322,7 +322,7 @@ public class TransactionsSQL {
 		Player p = Bukkit.getPlayer(playerName);
 		if (p == null) {
 			try {
-				p = Bukkit.getPlayer(MojangCommunicator.requestPlayerUUID(playerName));
+				p = Bukkit.getOfflinePlayer(MojangCommunicator.requestPlayerUUID(playerName)).getPlayer();
 			} catch (IOException e) {
 				if (ItemEdit.DEBUGGING) {
 					e.printStackTrace();
