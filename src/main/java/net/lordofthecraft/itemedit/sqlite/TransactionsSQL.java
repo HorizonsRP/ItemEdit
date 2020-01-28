@@ -103,8 +103,14 @@ public class TransactionsSQL {
 		}
 	}
 
-	// Save info
+	// Inserts or Replaces depending on what type of entry we're adding.
+	// Time of 0 means it's storing the amount of edit tokens a player has.
+	// Time of -1 defaults to current system time.
+	// Any non-zero time is treated as a VIP edit entry.
 	public void addEntry(long time, Player player, int tokens) {
+		addEntry(time, player.getUniqueId(), tokens);
+	}
+	public void addEntry(long time, UUID player, int tokens) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		String stmt = "INSERT";
@@ -121,7 +127,7 @@ public class TransactionsSQL {
 			} else {
 				ps.setLong(1, time);
 			}
-			ps.setString(2, player.getUniqueId().toString());
+			ps.setString(2, player.toString());
 			ps.setInt(3, tokens);
 			ps.executeUpdate();
 		} catch (SQLException ex) {
@@ -138,8 +144,13 @@ public class TransactionsSQL {
 		deleteOutdatedTokenEntries();
 	}
 
-	// Retrieve info
+	//// FETCHING ////
+
+	// Retrieves the amount of tokens a player has, as per our database.
 	public int getTokens(Player player) {
+		return getTokens(player.getUniqueId());
+	}
+	public int getTokens(UUID uuid) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -149,7 +160,7 @@ public class TransactionsSQL {
 		try {
 			conn = getSQLConnection();
 			String stmt;
-			stmt = "SELECT * FROM " + SQLiteTableName + " WHERE TIME=0 AND PLAYER='" + player.getUniqueId().toString() + "';";
+			stmt = "SELECT * FROM " + SQLiteTableName + " WHERE TIME=0 AND PLAYER='" + uuid.toString() + "';";
 
 			ps = conn.prepareStatement(stmt);
 			rs = ps.executeQuery();
@@ -174,16 +185,11 @@ public class TransactionsSQL {
 		return 0;
 	}
 
-	public String getVIPUsedStatement(Player player) {
-		deleteOldVIPEntries();
-
-		String stmt;
-		stmt = "SELECT * FROM " + SQLiteTableName + " WHERE TIME>0 AND PLAYER='" + player.getUniqueId().toString() + "';";
-
-		return stmt;
-	}
-
+	// Fetches how many VIP edits are stored in our database for a given player.
 	public int getVIPUsedAmount(Player player) {
+		return getVIPUsedAmount(player.getUniqueId());
+	}
+	public int getVIPUsedAmount(UUID player) {
 		Connection conn = getSQLConnection();
 		PreparedStatement ps = null;
 		int output = 0;
@@ -208,7 +214,11 @@ public class TransactionsSQL {
 		return output;
 	}
 
+	// Fetches the days until the next rename token will refresh for the given player.
 	public int getDaysUntilRename(Player player) {
+		return getDaysUntilRename(player.getUniqueId());
+	}
+	public int getDaysUntilRename(UUID player) {
 		Connection conn = getSQLConnection();
 		PreparedStatement ps = null;
 		long output = 0;
@@ -236,7 +246,19 @@ public class TransactionsSQL {
 		return (int) (ItemEdit.getRefreshTime() - (output / DAY_IN_MS));
 	}
 
-	// Remove info
+	// Builds a statement to get all VIP usages for a given UUID.
+	private String getVIPUsedStatement(UUID player) {
+		deleteOldVIPEntries();
+
+		String stmt;
+		stmt = "SELECT * FROM " + SQLiteTableName + " WHERE TIME>0 AND PLAYER='" + player.toString() + "';";
+
+		return stmt;
+	}
+
+	//// REMOVAL ////
+
+	// Removes all nonsensical entries (No need to store that someone has 0 tokens).
 	public void deleteOutdatedTokenEntries() {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -259,6 +281,33 @@ public class TransactionsSQL {
 		}
 	}
 
+	// Removes all stored data on a given player.
+	public void deleteAllFromPlayer(Player player) {
+		deleteAllFromPlayer(player.getUniqueId());
+	}
+	public void deleteAllFromPlayer(UUID player) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		try {
+			conn = getSQLConnection();
+			String stmt;
+			stmt = "DELETE FROM " + SQLiteTableName + " WHERE PLAYER='" + player.toString() + "';";
+			ps = conn.prepareStatement(stmt);
+			ps.executeUpdate();
+		} catch (SQLException ex) {
+			plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (SQLException ex) {
+				plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+			}
+		}
+	}
+
+	// Removes all VIP entries that have elapsed the auto refresh time.
 	public void deleteOldVIPEntries() {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -285,29 +334,9 @@ public class TransactionsSQL {
 		}
 	}
 
-	public void deleteAllFromPlayer(Player player) {
-		Connection conn = null;
-		PreparedStatement ps = null;
+	//// UTILITY ////
 
-		try {
-			conn = getSQLConnection();
-			String stmt;
-			stmt = "DELETE FROM " + SQLiteTableName + " WHERE PLAYER='" + player.getUniqueId().toString() + "';";
-			ps = conn.prepareStatement(stmt);
-			ps.executeUpdate();
-		} catch (SQLException ex) {
-			plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
-		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (SQLException ex) {
-				plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
-			}
-		}
-	}
-
-	// Utility
+	// Close two statements.
 	private static void close(PreparedStatement ps,ResultSet rs){
 		try {
 			if (ps != null)
@@ -319,47 +348,61 @@ public class TransactionsSQL {
 		}
 	}
 
+	// Returns a player by their username if possible.
 	public static Player getPlayerByName(String playerName) {
 		Player p = Bukkit.getPlayer(playerName);
 		if (p == null) {
-			try {
-				UUID uuid = MojangCommunicator.requestPlayerUUID(playerName);
-				if (uuid != null) {
-					p = Bukkit.getPlayer(uuid);
-					if (p == null) {
-						p = Bukkit.getOfflinePlayer(uuid).getPlayer();
-					}
-				}
-			} catch (IOException e) {
-				if (ItemEdit.DEBUGGING) {
-					e.printStackTrace();
+			UUID uuid = getUUIDByName(playerName);
+			if (uuid != null) {
+				p = Bukkit.getPlayer(uuid);
+				if (p == null) {
+					p = Bukkit.getOfflinePlayer(uuid).getPlayer();
 				}
 			}
 		}
 		return p;
 	}
 
+	// Returns a player UUID by their username if possible.
+	public static UUID getUUIDByName(String playerName) {
+		UUID p = null;
+		try {
+			p = MojangCommunicator.requestPlayerUUID(playerName);
+		} catch (IOException e) {
+			if (ItemEdit.DEBUGGING) {
+				e.printStackTrace();
+			}
+		}
+		return p;
+	}
+
+	// Returns the highest VIP tokens permission a player has.
 	public int getVipTokensTotal(Player p) {
+		return getVipTokensTotal(p.getUniqueId());
+	}
+	public int getVipTokensTotal(UUID p) {
 		return getMaxPermission(p, "vip", 0);
 	}
 
+	// Returns the highest Edit Lines permission a player has.
 	public int getMaxLines(Player p) {
+		return getMaxLines(p.getUniqueId());
+	}
+	public int getMaxLines(UUID p) {
 		return getMaxPermission(p, "length", ItemEdit.getMaxLines());
 	}
 
-	// Gets the max value for an itemedit.PERMISSION of the player
-	public int getMaxPermission(Player player, String permission, int defaultAmount) {
+	// Gets the max permission value of a player.
+	public int getMaxPermission(UUID player, String permission, int defaultAmount) {
 		int output = defaultAmount;
-		if (!player.hasPermission("itemedit.unlimited")) {
-			User user = LuckPerms.getApi().getUser(player.getUniqueId());
-			if (user != null) {
-				String thisPermission = "itemedit." + permission;
-				for (Node node : user.getAllNodes()) {
-					if (node.getValue() && node.getPermission().startsWith(thisPermission)) {
-						String[] split = node.getPermission().replace('.', ' ').split(" ");
-						if (split.length >= 3 && Integer.parseInt(split[2]) > output) {
-							output = Integer.parseInt(split[2]);
-						}
+		User user = LuckPerms.getApi().getUser(player);
+		if (user != null && user.hasPermission(LuckPerms.getApi().buildNode(ItemEdit.PERMISSION_START + ".unlimited").build()).asBoolean()) {
+			String thisPermission = ItemEdit.PERMISSION_START + "." + permission;
+			for (Node node : user.getAllNodes()) {
+				if (node.getValue() && node.getPermission().startsWith(thisPermission)) {
+					String[] split = node.getPermission().replace('.', ' ').split(" ");
+					if (split.length >= 3 && Integer.parseInt(split[2]) > output) {
+						output = Integer.parseInt(split[2]);
 					}
 				}
 			}
@@ -371,12 +414,14 @@ public class TransactionsSQL {
 
 	// Returns what type of charge we can apply to this player (doesn't charge yet).
 	public int safeToChargePlayer(Player p) {
-		grabMonikerTokens(p);
+		return safeToChargePlayer(p.getUniqueId());
+	}
+	public int safeToChargePlayer(UUID p) {
 		// Has VIP tokens still.
 		if (getVIPUsedAmount(p) < getVipTokensTotal(p)) {
 			return -1;
 
-			// Has edit tokens.
+		// Has edit tokens.
 		} else if (getTokens(p) > 0) {
 			return 1;
 		}
@@ -384,37 +429,11 @@ public class TransactionsSQL {
 		return 0;
 	}
 
-	// Grabs main hand first, if not exists, grabs off-hand. Result will place into main hand regardless.
+	// Grabs the item in main hand for the player.
 	public ItemStack getItemInHand(Player player) {
 		if (player.getInventory().getItemInMainHand().getType() != Material.AIR) {
 			return player.getInventory().getItemInMainHand();
 		}
 		return null;
-	}
-
-	// Legacy TODO :: DELETE THIS GARBAGE AFTER MONIKER TRANSFER COMPLETE
-	public void grabMonikerTokens(Player player) {
-		if (ItemEdit.get().getServer().getPluginManager().isPluginEnabled("Foundation") || ItemEdit.get().getServer().getPluginManager().isPluginEnabled("Obelisk")) {
-			if (Obelisk.getModule("Moniker").isPresent()) {
-				try {
-					Optional<Object> profile = Obelisk.getModule("Moniker").get().getUser(player).getVar("profile");
-					// hashCode() gets a string of current tokens. A bit jank, but Obelisk be like that.
-					profile.ifPresent(o -> addEntry(0, player, o.hashCode() + getTokens(player)));
-				} catch (NullPointerException ignored) {
-
-				}
-			}
-		}
-	}
-
-	public boolean isItemMonikerSigned(ItemStack stack) {
-		try {
-			for (String line : Objects.requireNonNull(Objects.requireNonNull(stack.getItemMeta()).getLore()))
-				if (line.contains("Approved") && line.contains(Character.toString((char) 0x2605)))
-					return true;
-		} catch (Exception ignored) {
-
-		}
-		return false;
 	}
 }

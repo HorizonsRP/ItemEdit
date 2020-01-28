@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class TokenCommands extends BaseCommand {
 
@@ -24,7 +25,7 @@ public class TokenCommands extends BaseCommand {
 	public void invoke(CommandSender sender) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			msg(getTokenData(p, null));
+			msg(getTokenData(p.getUniqueId(), null));
 		} else {
 			msg(ItemEdit.PREFIX + "Console does not have rename tokens.");
 		}
@@ -33,41 +34,50 @@ public class TokenCommands extends BaseCommand {
 	@Cmd(value="Check how many tokens someone else has.", permission="itemedit.mod")
 	public void get(CommandSender sender,
 					@Arg(value="Player Name") String playerName) {
-		Player p = TransactionsSQL.getPlayerByName(playerName);
-		if (p != null) {
-			msg(getTokenData(p, p.getName()));
-		} else {
-			msg(NO_PLAYER);
+		UUID uuid = null;
+		try {
+			uuid = MojangCommunicator.requestPlayerUUID(playerName);
+			if (uuid != null) {
+				msg(getTokenData(uuid, playerName));
+			}
+		} catch (IOException e) {
+			if (ItemEdit.DEBUGGING) {
+				e.printStackTrace();
+			}
+		} finally {
+			if (uuid == null) {
+				msg(NO_PLAYER);
+			}
 		}
 	}
 
-	private String getTokenData(Player p, String name) {
-		transSQL.grabMonikerTokens(p);
-		String output = "";
+	private String getTokenData(UUID player, String name) {
+		//transSQL.grabMonikerTokens(player);
+		int vipTokensTotal = transSQL.getVipTokensTotal(player);
+		int vipTokensUsed = transSQL.getVIPUsedAmount(player);
 
 		String startName = "You";
 		String middleName = "you";
 		String posses = "have";
+		String output = "";
 
 		if (name != null) {
 			startName = name;
 			middleName = name;
 			posses = "has";
 		}
-
-		output = ItemEdit.PREFIX + startName + " currently " + posses + " " + ItemEdit.ALT_COLOR + (transSQL.getTokens(p)) + ItemEdit.PREFIX + " edit tokens.\n";
-
-		if (transSQL.getVipTokensTotal(p) > 0) {
-			output += "In addition, " + middleName + " " + posses + " " + ItemEdit.ALT_COLOR + (transSQL.getVipTokensTotal(p) - transSQL.getVIPUsedAmount(p)) + " / " + transSQL.getVipTokensTotal(p) + ItemEdit.PREFIX + " VIP tokens.\n" +
+		output = ItemEdit.PREFIX + startName + " currently " + posses + " " + ItemEdit.ALT_COLOR + (transSQL.getTokens(player)) + ItemEdit.PREFIX + " edit tokens.\n";
+		if (vipTokensTotal > 0) {
+			output += "In addition, " + middleName + " " + posses + " " + ItemEdit.ALT_COLOR + (vipTokensTotal - vipTokensUsed) + " / " + vipTokensTotal + ItemEdit.PREFIX + " VIP tokens.\n" +
 					  "VIP tokens refresh " + ItemEdit.ALT_COLOR + ItemEdit.getRefreshTime() + ItemEdit.PREFIX + " days after use.\n";
 		}
-		if (transSQL.getVIPUsedAmount(p) > 0) {
+		if (vipTokensUsed > 0) {
 			if (name == null) {
 				output += "Your ";
 			} else {
 				output += "Their ";
 			}
-			output += "next VIP token will refresh in " + ItemEdit.ALT_COLOR + transSQL.getDaysUntilRename(p) + ItemEdit.PREFIX + " days.";
+			output += "next VIP token will refresh in " + ItemEdit.ALT_COLOR + transSQL.getDaysUntilRename(player) + ItemEdit.PREFIX + " days.";
 		}
 
 		return output;
@@ -107,7 +117,11 @@ public class TokenCommands extends BaseCommand {
 	}
 
 	private static String updateMessage(String playerName) {
-		return ItemEdit.PREFIX + "Successfully updated " + TransactionsSQL.getPlayerByName(playerName).getName() + "'s token count.";
+		String name = TransactionsSQL.getPlayerByName(playerName).getName();
+		if (name == null) {
+			name = playerName;
+		}
+		return ItemEdit.PREFIX + "Successfully updated " + name + "'s token count.";
 	}
 
 }

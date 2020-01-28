@@ -1,6 +1,7 @@
 package net.lordofthecraft.itemedit;
 
 import co.lotc.core.bukkit.command.Commands;
+import co.lotc.core.util.MojangCommunicator;
 import net.lordofthecraft.itemedit.command.MainCommands;
 import net.lordofthecraft.itemedit.command.SignType;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
@@ -15,10 +16,20 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public final class ItemEdit extends JavaPlugin implements Listener {
+public final class ItemEdit extends JavaPlugin {
 
 	public static final String PREFIX = ChatColor.AQUA + "";
 	public static final String ALT_COLOR = ChatColor.GOLD + "";
@@ -146,11 +157,12 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		saveConfig();
 	}
 
-	// HOOKS //
+	//// HOOKS ////
 
+	// CHANGE
 	// Changes the tokens of a player by a given amount (positive or negative).
 	public static boolean changeTokens(int amount, String playerName) {
-		Player p = TransactionsSQL.getPlayerByName(playerName);
+		UUID p = TransactionsSQL.getUUIDByName(playerName);
 		boolean output = false;
 		if (p != null) {
 			output = changeTokens(amount, p);
@@ -158,6 +170,9 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		return output;
 	}
 	public static boolean changeTokens(int amount, Player player) {
+		return changeTokens(amount, player.getUniqueId());
+	}
+	public static boolean changeTokens(int amount, UUID player) {
 		int newAmount = (getTokens(player) + amount);
 		if (newAmount < 0) {
 			newAmount = 0;
@@ -165,9 +180,10 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		return setTokens(newAmount, player);
 	}
 
+	// SET
 	// Sets a player's tokens to a value.
 	public static boolean setTokens(int amount, String playerName) {
-		Player p = TransactionsSQL.getPlayerByName(playerName);
+		UUID p = TransactionsSQL.getUUIDByName(playerName);
 		boolean output = false;
 		if (p != null) {
 			output = setTokens(amount, p);
@@ -175,13 +191,17 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		return output;
 	}
 	public static boolean setTokens(int amount, Player player) {
+		return setTokens(amount, player.getUniqueId());
+	}
+	public static boolean setTokens(int amount, UUID player) {
 		transaction.addEntry(0, player, amount);
 		return true;
 	}
 
+	// GET
 	// Provides how many tokens a player has.
 	public static int getTokens(String playerName) {
-		Player p = TransactionsSQL.getPlayerByName(playerName);
+		UUID p = TransactionsSQL.getUUIDByName(playerName);
 		int output = Integer.MIN_VALUE;
 		if (p != null) {
 			output = getTokens(p);
@@ -189,22 +209,27 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		return output;
 	}
 	public static int getTokens(Player p) {
+		return getTokens(p.getUniqueId());
+	}
+	public static int getTokens(UUID p) {
 		return transaction.getTokens(p);
 	}
+
 
 	// TODO :: Moniker Legacy Garbage
 	// Tries to run through all available profiles in Moniker to grab and store their tokens.
 	private void loadLegacyTokens() {
-		for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-			transaction.grabMonikerTokens(player.getPlayer());
-		}
-		Bukkit.getPluginManager().registerEvents(this, this);
-		// TODO :: When you delete the above line, get rid of the impelements listener for this class.
-	}
+		try (Stream<Path> paths = Files.walk(Paths.get(getDataFolder().getPath() + "/LegacyFiles"))) {
+			List<Path> files = paths.filter(Files::isRegularFile).collect(Collectors.toList());
+			// TODO: For each file grab Moniker values (if exist), transfer from Base64, grab tokens, delete file.
+			for (Path path : files) {
 
-	@EventHandler
-	public void checkMonikerTokensOnJoin(PlayerJoinEvent e) {
-		transaction.grabMonikerTokens(e.getPlayer());
+			}
+		} catch (IOException e) {
+			if (ItemEdit.DEBUGGING) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
