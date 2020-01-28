@@ -45,15 +45,20 @@ public class TokenCommands extends BaseCommand {
 		transSQL.grabMonikerTokens(p);
 		String output = "";
 
-		if (name == null) {
-			output = ItemEdit.PREFIX + "You currently have ";
-		} else {
-			output = ItemEdit.PREFIX + name + " currently has ";
+		String startName = "You";
+		String middleName = "you";
+		String posses = "have";
+
+		if (name != null) {
+			startName = name;
+			middleName = name;
+			posses = "has";
 		}
-		output += ItemEdit.ALT_COLOR + (transSQL.getTokens(p)) + ItemEdit.PREFIX + " edit tokens,\n";
+
+		output = ItemEdit.PREFIX + startName + " currently " + posses + " " + ItemEdit.ALT_COLOR + (transSQL.getTokens(p)) + ItemEdit.PREFIX + " edit tokens.\n";
 
 		if (transSQL.getVipTokensTotal(p) > 0) {
-			output += "and " + ItemEdit.ALT_COLOR + (transSQL.getVipTokensTotal(p) - transSQL.getVIPUsedAmount(p)) + " / " + transSQL.getVipTokensTotal(p) + ItemEdit.PREFIX + " VIP tokens.\n" +
+			output += "In addition, " + middleName + " " + posses + " " + ItemEdit.ALT_COLOR + (transSQL.getVipTokensTotal(p) - transSQL.getVIPUsedAmount(p)) + " / " + transSQL.getVipTokensTotal(p) + ItemEdit.PREFIX + " VIP tokens.\n" +
 					  "VIP tokens refresh " + ItemEdit.ALT_COLOR + ItemEdit.getRefreshTime() + ItemEdit.PREFIX + " days after use.\n";
 		}
 		if (transSQL.getVIPUsedAmount(p) > 0) {
