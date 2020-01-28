@@ -146,13 +146,50 @@ public final class ItemEdit extends JavaPlugin implements Listener {
 		saveConfig();
 	}
 
+	// HOOKS //
+
 	// Changes the tokens of a player by a given amount (positive or negative).
-	public static void changeTokens(int amount, Player p) {
-		int newAmount = (transaction.getTokens(p) + amount);
+	public static boolean changeTokens(int amount, String playerName) {
+		Player p = TransactionsSQL.getPlayerByName(playerName);
+		boolean output = false;
+		if (p != null) {
+			output = changeTokens(amount, p);
+		}
+		return output;
+	}
+	public static boolean changeTokens(int amount, Player player) {
+		int newAmount = (getTokens(player) + amount);
 		if (newAmount < 0) {
 			newAmount = 0;
 		}
-		transaction.addEntry(0, p, newAmount);
+		return setTokens(newAmount, player);
+	}
+
+	// Sets a player's tokens to a value.
+	public static boolean setTokens(int amount, String playerName) {
+		Player p = TransactionsSQL.getPlayerByName(playerName);
+		boolean output = false;
+		if (p != null) {
+			output = setTokens(amount, p);
+		}
+		return output;
+	}
+	public static boolean setTokens(int amount, Player player) {
+		transaction.addEntry(0, player, amount);
+		return true;
+	}
+
+	// Provides how many tokens a player has.
+	public static int getTokens(String playerName) {
+		Player p = TransactionsSQL.getPlayerByName(playerName);
+		int output = Integer.MIN_VALUE;
+		if (p != null) {
+			output = getTokens(p);
+		}
+		return output;
+	}
+	public static int getTokens(Player p) {
+		return transaction.getTokens(p);
 	}
 
 	// TODO :: Moniker Legacy Garbage

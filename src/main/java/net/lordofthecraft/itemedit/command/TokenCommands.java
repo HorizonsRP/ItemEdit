@@ -33,7 +33,7 @@ public class TokenCommands extends BaseCommand {
 	@Cmd(value="Check how many tokens someone else has.", permission="itemedit.mod")
 	public void get(CommandSender sender,
 					@Arg(value="Player Name") String playerName) {
-		Player p = getPlayerByName(playerName);
+		Player p = TransactionsSQL.getPlayerByName(playerName);
 		if (p != null) {
 			msg(getTokenData(p, p.getName()));
 		} else {
@@ -72,10 +72,8 @@ public class TokenCommands extends BaseCommand {
 	public void give(CommandSender sender,
 					 @Arg(value="Player Name") String playerName,
 					 @Arg(value="Tokens")@Range(min=1, max=15)int amount) {
-		Player p = getPlayerByName(playerName);
-		if (p != null) {
-			ItemEdit.changeTokens(amount, p);
-			msg(updateMessage(p));
+		if (ItemEdit.changeTokens(amount, playerName)) {
+			msg(updateMessage(playerName));
 		} else {
 			msg(NO_PLAYER);
 		}
@@ -85,10 +83,8 @@ public class TokenCommands extends BaseCommand {
 	public void remove(CommandSender sender,
 					   @Arg(value="Player Name") String playerName,
 					   @Arg(value="Tokens")@Range(min=1, max=15)int amount) {
-		Player p = getPlayerByName(playerName);
-		if (p != null) {
-			ItemEdit.changeTokens(-amount, p);
-			msg(updateMessage(p));
+		if (ItemEdit.changeTokens(-amount, playerName)) {
+			msg(updateMessage(playerName));
 		} else {
 			msg(NO_PLAYER);
 		}
@@ -98,31 +94,15 @@ public class TokenCommands extends BaseCommand {
 	public void set(CommandSender sender,
 					@Arg(value="Player Name") String playerName,
 					@Arg(value="Tokens")@Range(min=1)int amount) {
-		Player p = getPlayerByName(playerName);
-		if (p != null) {
-			transSQL.addEntry(0, p, amount);
-			msg(updateMessage(p));
+		if (ItemEdit.setTokens(amount, playerName)) {
+			msg(updateMessage(playerName));
 		} else {
 			msg(NO_PLAYER);
 		}
 	}
 
-	private static String updateMessage(Player p) {
-		return ItemEdit.PREFIX + "Successfully updated " + p.getName() + "'s token count.";
-	}
-
-	private static Player getPlayerByName(String playerName) {
-		Player p = Bukkit.getPlayer(playerName);
-		if (p == null) {
-			try {
-				p = Bukkit.getPlayer(MojangCommunicator.requestPlayerUUID(playerName));
-			} catch (IOException e) {
-				if (ItemEdit.DEBUGGING) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return p;
+	private static String updateMessage(String playerName) {
+		return ItemEdit.PREFIX + "Successfully updated " + TransactionsSQL.getPlayerByName(playerName).getName() + "'s token count.";
 	}
 
 }

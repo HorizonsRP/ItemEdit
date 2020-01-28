@@ -7,10 +7,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 
+import co.lotc.core.util.MojangCommunicator;
 import me.lucko.luckperms.LuckPerms;
 import me.lucko.luckperms.api.Node;
 import me.lucko.luckperms.api.User;
 import net.lordofthecraft.itemedit.ItemEdit;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -314,6 +316,20 @@ public class TransactionsSQL {
 		} catch (SQLException ex) {
 			Errors.close(plugin, ex);
 		}
+	}
+
+	public static Player getPlayerByName(String playerName) {
+		Player p = Bukkit.getPlayer(playerName);
+		if (p == null) {
+			try {
+				p = Bukkit.getPlayer(MojangCommunicator.requestPlayerUUID(playerName));
+			} catch (IOException e) {
+				if (ItemEdit.DEBUGGING) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return p;
 	}
 
 	public int getVipTokensTotal(Player p) {
