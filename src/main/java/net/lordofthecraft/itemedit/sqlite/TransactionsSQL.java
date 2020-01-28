@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import co.lotc.core.util.MojangCommunicator;
@@ -322,7 +323,13 @@ public class TransactionsSQL {
 		Player p = Bukkit.getPlayer(playerName);
 		if (p == null) {
 			try {
-				p = Bukkit.getOfflinePlayer(MojangCommunicator.requestPlayerUUID(playerName)).getPlayer();
+				UUID uuid = MojangCommunicator.requestPlayerUUID(playerName);
+				if (uuid != null) {
+					p = Bukkit.getPlayer(uuid);
+					if (p == null) {
+						p = Bukkit.getOfflinePlayer(uuid).getPlayer();
+					}
+				}
 			} catch (IOException e) {
 				if (ItemEdit.DEBUGGING) {
 					e.printStackTrace();
