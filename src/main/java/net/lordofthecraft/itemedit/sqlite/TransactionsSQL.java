@@ -398,18 +398,19 @@ public class TransactionsSQL {
 		int output = defaultAmount;
 		User user = LuckPerms.getApi().getUser(player);
 		if (user != null) {
-			if (!user.hasPermission(LuckPerms.getApi().buildNode(ItemEdit.PERMISSION_START + ".unlimited").build()).asBoolean()) {
-				String thisPermission = ItemEdit.PERMISSION_START + "." + permission;
-				for (Node node : user.getAllNodes()) {
-					if (node.getValue() && node.getPermission().startsWith(thisPermission)) {
+			String thisPermission = ItemEdit.PERMISSION_START + "." + permission;
+			for (Node node : user.getAllNodes()) {
+				if (node.getValue()) {
+					if (node.getPermission().startsWith(thisPermission)) {
 						String[] split = node.getPermission().replace('.', ' ').split(" ");
 						if (split.length >= 3 && Integer.parseInt(split[2]) > output) {
 							output = Integer.parseInt(split[2]);
 						}
+					} else if (node.getPermission().equalsIgnoreCase(ItemEdit.PERMISSION_START + ".unlimited")) {
+						output = Integer.MAX_VALUE;
+						break;
 					}
 				}
-			} else {
-				output = Integer.MAX_VALUE;
 			}
 		}
 		return output;
