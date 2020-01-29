@@ -1,29 +1,31 @@
 package net.lordofthecraft.itemedit;
 
 import co.lotc.core.bukkit.command.Commands;
-import co.lotc.core.util.MojangCommunicator;
 import net.lordofthecraft.itemedit.command.MainCommands;
 import net.lordofthecraft.itemedit.command.SignType;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.libs.org.apache.commons.codec.binary.Base64;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,6 +39,7 @@ public final class ItemEdit extends JavaPlugin {
 	public static final String BONUS_SIGNATURE_PERM = "signature";
 
 	public static final boolean DEBUGGING = false;
+	public static final boolean LEGACY_CHECK = true;
 
 	private static int maxWidth;
 	public static int getMaxWidth() {
@@ -90,7 +93,9 @@ public final class ItemEdit extends JavaPlugin {
 		loadCurrentTokens();
 
 		// Try to grab all Moniker Tokens
-		loadLegacyTokens();
+		if (LEGACY_CHECK) {
+			loadLegacyTokens();
+		}
 
 		// Register our auto-complete and glow enchant.
 		registerParameters();
@@ -221,15 +226,133 @@ public final class ItemEdit extends JavaPlugin {
 	private void loadLegacyTokens() {
 		try (Stream<Path> paths = Files.walk(Paths.get(getDataFolder().getPath() + "/LegacyFiles"))) {
 			List<Path> files = paths.filter(Files::isRegularFile).collect(Collectors.toList());
-			// TODO: For each file grab Moniker values (if exist), transfer from Base64, grab tokens, delete file.
 			for (Path path : files) {
+				if (DEBUGGING) {
+					getServer().getLogger().info(path.toString());
+				}
+				File playerFile = new File(path.toString());
+				try {
+					String monikerXML = getMonikerXML(playerFile);
+					if (monikerXML != null) {
+						if (DEBUGGING) {
+							getServer().getLogger().info("Found Moniker data.");
+						}
+						int tokens = getTokensFromXML(monikerXML);
+						if (tokens > 0) {
+							changeTokens(tokens, UUID.fromString(playerFile.getName()));
+						}
+					}
+				} catch (Exception ignore) {
 
+				}
+
+				if (!playerFile.delete()) {
+					getServer().getLogger().warning("Failed to delete file at " + path.toString() + ". Consider manually deleting.");
+				}
 			}
 		} catch (IOException e) {
-			if (ItemEdit.DEBUGGING) {
+			if (DEBUGGING) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private int getTokensFromXML(String parsed) {
+		int output = 0;
+		try {
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(new InputSource(new StringReader(parsed)));
+			doc.getDocumentElement().normalize();
+			NodeList nodeList = doc.getFirstChild().getChildNodes();
+			for (int i = 0; i < nodeList.getLength(); i++) {
+				Node node = nodeList.item(i);
+				if (DEBUGGING) {
+					getServer().getLogger().info(node.getNodeName());
+				}
+				if (node.getNodeName().equalsIgnoreCase("cachedVars")) {
+					NodeList subNodeList = node.getChildNodes();
+					for (int j = 0; j < subNodeList.getLength(); j++) {
+						Node subNode = subNodeList.item(j);
+						if (DEBUGGING) {
+							getServer().getLogger().info(subNode.getNodeName());
+						}
+						if (subNode.getNodeName().equalsIgnoreCase("entry")) {
+							NodeList subSubNodeList = subNode.getChildNodes();
+							for (int k = 0; k < subSubNodeList.getLength(); k++) {
+								Node subSubNode = subSubNodeList.item(k);
+								if (DEBUGGING) {
+									getServer().getLogger().info(subSubNode.getNodeName());
+								}
+								if (subSubNode.getNodeName().equalsIgnoreCase("net.minegrid.feature.moniker.MonikerProfile")) {
+									NodeList finalNodeList = subSubNode.getChildNodes();
+									for (int l = 0; l < finalNodeList.getLength(); l++) {
+										Node finalNode = finalNodeList.item(l);
+										if (DEBUGGING) {
+											getServer().getLogger().info(finalNode.getNodeName());
+										}
+										if (finalNode.getNodeName().equalsIgnoreCase("tokens")) {
+											output = Integer.parseInt(finalNode.getTextContent());
+											if (DEBUGGING) {
+												getServer().getLogger().info("" + output);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			if (DEBUGGING) {
+				e.printStackTrace();
+			}
+		}
+		return output;
+	}
+
+	private String getMonikerXML(File file) {
+		try {
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(file);
+			doc.getDocumentElement().normalize();
+
+			NodeList nodeList = doc.getElementsByTagName("rawData");
+			String base64XML = null;
+			for (int i = 0; i < nodeList.getLength(); i++) {
+
+				Node node = nodeList.item(i);
+				base64XML = grabMonikerBase64(node.getChildNodes());
+				if (base64XML != null) {
+					break;
+				}
+			}
+
+			if (base64XML != null) {
+				return new String(Base64.decodeBase64(base64XML));
+			}
+			return null;
+		} catch (Exception e) {
+			if (DEBUGGING) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	private String grabMonikerBase64(NodeList list) {
+		for (int i = 0; i < list.getLength(); i++) {
+			Node node = list.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element) node;
+				if (element.getElementsByTagName("string").item(0).getTextContent().equalsIgnoreCase("moniker")) {
+					return element.getElementsByTagName("string").item(1).getTextContent();
+				}
+			}
+		}
+		return null;
 	}
 
 }

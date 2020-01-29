@@ -50,6 +50,7 @@ public class MainCommands extends BaseCommand {
 	// Tags set by CustomItem for identification
 	public static final String EDITED_TAG = "editor-uuid";
 	public static final String SIGNED_TAG = "signed-uuid";
+	public static final String PAPER_FREEBIE = "paper-desc-free";
 
 	// Our SQL access
 	public static TransactionsSQL transSQL;
@@ -90,7 +91,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && !ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -112,7 +113,7 @@ public class MainCommands extends BaseCommand {
 					item.setItemMeta(meta);
 				}
 
-				finalizeEdit(p, item, tokensUsed);
+				finalizeEdit(p, item, tokensUsed, false);
 				return;
 			}
 		}
@@ -159,7 +160,7 @@ public class MainCommands extends BaseCommand {
 				if (meta != null && meta.hasDisplayName()) {
 
 					int tokensUsed = transSQL.safeToChargePlayer(p);
-					if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
+					if (ItemUtil.hasCustomTag(item, EDITED_TAG) && !ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
 						tokensUsed = 0;
 					} else if (tokensUsed == 0) {
 						msg(NO_TOKENS);
@@ -169,7 +170,7 @@ public class MainCommands extends BaseCommand {
 					meta.setDisplayName(colorString + ChatColor.ITALIC + ChatColor.stripColor(meta.getDisplayName()));
 					item.setItemMeta(meta);
 
-					finalizeEdit(p, item, tokensUsed);
+					finalizeEdit(p, item, tokensUsed, false);
 				} else {
 					msg(NO_NAME_SET);
 				}
@@ -192,8 +193,9 @@ public class MainCommands extends BaseCommand {
 					return;
 				}
 
+				boolean paper = item.getType() != Material.PAPER;
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG) || item.getType() != Material.PAPER) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG) || paper) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -211,7 +213,7 @@ public class MainCommands extends BaseCommand {
 					msg(MAX_LENGTH);
 					return;
 				} else {
-					finalizeEdit(p, item, tokensUsed);
+					finalizeEdit(p, item, tokensUsed, paper);
 				}
 
 				return;
@@ -318,7 +320,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && !ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -331,7 +333,7 @@ public class MainCommands extends BaseCommand {
 					item.setItemMeta(meta);
 				}
 
-				finalizeEdit(p, item, tokensUsed);
+				finalizeEdit(p, item, tokensUsed, false);
 				return;
 			}
 		}
@@ -356,7 +358,7 @@ public class MainCommands extends BaseCommand {
 
 				// Check if it has a tag first and foremost, otherwise check how many tokens it would cost.
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && !ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -383,7 +385,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				ItemUtil.setCustomTag(item, SIGNED_TAG, p.getUniqueId().toString() + ":" + System.currentTimeMillis());
-				finalizeEdit(p, item, tokensUsed);
+				finalizeEdit(p, item, tokensUsed, false);
 				return;
 			}
 		}
@@ -419,13 +421,18 @@ public class MainCommands extends BaseCommand {
 	}
 
 	// Replaces the item in hand with the given edits after applying the appropriate tags and charging the player.
-	private static void finalizeEdit(Player p, ItemStack item, int tokensUsed) {
+	private static void finalizeEdit(Player p, ItemStack item, int tokensUsed, boolean paper) {
 		// If tokensUsed is 0 it's a clearing and doesn't need to be logged.
 		String preString = "";
 		if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
 			preString = ItemUtil.getCustomTag(item, EDITED_TAG) + "/";
 		}
 		ItemUtil.setCustomTag(item, EDITED_TAG, preString + p.getUniqueId().toString() + ":" + System.currentTimeMillis());
+		if (paper) {
+			ItemUtil.setCustomTag(item, PAPER_FREEBIE, "!");
+		} else if (ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
+			ItemUtil.removeCustomTag(item, PAPER_FREEBIE);
+		}
 
 		// If the player used an edit token, otherwise the player had to've used a VIP token.
 		if (tokensUsed > 0) {
@@ -480,7 +487,7 @@ public class MainCommands extends BaseCommand {
 							return SIGNED_ALREADY;
 						} else {
 							clearData(item, descOnly, sigOnly);
-							finalizeEdit(p, item, 0);
+							finalizeEdit(p, item, 0, false);
 						}
 					}
 					return null;

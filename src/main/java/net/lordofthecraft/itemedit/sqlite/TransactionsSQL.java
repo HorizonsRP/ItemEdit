@@ -37,7 +37,7 @@ public class TransactionsSQL {
 		plugin = instance;
 		dbname = instance.getConfig().getString("SQLite.Filename", "edits");
 		SQLiteTokensTable = "CREATE TABLE IF NOT EXISTS " + SQLiteTableName + " (\n" +
-							"    TIME NUM PRIMARY KEY,\n" +
+							"    TIME NUM NOT NULL,\n" +
 							"    PLAYER TEXT NOT NULL,\n" +
 							"    TOKENS INT NOT NULL\n" +
 							");";
@@ -113,15 +113,16 @@ public class TransactionsSQL {
 	public void addEntry(long time, UUID player, int tokens) {
 		Connection conn = null;
 		PreparedStatement ps = null;
-		String stmt = "INSERT";
-		if (time == 0) {
-			stmt += " OR REPLACE";
-		}
-		stmt += " INTO " + SQLiteTableName + " (TIME,PLAYER,TOKENS) VALUES(?,?,?)";
-
 		try {
+			if (time == 0) {
+				conn = getSQLConnection();
+				ps = conn.prepareStatement("DELETE FROM " + SQLiteTableName + " WHERE TIME=0 AND PLAYER='" + player.toString() + "';");
+				ps.executeUpdate();
+				ps.close();
+			}
+
 			conn = getSQLConnection();
-			ps = conn.prepareStatement(stmt);
+			ps = conn.prepareStatement("INSERT INTO " + SQLiteTableName + " (TIME,PLAYER,TOKENS) VALUES(?,?,?)");
 			if (time == -1) {
 				ps.setLong(1, System.currentTimeMillis());
 			} else {
@@ -396,18 +397,20 @@ public class TransactionsSQL {
 	public int getMaxPermission(UUID player, String permission, int defaultAmount) {
 		int output = defaultAmount;
 		User user = LuckPerms.getApi().getUser(player);
-		if (user != null && user.hasPermission(LuckPerms.getApi().buildNode(ItemEdit.PERMISSION_START + ".unlimited").build()).asBoolean()) {
-			String thisPermission = ItemEdit.PERMISSION_START + "." + permission;
-			for (Node node : user.getAllNodes()) {
-				if (node.getValue() && node.getPermission().startsWith(thisPermission)) {
-					String[] split = node.getPermission().replace('.', ' ').split(" ");
-					if (split.length >= 3 && Integer.parseInt(split[2]) > output) {
-						output = Integer.parseInt(split[2]);
+		if (user != null) {
+			if (!user.hasPermission(LuckPerms.getApi().buildNode(ItemEdit.PERMISSION_START + ".unlimited").build()).asBoolean()) {
+				String thisPermission = ItemEdit.PERMISSION_START + "." + permission;
+				for (Node node : user.getAllNodes()) {
+					if (node.getValue() && node.getPermission().startsWith(thisPermission)) {
+						String[] split = node.getPermission().replace('.', ' ').split(" ");
+						if (split.length >= 3 && Integer.parseInt(split[2]) > output) {
+							output = Integer.parseInt(split[2]);
+						}
 					}
 				}
+			} else {
+				output = Integer.MAX_VALUE;
 			}
-		} else {
-			output = Integer.MAX_VALUE;
 		}
 		return output;
 	}
@@ -436,4 +439,16 @@ public class TransactionsSQL {
 		}
 		return null;
 	}
+
+	public boolean isItemMonikerSigned(ItemStack stack) {
+		try {
+			for (String line : Objects.requireNonNull(Objects.requireNonNull(stack.getItemMeta()).getLore()))
+				if (line.contains("Approved") && line.contains(Character.toString((char) 0x2605)))
+					return true;
+		} catch (Exception ignored) {
+
+		}
+		return false;
+	}
+
 }
