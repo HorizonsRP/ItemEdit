@@ -117,9 +117,10 @@ public class TokenCommands extends BaseCommand {
 	}
 
 	private static String updateMessage(String playerName) {
-		String name = TransactionsSQL.getPlayerByName(playerName).getName();
-		if (name == null) {
-			name = playerName;
+		Player p = TransactionsSQL.getPlayerByName(playerName);
+		String name = playerName;
+		if (p != null) {
+			name = p.getName();
 		}
 		return ItemEdit.PREFIX + "Successfully updated " + name + "'s token count.";
 	}
