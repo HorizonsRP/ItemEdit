@@ -39,7 +39,7 @@ public final class ItemEdit extends JavaPlugin {
 	public static final String BONUS_SIGNATURE_PERM = "signature";
 
 	public static final boolean DEBUGGING = false;
-	public static final boolean LEGACY_CHECK = true;
+	public static final boolean LEGACY_CHECK = false;
 
 	private static int maxWidth;
 	public static int getMaxWidth() {
