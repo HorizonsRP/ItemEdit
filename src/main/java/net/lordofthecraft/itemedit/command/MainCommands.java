@@ -91,7 +91,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && !ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -160,7 +160,7 @@ public class MainCommands extends BaseCommand {
 				if (meta != null && meta.hasDisplayName()) {
 
 					int tokensUsed = transSQL.safeToChargePlayer(p);
-					if (ItemUtil.hasCustomTag(item, EDITED_TAG) && !ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
+					if (ItemUtil.hasCustomTag(item, EDITED_TAG) && (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) {
 						tokensUsed = 0;
 					} else if (tokensUsed == 0) {
 						msg(NO_TOKENS);
@@ -193,7 +193,7 @@ public class MainCommands extends BaseCommand {
 					return;
 				}
 
-				boolean paper = item.getType() != Material.PAPER;
+				boolean paper = item.getType() == Material.PAPER;
 				int tokensUsed = transSQL.safeToChargePlayer(p);
 				if (ItemUtil.hasCustomTag(item, EDITED_TAG) || paper) {
 					tokensUsed = 0;
@@ -320,7 +320,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && !ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -358,7 +358,7 @@ public class MainCommands extends BaseCommand {
 
 				// Check if it has a tag first and foremost, otherwise check how many tokens it would cost.
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && !ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -402,7 +402,7 @@ public class MainCommands extends BaseCommand {
 		return staffCommands;
 	}
 
-	// Checks if the item is signed, and if so, if it's by this player. Defaults to true if not signed.
+	// Checks if the item is signed, legacy or otherwise.
 	private static boolean isSigned(ItemStack item) {
 		if (transSQL.isItemMonikerSigned(item)) {
 			return true;
@@ -411,7 +411,7 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
-	// Checks if the item was signed by the give player
+	// Checks if the item was signed by the given player
 	private static boolean notSignedBy(ItemStack item, Player p) {
 		if (ItemUtil.hasCustomTag(item, SIGNED_TAG)) {
 			String uuid = ItemUtil.getCustomTag(item, SIGNED_TAG).replace(":", " ").split(" ")[0];
@@ -430,7 +430,7 @@ public class MainCommands extends BaseCommand {
 		ItemUtil.setCustomTag(item, EDITED_TAG, preString + p.getUniqueId().toString() + ":" + System.currentTimeMillis());
 		if (paper) {
 			ItemUtil.setCustomTag(item, PAPER_FREEBIE, "!");
-		} else if (ItemUtil.hasCustomTag(item, PAPER_FREEBIE)) {
+		} else {
 			ItemUtil.removeCustomTag(item, PAPER_FREEBIE);
 		}
 
