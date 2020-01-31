@@ -79,6 +79,7 @@ public class MainCommands extends BaseCommand {
 	// Edit Types //
 	@Cmd(value="Set a custom name for an item.", permission="itemedit.name")
 	@Flag(name="mod", description="Sets the name regardless of signature.", permission="itemedit.mod")
+	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
 	public void name(CommandSender sender,
 					 @Arg(value="Name", description="The name you wish to give the item.") String[] name) {
 		if (sender instanceof Player) {
@@ -91,7 +92,11 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) {
+				// If item has been edited and is does not have the paper tag (if relevent), or if
+				// a staff is using the -staff flag, then the edit is free regardless.
+				if ((ItemUtil.hasCustomTag(item, EDITED_TAG) &&
+					 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
+					hasFlag("staff")) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -121,6 +126,7 @@ public class MainCommands extends BaseCommand {
 	}
 
 	@Cmd(value="Change the color of the name of an item's name.", permission="itemedit.color")
+	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
 	@Flag(name="bold", description="Allows bypassing the colour type.", permission="itemedit.mod")
 	@Flag(name="under", description="Allows bypassing the colour type.", permission="itemedit.mod")
 	@Flag(name="strike", description="Allows bypassing the colour type.", permission="itemedit.mod")
@@ -160,7 +166,11 @@ public class MainCommands extends BaseCommand {
 				if (meta != null && meta.hasDisplayName()) {
 
 					int tokensUsed = transSQL.safeToChargePlayer(p);
-					if (ItemUtil.hasCustomTag(item, EDITED_TAG) && (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) {
+					// If item has been edited and is does not have the paper tag (if relevent), or if
+					// a staff is using the -staff flag, then the edit is free regardless.
+					if ((ItemUtil.hasCustomTag(item, EDITED_TAG) &&
+						 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
+						hasFlag("staff")) {
 						tokensUsed = 0;
 					} else if (tokensUsed == 0) {
 						msg(NO_TOKENS);
@@ -182,6 +192,7 @@ public class MainCommands extends BaseCommand {
 
 	@Cmd(value="Add a custom description for an item.", permission="itemedit.desc")
 	@Flag(name="newline", description="Adds a new line. If a description was entered, adds the new line after.")
+	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
 	public void desc(CommandSender sender,
 					 @Arg(value="Description", description="The blurb of text you wish to add to the item's lore. Use multiple times to string together more lore.")@Default("") String[] desc) {
 		if (sender instanceof Player) {
@@ -195,7 +206,7 @@ public class MainCommands extends BaseCommand {
 
 				boolean paper = item.getType() == Material.PAPER;
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG) || paper) {
+				if (ItemUtil.hasCustomTag(item, EDITED_TAG) || paper || hasFlag("staff")) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -309,6 +320,7 @@ public class MainCommands extends BaseCommand {
 
 	@Cmd(value="Add a glowing effect to an item as if it were enchanted.", permission="itemedit.glow")
 	@Flag(name="mod", description="Adds glow to the item regardless of signature.", permission="itemedit.mod")
+	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
 	public void glow(CommandSender sender) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
@@ -320,7 +332,11 @@ public class MainCommands extends BaseCommand {
 				}
 
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) {
+				// If item has been edited and is does not have the paper tag (if relevent), or if
+				// a staff is using the -staff flag, then the edit is free regardless.
+				if ((ItemUtil.hasCustomTag(item, EDITED_TAG) &&
+					 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
+					hasFlag("staff")) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
@@ -343,6 +359,7 @@ public class MainCommands extends BaseCommand {
 	// Finalization & Clearing //
 	@Cmd(value="Sign an item to lock in the information. Can be cleared later if needed.", permission="itemedit.sign")
 	@Flag(name="mod", description="Prevents the username from being written on player approved signs.", permission="itemedit.mod")
+	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
 	@Flag(name="rp", description="Allows signing with your RP name")
 	public void sign(CommandSender sender,
 					 @Default("ROLEPLAY") SignType type) {
@@ -358,7 +375,11 @@ public class MainCommands extends BaseCommand {
 
 				// Check if it has a tag first and foremost, otherwise check how many tokens it would cost.
 				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG) && (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) {
+				// If item has been edited and is does not have the paper tag (if relevent), or if
+				// a staff is using the -staff flag, then the edit is free regardless.
+				if ((ItemUtil.hasCustomTag(item, EDITED_TAG) &&
+					 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
+					hasFlag("staff")) {
 					tokensUsed = 0;
 				} else if (tokensUsed == 0) {
 					msg(NO_TOKENS);
