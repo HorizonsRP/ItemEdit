@@ -1,5 +1,5 @@
 name: ItemEdit
-version: 1.14.4-R0.1
+version: 1.13.2-R0.1
 main: net.lordofthecraft.itemedit.ItemEdit
 api-version: "1.13"
 depend: [Tythan, CustomItem]
@@ -41,10 +41,12 @@ permissions:
       default: op
       description: Allows access to config settings and provides tha dmin signature.
       children:
-        itemedit.mod: true
+        itemedit.dev: true
   itemedit.dev:
       default: op
       description: Dev Signature
+      children:
+        itemedit.mod: true
   itemedit.mod:
     default: op
     description: Allows staff to override signatures and provides the mod signature.
@@ -52,9 +54,22 @@ permissions:
       itemedit.prices: true
       itemedit.glow: true
       itemedit.use: true
+      itemedit.free: true
   itemedit.st:
     default: op
     description: Story Signature
+    children:
+      itemedit.free: true
+  itemedit.lt:
+    default: op
+    description: Story Writer Signature
+    children:
+      itemedit.st: true
+  itemedit.et:
+    default: op
+    description: Story Actor Signature
+    children:
+      itemedit.st: true
   itemedit.world:
     default: op
     description: World Signature
@@ -71,6 +86,9 @@ permissions:
       itemedit.sign: true
       itemedit.clear: true
       itemedit.check: true
+  itemedit.free:
+    default: false
+    description: Allows one to use the -staff flag for free edits.
 
   #Custom values per person/group.
   itemedit.length:

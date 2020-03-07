@@ -18,8 +18,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import net.minegrid.obelisk.api.Obelisk;
-
 public class TransactionsSQL {
 
 	public static Connection connection;

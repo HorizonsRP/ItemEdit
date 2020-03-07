@@ -9,7 +9,6 @@ import io.github.archemedes.customitem.CustomItem;
 import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
-import net.lordofthecraft.soulbind.SoulbindEnchant;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -522,7 +521,7 @@ public class MainCommands extends BaseCommand {
 
 			if (meta != null) {
 				for (Enchantment enc : meta.getEnchants().keySet()) {
-					if ((enc instanceof SoulbindEnchant) ||
+					if (/*(enc instanceof SoulbindEnchant) ||*/
 						(!descOnly && !sigOnly && (enc instanceof Glow))) {
 						meta.removeEnchant(enc);
 					}
