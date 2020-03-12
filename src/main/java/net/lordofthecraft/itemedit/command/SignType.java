@@ -1,8 +1,6 @@
 package net.lordofthecraft.itemedit.command;
 
 import co.lotc.core.agnostic.Sender;
-import net.lordofthecraft.arche.ArcheCore;
-import net.lordofthecraft.arche.interfaces.Persona;
 import net.lordofthecraft.itemedit.ItemEdit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -63,10 +61,9 @@ public enum SignType {
 		String name = p.getName();
 		if (roleplay) {
 			//Grab Persona name.
-			if (ItemEdit.get().getServer().getPluginManager().isPluginEnabled("ArcheCore")) {
-				Persona persona = ArcheCore.getPersona(p);
-				name = persona.getName();
-			}
+			/*if (ItemEdit.get().getServer().getPluginManager().isPluginEnabled("ArcheCore")) {
+				name = p.getName();
+			}*/
 
 			// Still add this even if we fail to find any persona name.
 			name += " (" + p.getName() + ") ";

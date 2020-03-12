@@ -49,7 +49,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.powermock:powermock-api-mockito2:1.7.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.powermock:powermock-api-mockito-common:1.7.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.powermock:powermock-api-support:1.7.4" level="project" />
-    <orderEntry type="library" name="Maven: me.lucko.luckperms:luckperms-api:4.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.luckperms:api:5.0" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.14" level="project" />
   </component>
 </module>

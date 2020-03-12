@@ -9,14 +9,15 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import co.lotc.core.util.MojangCommunicator;
-import me.lucko.luckperms.LuckPerms;
-import me.lucko.luckperms.api.Node;
-import me.lucko.luckperms.api.User;
 import net.lordofthecraft.itemedit.ItemEdit;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class TransactionsSQL {
 
@@ -394,20 +395,24 @@ public class TransactionsSQL {
 	// Gets the max permission value of a player.
 	public int getMaxPermission(UUID player, String permission, int defaultAmount) {
 		int output = defaultAmount;
-		User user = LuckPerms.getApi().getUser(player);
-		if (user != null) {
-			for (Node node : user.getAllNodes()) {
-				if (node.getValue()) {
-					String thisPerm = node.getPermission();
-					if (thisPerm.equalsIgnoreCase(ItemEdit.PERMISSION_START + ".unlimited") ||
-						thisPerm.equalsIgnoreCase(ItemEdit.PERMISSION_START + ".*") ||
-						thisPerm.equalsIgnoreCase("*")) {
-						output = Integer.MAX_VALUE;
-						break;
-					} else if (thisPerm.startsWith(ItemEdit.PERMISSION_START + "." + permission)) {
-						String[] split = node.getPermission().replace('.', ' ').split(" ");
-						if (split.length >= 3 && Integer.parseInt(split[2]) > output) {
-							output = Integer.parseInt(split[2]);
+		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+		if (provider != null) {
+			LuckPerms api = provider.getProvider();
+			User user = api.getUserManager().getUser(player);
+			if (user != null) {
+				for (Node node : user.getNodes()) {
+					if (node.getValue()) {
+						String thisPerm = node.getKey();
+						if (thisPerm.equalsIgnoreCase(ItemEdit.PERMISSION_START + ".unlimited") ||
+							thisPerm.equalsIgnoreCase(ItemEdit.PERMISSION_START + ".*") ||
+							thisPerm.equalsIgnoreCase("*")) {
+							output = Integer.MAX_VALUE;
+							break;
+						} else if (thisPerm.startsWith(ItemEdit.PERMISSION_START + "." + permission)) {
+							String[] split = node.getKey().replace('.', ' ').split(" ");
+							if (split.length >= 3 && Integer.parseInt(split[2]) > output) {
+								output = Integer.parseInt(split[2]);
+							}
 						}
 					}
 				}
