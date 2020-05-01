@@ -5,7 +5,6 @@ import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Range;
 import co.lotc.core.util.MojangCommunicator;
-import io.github.archemedes.customitem.CustomTag;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
 import org.bukkit.Bukkit;

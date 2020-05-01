@@ -5,7 +5,6 @@ import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
 import co.lotc.core.command.annotate.Flag;
-import io.github.archemedes.customitem.CustomItem;
 import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
@@ -59,9 +58,6 @@ public class MainCommands extends BaseCommand {
 		transSQL = trans;
 		staffCommands = new StaffCommands(transSQL);
 		tokenCommands = new TokenCommands(transSQL);
-
-		CustomItem.makeUnplaceable(SIGNED_TAG);
-		CustomItem.makeUnplaceable("monikerrenamed");
 	}
 
 	// Per Player //
