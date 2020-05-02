@@ -4,17 +4,17 @@ import org.bukkit.ChatColor;
 
 public enum Type {
 
-	FLORA("Flora"),
-	FAUNA("Fauna"),
+	FLORA(   "Flora"),
+	FAUNA(   "Fauna"),
 	CREATURE("Creature"),
-	WOOD("Wood"),
-	METAL("Metal"),
-	ALCHEMY("Alchemical"),
-	CLOTH("Cloth"),
-	TOOL("Tool"),
-	FOOD("Food"),
-	GEM("Gem"),
-	MISC("Miscellanea");
+	WOOD(    "Wood"),
+	METAL(   "Metal"),
+	ALCHEMY( "Alchemical"),
+	CLOTH(   "Cloth"),
+	TOOL(    "Tool"),
+	FOOD(    "Food"),
+	GEM(     "Gem"),
+	MISC(    "Miscellanea");
 
 
 	private String name;
