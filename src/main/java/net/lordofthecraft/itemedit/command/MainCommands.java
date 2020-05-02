@@ -127,10 +127,18 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
-	private void updateGlow(ItemStack item) {
+	private void updateGlow(ItemStack item, boolean enable) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
-			meta.addEnchant(GLOW, 1, true);
+			if (enable) {
+				meta.addEnchant(GLOW, 1, true);
+			} else {
+				for (Enchantment enc : meta.getEnchants().keySet()) {
+					if (enc instanceof Glow) {
+						meta.removeEnchant(enc);
+					}
+				}
+			}
 			item.setItemMeta(meta);
 		}
 	}
@@ -173,7 +181,7 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				updateTags(item, null, null, aura, null, strong);
-				updateGlow(item);
+				updateGlow(item, strong);
 				return;
 			}
 		}
