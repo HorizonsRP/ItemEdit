@@ -122,7 +122,7 @@ public class Tags {
 	}
 
 	public void applyTagToItem(ItemStack item) {
-		ItemUtil.setCustomTag(item, ItemEdit.INFO_TAG, toString());
+		ItemUtil.setCustomTag(item, ItemEdit.INFO_TAG, this.toString());
 	}
 
 }

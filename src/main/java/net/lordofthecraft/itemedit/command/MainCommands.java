@@ -89,12 +89,13 @@ public class MainCommands extends BaseCommand {
 				item.setItemMeta(meta);
 			}
 		} else {
-			updateTags(item, null, null, null, null, false, 0);
+			updateTags(item, null, null, null, null, -1, 0);
 			updateDisplayName(item, name);
 		}
 	}
 
-	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type, boolean strongAura, int id) {
+	// strongAura | -1 = No Change, 0 = False, 1 = True
+	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type, int strongAura, int id) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
@@ -103,7 +104,13 @@ public class MainCommands extends BaseCommand {
 			tags.setQuality(quality);
 			tags.setAura(aura);
 			tags.setType(type);
-			tags.setStrongAura(strongAura);
+			if (strongAura > -1) {
+				if (strongAura > 0) {
+					tags.setStrongAura(true);
+				} else {
+					tags.setStrongAura(false);
+				}
+			}
 
 			if (id > 0) {
 				tags.setLFItemID(id);
@@ -153,7 +160,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, rarity, null, null, null, false, 0);
+				updateTags(item, rarity, null, null, null, -1, 0);
 				ItemMeta meta = item.getItemMeta();
 				if (meta != null) {
 					String name = ChatColor.stripColor(meta.getDisplayName());
@@ -171,7 +178,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, quality, null, null, false, 0);
+				updateTags(item, null, quality, null, null, -1, 0);
 				return;
 			}
 		}
@@ -184,7 +191,11 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, null, aura, null, strong, 0);
+				if (strong) {
+					updateTags(item, null, null, aura, null, 1, 0);
+				} else {
+					updateTags(item, null, null, aura, null, 0, 0);
+				}
 				updateGlow(item, strong);
 				return;
 			}
@@ -198,7 +209,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, null, null, type, false, 0);
+				updateTags(item, null, null, null, type, -1, 0);
 				return;
 			}
 		}
@@ -211,7 +222,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, null, null, null, false, id);
+				updateTags(item, null, null, null, null, -1, id);
 				return;
 			}
 		}
