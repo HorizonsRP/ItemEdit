@@ -165,7 +165,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Set the quality of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
+	@Cmd(value="Set the quality of the given item.", permission=ItemEdit.PERMISSION_START + ".quality")
 	public void quality(CommandSender sender, Quality quality) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
@@ -178,7 +178,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Set the aura of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
+	@Cmd(value="Set the aura of the given item.", permission=ItemEdit.PERMISSION_START + ".aura")
 	public void aura(CommandSender sender, Aura aura, boolean strong) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
@@ -192,7 +192,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Set the type of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
+	@Cmd(value="Set the type of the given item.", permission=ItemEdit.PERMISSION_START + ".type")
 	public void type(CommandSender sender, Type type) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
@@ -205,7 +205,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Set the item ID of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
+	@Cmd(value="Set the item ID of the given item.", permission=ItemEdit.PERMISSION_START + ".itemid")
 	public void itemid(CommandSender sender, int id) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
