@@ -89,12 +89,12 @@ public class MainCommands extends BaseCommand {
 				item.setItemMeta(meta);
 			}
 		} else {
-			updateTags(item, null, null, null, null, false);
+			updateTags(item, null, null, null, null, false, 0);
 			updateDisplayName(item, name);
 		}
 	}
 
-	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type, boolean strongAura) {
+	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type, boolean strongAura, int id) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
@@ -104,6 +104,10 @@ public class MainCommands extends BaseCommand {
 			tags.setAura(aura);
 			tags.setType(type);
 			tags.setStrongAura(strongAura);
+
+			if (id > 0) {
+				tags.setLFItemID(id);
+			}
 
 			if (lore != null && lore.size() > 0) {
 				int start = 0;
@@ -149,7 +153,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, rarity, null, null, null, false);
+				updateTags(item, rarity, null, null, null, false, 0);
 				ItemMeta meta = item.getItemMeta();
 				if (meta != null) {
 					String name = ChatColor.stripColor(meta.getDisplayName());
@@ -167,7 +171,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, quality, null, null, false);
+				updateTags(item, null, quality, null, null, false, 0);
 				return;
 			}
 		}
@@ -180,7 +184,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, null, aura, null, strong);
+				updateTags(item, null, null, aura, null, strong, 0);
 				updateGlow(item, strong);
 				return;
 			}
@@ -194,7 +198,20 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, null, null, type, false);
+				updateTags(item, null, null, null, type, false, 0);
+				return;
+			}
+		}
+		msg(NO_ITEM);
+	}
+
+	@Cmd(value="Set the item ID of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
+	public void itemid(CommandSender sender, int id) {
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null) {
+				updateTags(item, null, null, null, null, false, id);
 				return;
 			}
 		}
