@@ -1,7 +1,6 @@
 package net.lordofthecraft.itemedit.enums;
 
 import co.lotc.core.bukkit.util.ItemUtil;
-import com.sun.istack.internal.NotNull;
 import net.lordofthecraft.itemedit.ItemEdit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
