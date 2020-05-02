@@ -7,6 +7,7 @@ import co.lotc.core.command.annotate.Default;
 import co.lotc.core.command.annotate.Flag;
 import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemEdit;
+import net.lordofthecraft.itemedit.enums.Signature;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -357,7 +358,7 @@ public class MainCommands extends BaseCommand {
 	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
 	@Flag(name="rp", description="Allows signing with your RP name")
 	public void sign(CommandSender sender,
-					 @Default("ROLEPLAY") SignType type) {
+					 @Default("ROLEPLAY") Signature type) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			validate(p.hasPermission(type.permission), NO_SIGNATURE_PERM);
@@ -388,12 +389,12 @@ public class MainCommands extends BaseCommand {
 						lore = new ArrayList<>();
 					}
 
-					boolean roleplayName = (type.equals(SignType.ROLEPLAY) || hasFlag("rp"));
+					boolean roleplayName = (type.equals(Signature.ROLEPLAY) || hasFlag("rp"));
 
-					if (type.equals(SignType.PLAYER) || type.equals(SignType.ROLEPLAY) || type.permission.startsWith(ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM)) {
-						lore.addAll(SignType.getSignature(p, type, roleplayName, !hasFlag("mod")));
+					if (type.equals(Signature.PLAYER) || type.equals(Signature.ROLEPLAY) || type.permission.startsWith(ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM)) {
+						lore.addAll(Signature.getSignature(p, type, roleplayName, !hasFlag("mod")));
 					} else {
-						lore.addAll(SignType.getSignature(p, type, roleplayName, true));
+						lore.addAll(Signature.getSignature(p, type, roleplayName, true));
 					}
 
 					meta.setLore(lore);

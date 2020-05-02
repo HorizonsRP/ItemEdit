@@ -35,18 +35,14 @@ public class StaffCommands extends BaseCommand {
 
 			if (ItemUtil.hasCustomTag(item, MainCommands.EDITED_TAG)) {
 				output.append(ItemEdit.ALT_COLOR).append("Edited By:").append(tagPlayerInfo(item, MainCommands.EDITED_TAG));
-			} else if (ItemUtil.hasCustomTag(item, "renamedusers")) {
-				output.append(ItemEdit.ALT_COLOR).append("Edited By:").append(tagPlayerInfo(item, "renamedusers"));
 			}
 
 			if (ItemUtil.hasCustomTag(item, MainCommands.SIGNED_TAG)) {
 				output.append(ItemEdit.ALT_COLOR).append("Signed By:").append(tagPlayerInfo(item, MainCommands.SIGNED_TAG));
-			} else if (ItemUtil.hasCustomTag(item, "signuser")) {
-				output.append(ItemEdit.ALT_COLOR).append("Signed By:").append(tagPlayerInfo(item, "signuser"));
 			}
 
 			if (output.length() <= 0) {
-				output.append("This is a legacy item created by Moniker, or it has not been edited. Please use /ci to investigate the custom tags.");
+				output.append("This item has not been edited.");
 			}
 			msg(ItemEdit.PREFIX + output.toString());
 		}

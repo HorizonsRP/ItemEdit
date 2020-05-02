@@ -1,16 +1,16 @@
-package net.lordofthecraft.itemedit.command;
+package net.lordofthecraft.itemedit.enums;
 
 import co.lotc.core.agnostic.Sender;
 import net.lordofthecraft.itemedit.ItemEdit;
+import net.lordofthecraft.itemedit.command.MainCommands;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public enum SignType {
+public enum Signature {
 
 	// STAFF AND DEFAULT SIGNATURES
 	ADMIN("ADMIN", ChatColor.DARK_RED, "Admin Approved", "❃", ItemEdit.PERMISSION_START + ".admin"),
@@ -48,16 +48,16 @@ public enum SignType {
 	public final String affixes;
 	public final String permission;
 
-	SignType(String name, ChatColor color, String approved, String affixes, String permission) {
+	Signature(String name, ChatColor color, String approved, String affixes, String permission) {
 		this.name = name;
 		this.color = color;
 		this.approved = approved;
 		this.affixes = ChatColor.RESET + "" + ChatColor.RED + affixes + ChatColor.RESET;
 		this.permission = permission;
 	}
-	public static final SignType DEFAULT = PLAYER;
+	public static final Signature DEFAULT = PLAYER;
 
-	public static List<String> getSignature(Player p, SignType type, boolean roleplay, boolean showRealName) {
+	public static List<String> getSignature(Player p, Signature type, boolean roleplay, boolean showRealName) {
 		String name = p.getName();
 		if (roleplay) {
 			//Grab Persona name.
@@ -115,8 +115,8 @@ public enum SignType {
 		return output;
 	}
 
-	public static SignType typeFromString(String string) {
-		for (SignType type : values()) {
+	public static Signature typeFromString(String string) {
+		for (Signature type : values()) {
 			if (type.name.equalsIgnoreCase(string)) {
 				return type;
 			}
@@ -127,7 +127,7 @@ public enum SignType {
 
 	public static List<String> getAvailableTypes(Sender player) {
 		ArrayList<String> list = new ArrayList<>();
-		for (SignType type : values()) {
+		for (Signature type : values()) {
 			if (player.hasPermission(type.permission)) {
 				list.add(type.name);
 			}

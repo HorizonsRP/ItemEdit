@@ -2,34 +2,16 @@ package net.lordofthecraft.itemedit;
 
 import co.lotc.core.bukkit.command.Commands;
 import net.lordofthecraft.itemedit.command.MainCommands;
-import net.lordofthecraft.itemedit.command.SignType;
+import net.lordofthecraft.itemedit.enums.Signature;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
-import org.apache.commons.codec.binary.Base64;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class ItemEdit extends JavaPlugin {
 
@@ -106,10 +88,10 @@ public final class ItemEdit extends JavaPlugin {
 
 	// Auto-populate our SignTypes
 	private void registerParameters() {
-		Commands.defineArgumentType(SignType.class)
+		Commands.defineArgumentType(Signature.class)
 				.defaultName("Type")
-				.completer((s,$) -> SignType.getAvailableTypes(s))
-				.mapperWithSender((sender, type) -> SignType.typeFromString(type))
+				.completer((s,$) -> Signature.getAvailableTypes(s))
+				.mapperWithSender((sender, type) -> Signature.typeFromString(type))
 				.register();
 	}
 
