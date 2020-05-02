@@ -73,20 +73,20 @@ public enum Signature {
 		return DGRAY_ITALIC + "Created By " + type.aRank + " " + type.color + name;
 	}
 
-	public static Signature typeFromString(String string) {
-		for (Signature type : values()) {
-			if (type.name.equalsIgnoreCase(string)) {
-				return type;
+	public static Signature getByName(String string) {
+		for (Signature signature : values()) {
+			if (signature.name.equalsIgnoreCase(string)) {
+				return signature;
 			}
 		}
 		return DEFAULT;
 	}
 
-	public static List<String> getAvailableTypes(Sender player) {
+	public static List<String> getAvailable(Sender player) {
 		ArrayList<String> list = new ArrayList<>();
-		for (Signature type : values()) {
-			if (player.hasPermission(type.permission)) {
-				list.add(type.name);
+		for (Signature signature : values()) {
+			if (player.hasPermission(signature.permission)) {
+				list.add(signature.name);
 			}
 		}
 		return list;

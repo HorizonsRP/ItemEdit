@@ -2,7 +2,7 @@ package net.lordofthecraft.itemedit;
 
 import co.lotc.core.bukkit.command.Commands;
 import net.lordofthecraft.itemedit.command.MainCommands;
-import net.lordofthecraft.itemedit.enums.Signature;
+import net.lordofthecraft.itemedit.enums.*;
 import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -18,6 +18,10 @@ public final class ItemEdit extends JavaPlugin {
 	public static final String PREFIX = ChatColor.AQUA + "";
 	public static final String ALT_COLOR = ChatColor.GOLD + "";
 	public static final String PERMISSION_START = "itemedit";
+	public static final String RARITY_PERM = "rarity";
+	public static final String QUALITY_PERM = "quality";
+	public static final String AURA_PERM = "aura";
+	public static final String TYPE_PERM = "type";
 	public static final String SIGNATURE_PERM = "signature";
 
 	public static final boolean DEBUGGING = true;
@@ -89,9 +93,33 @@ public final class ItemEdit extends JavaPlugin {
 	// Auto-populate our SignTypes
 	private void registerParameters() {
 		Commands.defineArgumentType(Signature.class)
+				.defaultName("Signature")
+				.completer((s,$) -> Signature.getAvailable(s))
+				.mapperWithSender((sender, type) -> Signature.getByName(type))
+				.register();
+
+		Commands.defineArgumentType(Rarity.class)
+				.defaultName("Rarity")
+				.completer((s,$) -> Rarity.getAvailable(s))
+				.mapperWithSender((sender, type) -> Rarity.getByName(type))
+				.register();
+
+		Commands.defineArgumentType(Quality.class)
+				.defaultName("Quality")
+				.completer((s,$) -> Quality.getAvailable(s))
+				.mapperWithSender((sender, type) -> Quality.getByName(type))
+				.register();
+
+		Commands.defineArgumentType(Aura.class)
+				.defaultName("Aura")
+				.completer((s,$) -> Aura.getAvailable(s))
+				.mapperWithSender((sender, type) -> Aura.getByName(type))
+				.register();
+
+		Commands.defineArgumentType(Type.class)
 				.defaultName("Type")
-				.completer((s,$) -> Signature.getAvailableTypes(s))
-				.mapperWithSender((sender, type) -> Signature.typeFromString(type))
+				.completer((s,$) -> Type.getAvailable(s))
+				.mapperWithSender((sender, type) -> Type.getByName(type))
 				.register();
 	}
 
