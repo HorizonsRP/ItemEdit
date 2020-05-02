@@ -6,7 +6,6 @@ import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Range;
 import co.lotc.core.util.MojangCommunicator;
 import net.lordofthecraft.itemedit.ItemEdit;
-import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -20,25 +19,19 @@ import java.util.UUID;
 
 public class StaffCommands extends BaseCommand {
 
-	private TransactionsSQL transSQL;
-
-	StaffCommands(TransactionsSQL trans) {
-		transSQL = trans;
-	}
-
 	@Cmd(value="Gets information on the given item.")
 	public void iteminfo(CommandSender sender) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			ItemStack item = transSQL.getItemInHand(p);
+			ItemStack item = ItemEdit.getItemInHand(p);
 			StringBuilder output = new StringBuilder();
 
-			if (ItemUtil.hasCustomTag(item, MainCommands.EDITED_TAG)) {
-				output.append(ItemEdit.ALT_COLOR).append("Edited By:").append(tagPlayerInfo(item, MainCommands.EDITED_TAG));
+			if (ItemUtil.hasCustomTag(item, ItemEdit.EDITED_TAG)) {
+				output.append(ItemEdit.ALT_COLOR).append("Edited By:").append(tagPlayerInfo(item, ItemEdit.EDITED_TAG));
 			}
 
-			if (ItemUtil.hasCustomTag(item, MainCommands.SIGNED_TAG)) {
-				output.append(ItemEdit.ALT_COLOR).append("Signed By:").append(tagPlayerInfo(item, MainCommands.SIGNED_TAG));
+			if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG)) {
+				output.append(ItemEdit.ALT_COLOR).append("Signed By:").append(tagPlayerInfo(item, ItemEdit.SIGNED_TAG));
 			}
 
 			if (output.length() <= 0) {
@@ -102,12 +95,6 @@ public class StaffCommands extends BaseCommand {
 	public void setDescWidth(@Arg(value="# of letters")@Range(min=1, max=100)int characters) {
 		ItemEdit.get().setMaxWidth(characters);
 		msg(ItemEdit.PREFIX + "Lore and name width set to " + characters + ".");
-	}
-
-	@Cmd(value="Removes all tokens and recent edit history of a given player.", permission="itemedit.admin")
-	public void purge(CommandSender sender, Player p) {
-		transSQL.deleteAllFromPlayer(p);
-		msg(ItemEdit.PREFIX + "Purged all edit data for " + p.getDisplayName() + " from our SQL Database. Edited items will not been affected.");
 	}
 
 }

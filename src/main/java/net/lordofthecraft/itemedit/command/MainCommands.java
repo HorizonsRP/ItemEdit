@@ -7,8 +7,7 @@ import co.lotc.core.command.annotate.Default;
 import co.lotc.core.command.annotate.Flag;
 import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemEdit;
-import net.lordofthecraft.itemedit.enums.Signature;
-import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
+import net.lordofthecraft.itemedit.enums.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -26,7 +25,6 @@ public class MainCommands extends BaseCommand {
 
 	// Sub command for moderators
 	private static StaffCommands staffCommands;
-	private static TokenCommands tokenCommands;
 
 	// Our local /edit clear sub command.
 	private static final ClearCommands CLEAR_COMMANDS = new ClearCommands();
@@ -46,170 +44,75 @@ public class MainCommands extends BaseCommand {
 	private static final String DESC_PREFIX = ChatColor.GRAY + "" + ChatColor.ITALIC;
 	private static final Glow GLOW = new Glow(new NamespacedKey(ItemEdit.get(), ItemEdit.get().getDescription().getName()));
 
-	// Tags set by CustomItem for identification
-	public static final String EDITED_TAG = "editor-uuid";
-	public static final String SIGNED_TAG = "signed-uuid";
-	public static final String PAPER_FREEBIE = "paper-desc-free";
-
-	// Our SQL access
-	public static TransactionsSQL transSQL;
-
-	public MainCommands(TransactionsSQL trans) {
+	public MainCommands() {
 		nameTooLong = ItemEdit.PREFIX + "That name is too long! Please shorten it to " + ItemEdit.getMaxWidth() + " characters long.";
-		transSQL = trans;
-		staffCommands = new StaffCommands(transSQL);
-		tokenCommands = new TokenCommands(transSQL);
-	}
-
-	// Per Player //
-	@Cmd(value="Check how many tokens you have.", permission="itemedit.check")
-	public BaseCommand tokens() {
-		return tokenCommands;
-	}
-
-	@Cmd(value="Checks the prices on each edit, if enabled.", permission="itemedit.prices")
-	public void prices() {
-		msg(ItemEdit.PREFIX + "This feature is not currently enabled!");
+		staffCommands = new StaffCommands();
 	}
 
 	// Edit Types //
-	@Cmd(value="Set a custom name for an item.", permission="itemedit.name")
-	@Flag(name="mod", description="Sets the name regardless of signature.", permission="itemedit.mod")
-	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
+	@Cmd(value="Set a custom name for an item.", permission=ItemEdit.PERMISSION_START + ".name")
+	@Flag(name="mod", description="Sets the name regardless of signature.", permission=ItemEdit.PERMISSION_START + ".mod")
+	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission=ItemEdit.PERMISSION_START + ".free")
 	public void name(CommandSender sender,
 					 @Arg(value="Name", description="The name you wish to give the item.") String[] name) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			ItemStack item = transSQL.getItemInHand(p);
+			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
 				if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
 					msg(SIGNED_ALREADY);
 					return;
 				}
-
-				int tokensUsed = transSQL.safeToChargePlayer(p);
-				// If item has been edited and is does not have the paper tag (if relevent), or if
-				// a staff is using the -staff flag, then the edit is free regardless.
-				if ((ItemUtil.hasCustomTag(item, EDITED_TAG) &&
-					 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
-					hasFlag("staff")) {
-					tokensUsed = 0;
-				} else if (tokensUsed == 0) {
-					msg(NO_TOKENS);
-					return;
-				}
-
-				ItemMeta meta = item.getItemMeta();
-				if (meta != null) {
-					StringBuilder thisName = new StringBuilder();
-					for (String s : name) {
-						if (thisName.length() > 0) {
-							thisName.append(" ").append(s);
-						} else {
-							thisName.append(s);
-						}
+				StringBuilder thisName = new StringBuilder();
+				for (String s : name) {
+					if (thisName.length() > 0) {
+						thisName.append(" ").append(s);
+					} else {
+						thisName.append(s);
 					}
-					validate(thisName.toString().length() <= ItemEdit.getMaxWidth(), nameTooLong);
-					meta.setDisplayName(ChatColor.ITALIC + ChatColor.stripColor(thisName.toString()));
-					item.setItemMeta(meta);
 				}
-
-				finalizeEdit(p, item, tokensUsed, false);
+				validate(thisName.toString().length() <= ItemEdit.getMaxWidth(), nameTooLong);
+				updateDisplayName(item, thisName.toString());
+				finalizeEdit(p, item);
 				return;
 			}
 		}
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Change the color of the name of an item's name.", permission="itemedit.color")
-	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
-	@Flag(name="bold", description="Allows bypassing the colour type.", permission="itemedit.mod")
-	@Flag(name="under", description="Allows bypassing the colour type.", permission="itemedit.mod")
-	@Flag(name="strike", description="Allows bypassing the colour type.", permission="itemedit.mod")
-	@Flag(name="magic", description="Allows bypassing the colour type.", permission="itemedit.mod")
-	public void color(CommandSender sender, ChatColor color) {
-
-		validate(color != ChatColor.BOLD, COLOR_ERROR);
-		validate(color != ChatColor.ITALIC, COLOR_ERROR);
-		validate(color != ChatColor.MAGIC, COLOR_ERROR);
-		validate(color != ChatColor.RESET, COLOR_ERROR);
-		validate(color != ChatColor.UNDERLINE, COLOR_ERROR);
-		validate(color != ChatColor.STRIKETHROUGH, COLOR_ERROR);
-
-		String colorString = "" + color;
-		if (hasFlag("bold")) {
-			colorString += ChatColor.BOLD;
-		}
-		if (hasFlag("under")) {
-			colorString += ChatColor.UNDERLINE;
-		}
-		if (hasFlag("strike")) {
-			colorString += ChatColor.STRIKETHROUGH;
-		}
-		if (hasFlag("magic")) {
-			colorString += ChatColor.MAGIC;
-		}
-
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			ItemStack item = transSQL.getItemInHand(p);
-			if (item != null && item.getType() != Material.AIR) {
-				if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
-					msg(SIGNED_ALREADY);
-					return;
-				}
-				ItemMeta meta = item.getItemMeta();
-				if (meta != null && meta.hasDisplayName()) {
-
-					int tokensUsed = transSQL.safeToChargePlayer(p);
-					// If item has been edited and is does not have the paper tag (if relevent), or if
-					// a staff is using the -staff flag, then the edit is free regardless.
-					if ((ItemUtil.hasCustomTag(item, EDITED_TAG) &&
-						 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
-						hasFlag("staff")) {
-						tokensUsed = 0;
-					} else if (tokensUsed == 0) {
-						msg(NO_TOKENS);
-						return;
-					}
-
-					meta.setDisplayName(colorString + ChatColor.ITALIC + ChatColor.stripColor(meta.getDisplayName()));
-					item.setItemMeta(meta);
-
-					finalizeEdit(p, item, tokensUsed, false);
-				} else {
-					msg(NO_NAME_SET);
-				}
-				return;
+	private void updateDisplayName(ItemStack item, String name) {
+		Tags tags = new Tags(item);
+		Rarity rarity = tags.getRarity();
+		if (rarity != null) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				meta.setDisplayName(rarity.getColor() + name);
+				item.setItemMeta(meta);
 			}
+		} else {
+			updateRarity(item, null, null, null, null);
+			updateDisplayName(item, name);
 		}
-		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Add a custom description for an item.", permission="itemedit.desc")
+	private void updateRarity(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type) {
+		String newTags = Tags.formatTags(rarity, quality, aura, type);
+	}
+
+	@Cmd(value="Add a custom description for an item.", permission=ItemEdit.PERMISSION_START + ".desc")
 	@Flag(name="newline", description="Adds a new line. If a description was entered, adds the new line after.")
-	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
-	public void desc(CommandSender sender,
-					 @Arg(value="Description", description="The blurb of text you wish to add to the item's lore. Use multiple times to string together more lore.")@Default("") String[] desc) {
+	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission=ItemEdit.PERMISSION_START + ".free")
+	public void desc(CommandSender sender, String[] desc) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			ItemStack item = transSQL.getItemInHand(p);
+			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
 				if (isSigned(item)) {
 					msg(SIGNED_ALREADY);
 					return;
 				}
 
-				boolean paper = item.getType() == Material.PAPER;
-				int tokensUsed = transSQL.safeToChargePlayer(p);
-				if (ItemUtil.hasCustomTag(item, EDITED_TAG) || paper || hasFlag("staff")) {
-					tokensUsed = 0;
-				} else if (tokensUsed == 0) {
-					msg(NO_TOKENS);
-					return;
-				}
-
-				int maxLines = transSQL.getMaxLines(p);
+				int maxLines = .getMaxLines(p);
 				if (item.getItemMeta() != null && item.getItemMeta().getLore() != null &&
 					item.getItemMeta().getLore().size() > maxLines) {
 					msg(MAX_LENGTH);
@@ -220,7 +123,7 @@ public class MainCommands extends BaseCommand {
 					msg(MAX_LENGTH);
 					return;
 				} else {
-					finalizeEdit(p, item, tokensUsed, paper);
+					finalizeEdit(p, item);
 				}
 
 				return;
@@ -314,9 +217,9 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
-	@Cmd(value="Add a glowing effect to an item as if it were enchanted.", permission="itemedit.glow")
-	@Flag(name="mod", description="Adds glow to the item regardless of signature.", permission="itemedit.mod")
-	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
+	@Cmd(value="Add a glowing effect to an item as if it were enchanted.", permission=ItemEdit.PERMISSION_START + ".glow")
+	@Flag(name="mod", description="Adds glow to the item regardless of signature.", permission=ItemEdit.PERMISSION_START + ".mod")
+	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission=ItemEdit.PERMISSION_START + ".free")
 	public void glow(CommandSender sender) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
@@ -330,7 +233,7 @@ public class MainCommands extends BaseCommand {
 				int tokensUsed = transSQL.safeToChargePlayer(p);
 				// If item has been edited and is does not have the paper tag (if relevent), or if
 				// a staff is using the -staff flag, then the edit is free regardless.
-				if ((ItemUtil.hasCustomTag(item, EDITED_TAG) &&
+				if ((ItemUtil.hasCustomTag(item, ItemEdit.EDITED_TAG) &&
 					 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
 					hasFlag("staff")) {
 					tokensUsed = 0;
@@ -373,7 +276,7 @@ public class MainCommands extends BaseCommand {
 				int tokensUsed = transSQL.safeToChargePlayer(p);
 				// If item has been edited and is does not have the paper tag (if relevent), or if
 				// a staff is using the -staff flag, then the edit is free regardless.
-				if ((ItemUtil.hasCustomTag(item, EDITED_TAG) &&
+				if ((ItemUtil.hasCustomTag(item, ItemEdit.EDITED_TAG) &&
 					 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
 					hasFlag("staff")) {
 					tokensUsed = 0;
@@ -400,7 +303,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				ItemUtil.setCustomTag(item, SIGNED_TAG, p.getUniqueId().toString() + ":" + System.currentTimeMillis());
-				finalizeEdit(p, item, tokensUsed, false);
+				finalizeEdit(p, item);
 				return;
 			}
 		}
@@ -436,26 +339,12 @@ public class MainCommands extends BaseCommand {
 	}
 
 	// Replaces the item in hand with the given edits after applying the appropriate tags and charging the player.
-	private static void finalizeEdit(Player p, ItemStack item, int tokensUsed, boolean paper) {
-		// If tokensUsed is 0 it's a clearing and doesn't need to be logged.
+	private static void finalizeEdit(Player p, ItemStack item) {
 		String preString = "";
-		if (ItemUtil.hasCustomTag(item, EDITED_TAG)) {
-			preString = ItemUtil.getCustomTag(item, EDITED_TAG) + "/";
+		if (ItemUtil.hasCustomTag(item, ItemEdit.EDITED_TAG)) {
+			preString = ItemUtil.getCustomTag(item, ItemEdit.EDITED_TAG) + "/";
 		}
-		ItemUtil.setCustomTag(item, EDITED_TAG, preString + p.getUniqueId().toString() + ":" + System.currentTimeMillis());
-		if (paper) {
-			ItemUtil.setCustomTag(item, PAPER_FREEBIE, "!");
-		} else {
-			ItemUtil.removeCustomTag(item, PAPER_FREEBIE);
-		}
-
-		// If the player used an edit token, otherwise the player had to've used a VIP token.
-		if (tokensUsed > 0) {
-			int tokensLeft = (transSQL.getTokens(p)) - tokensUsed;
-			transSQL.addEntry(0L, p, tokensLeft);
-		} else if (tokensUsed < 0) {
-			transSQL.addEntry(-1L, p, 0);
-		}
+		ItemUtil.setCustomTag(item, ItemEdit.EDITED_TAG, preString + p.getUniqueId().toString() + ":" + System.currentTimeMillis());
 	}
 
 	/////////////////////
@@ -497,7 +386,7 @@ public class MainCommands extends BaseCommand {
 				Player p = (Player) sender;
 				ItemStack item = transSQL.getItemInHand(p);
 				if (item != null && item.getType() != Material.AIR) {
-					if (ItemUtil.hasCustomTag(item, EDITED_TAG) || transSQL.isItemMonikerSigned(item)) {
+					if (ItemUtil.hasCustomTag(item, ItemEdit.EDITED_TAG) || transSQL.isItemMonikerSigned(item)) {
 						if (!mod && isSigned(item) && notSignedBy(item, p)) {
 							return SIGNED_ALREADY;
 						} else {

@@ -3,11 +3,12 @@ package net.lordofthecraft.itemedit;
 import co.lotc.core.bukkit.command.Commands;
 import net.lordofthecraft.itemedit.command.MainCommands;
 import net.lordofthecraft.itemedit.enums.*;
-import net.lordofthecraft.itemedit.sqlite.TransactionsSQL;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -26,6 +27,11 @@ public final class ItemEdit extends JavaPlugin {
 
 	public static final boolean DEBUGGING = true;
 
+	// Tags set by Tythan for identification
+	public static final String EDITED_TAG = "editor-uuid";
+	public static final String SIGNED_TAG = "signed-uuid";
+	public static final String INFO_TAG = "item-data";
+
 	private static int maxWidth;
 	public static int getMaxWidth() {
 		return maxWidth;
@@ -42,10 +48,6 @@ public final class ItemEdit extends JavaPlugin {
 	private static ItemEdit instance;
 	public static ItemEdit get() {
 		return instance;
-	}
-	private static TransactionsSQL transaction;
-	public static TransactionsSQL getTransaction() {
-		return transaction;
 	}
 
 	@Override
@@ -74,15 +76,12 @@ public final class ItemEdit extends JavaPlugin {
 			refreshTime = 7;
 		}
 
-		// Load the tokens we have.
-		loadCurrentTokens();
-
 		// Register our auto-complete and glow enchant.
 		registerParameters();
 		registerGlow();
 
 		// Initiate commands if everything else has been successful.
-		Commands.build(getCommand("edit"), () -> new MainCommands(transaction));
+		Commands.build(getCommand("edit"), MainCommands::new);
 	}
 
 	@Override
@@ -135,7 +134,6 @@ public final class ItemEdit extends JavaPlugin {
 		}
 		try {
 			NamespacedKey key = new NamespacedKey(this, getDescription().getName());
-			// 1.12.2 Glow glow = new Glow(70);
 			Glow glow = new Glow(key);
 			Enchantment.registerEnchantment(glow);
 		}
@@ -144,13 +142,6 @@ public final class ItemEdit extends JavaPlugin {
 		catch(Exception e){
 			e.printStackTrace();
 		}
-	}
-
-	// Loads the tokens and transactions we have registered for each player.
-	// Also deletes any transactions from REFRESH_TIME ago.
-	private void loadCurrentTokens() {
-		transaction = new TransactionsSQL(this);
-		transaction.load();
 	}
 
 	// Config Editors
@@ -166,62 +157,11 @@ public final class ItemEdit extends JavaPlugin {
 		saveConfig();
 	}
 
-	//// HOOKS ////
-
-	// CHANGE
-	// Changes the tokens of a player by a given amount (positive or negative).
-	public static boolean changeTokens(int amount, String playerName) {
-		UUID p = TransactionsSQL.getUUIDByName(playerName);
-		boolean output = false;
-		if (p != null) {
-			output = changeTokens(amount, p);
+	// Grabs the item in main hand for the player.
+	public static ItemStack getItemInHand(Player player) {
+		if (player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+			return player.getInventory().getItemInMainHand();
 		}
-		return output;
+		return null;
 	}
-	public static boolean changeTokens(int amount, Player player) {
-		return changeTokens(amount, player.getUniqueId());
-	}
-	public static boolean changeTokens(int amount, UUID player) {
-		int newAmount = (getTokens(player) + amount);
-		if (newAmount < 0) {
-			newAmount = 0;
-		}
-		return setTokens(newAmount, player);
-	}
-
-	// SET
-	// Sets a player's tokens to a value.
-	public static boolean setTokens(int amount, String playerName) {
-		UUID p = TransactionsSQL.getUUIDByName(playerName);
-		boolean output = false;
-		if (p != null) {
-			output = setTokens(amount, p);
-		}
-		return output;
-	}
-	public static boolean setTokens(int amount, Player player) {
-		return setTokens(amount, player.getUniqueId());
-	}
-	public static boolean setTokens(int amount, UUID player) {
-		transaction.addEntry(0, player, amount);
-		return true;
-	}
-
-	// GET
-	// Provides how many tokens a player has.
-	public static int getTokens(String playerName) {
-		UUID p = TransactionsSQL.getUUIDByName(playerName);
-		int output = Integer.MIN_VALUE;
-		if (p != null) {
-			output = getTokens(p);
-		}
-		return output;
-	}
-	public static int getTokens(Player p) {
-		return getTokens(p.getUniqueId());
-	}
-	public static int getTokens(UUID p) {
-		return transaction.getTokens(p);
-	}
-
 }

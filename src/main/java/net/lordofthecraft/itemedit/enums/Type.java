@@ -21,6 +21,8 @@ public enum Type {
 	GEM(     "Gem",         ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".gem"),
 	MISC(    "Miscellanea", ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".misc");
 
+	public static Type DEFAULT = MISC;
+
 	private String name;
 	private String permission;
 

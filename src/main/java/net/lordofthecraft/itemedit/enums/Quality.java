@@ -20,6 +20,8 @@ public enum Quality {
 	PERFECT( false, "Perfect",     ChatColor.RED,          ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".perfect"),
 	LASAGNA( true,  "Lasagna",     ChatColor.BLACK,        ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".lasagna");
 
+	public static Quality DEFAULT = FAILURE;
+
 	private boolean magic;
 	private String name;
 	private ChatColor color;

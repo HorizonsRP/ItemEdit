@@ -23,6 +23,8 @@ public enum Aura {
 	VOIDAL(    "Voidal",     ChatColor.DARK_PURPLE, ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".voidal"),
 	ABYSSAL(   "Abyssal",    ChatColor.GRAY,        ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".abyssal");
 
+	public static Aura DEFAULT = MUNDANE;
+
 	private String name;
 	private ChatColor color;
 	private String permission;

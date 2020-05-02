@@ -19,6 +19,8 @@ public enum Rarity {
 	FABLED(   false, true,  "Fabled",      ChatColor.DARK_RED,    ItemEdit.PERMISSION_START + "." + ItemEdit.RARITY_PERM + ".fabled"),
 	LASAGNA(  true,  true,  "Lasagna",     ChatColor.BLACK,       ItemEdit.PERMISSION_START + "." + ItemEdit.RARITY_PERM + ".lasagna");
 
+	public static Rarity DEFAULT = VCOMMON;
+
 	private boolean magic;
 	private boolean bold;
 	private String name;
@@ -34,14 +36,7 @@ public enum Rarity {
 	}
 
 	public String getTag() {
-		String color = this.color + "";
-		if (this.bold) {
-			color += ChatColor.BOLD;
-		}
-		if (this.magic) {
-			color += ChatColor.MAGIC;
-		}
-		return color + this.name;
+		return getColor() + this.name;
 	}
 
 	public String getName() {
@@ -50,7 +45,18 @@ public enum Rarity {
 	public String getPermission() {
 		return this.permission;
 	}
+	public String getColor() {
+		String output = this.color + "";
+		if (this.bold) {
+			output += ChatColor.BOLD;
+		}
+		if (this.magic) {
+			output += ChatColor.MAGIC;
+		}
+		return output;
+	}
 
+	// STATIC //
 	public static Rarity getByName(String name) {
 		for (Rarity rarity : values()) {
 			if (rarity.getName().equalsIgnoreCase(name)) {

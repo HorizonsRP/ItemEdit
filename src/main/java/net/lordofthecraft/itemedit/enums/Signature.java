@@ -92,15 +92,4 @@ public enum Signature {
 		return list;
 	}
 
-	// TAGS //
-	private static final ChatColor BRACKET_COLOR = ChatColor.GRAY;
-	private static final String DIVIDER = BRACKET_COLOR + " | ";
-
-	public static String formatTags(Rarity rarity, Quality quality, Aura aura, Type type) {
-		return formatTags(rarity, quality, aura, type, false);
-	}
-	public static String formatTags(Rarity rarity, Quality quality, Aura aura, Type type, boolean boldAura) {
-		return BRACKET_COLOR + "[" + rarity.getTag() + DIVIDER + quality.getTag() + DIVIDER + aura.getTag(boldAura) + DIVIDER + type.getTag() + BRACKET_COLOR + "]";
-	}
-
 }
