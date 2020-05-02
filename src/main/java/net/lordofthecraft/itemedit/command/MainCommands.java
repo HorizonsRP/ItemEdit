@@ -81,12 +81,11 @@ public class MainCommands extends BaseCommand {
 	}
 
 	private void updateDisplayName(ItemStack item, String name) {
-		Tags tags = new Tags(item);
-		Rarity rarity = tags.getRarity();
-		if (rarity != null) {
+		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
+			Tags tags = new Tags(item);
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
-				meta.setDisplayName(rarity.getColor() + name);
+				meta.setDisplayName(tags.getRarity().getColor() + name);
 				item.setItemMeta(meta);
 			}
 		} else {
@@ -104,7 +103,6 @@ public class MainCommands extends BaseCommand {
 			tags.setQuality(quality);
 			tags.setAura(aura);
 			tags.setType(type);
-			tags.applyTagToItem(item);
 
 			if (lore != null && lore.size() > 0) {
 				int start = 0;
@@ -124,6 +122,7 @@ public class MainCommands extends BaseCommand {
 
 			meta.setLore(lore);
 			item.setItemMeta(meta);
+			tags.applyTagToItem(item);
 		}
 	}
 
