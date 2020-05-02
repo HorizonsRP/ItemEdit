@@ -51,7 +51,7 @@ public enum Signature {
 		this.name = name;
 		this.color = color;
 		this.aRank = aRank;
-		this.affixes = ChatColor.RESET + "" + ChatColor.RED + affixes + ChatColor.RESET;
+		this.affixes = ChatColor.RESET + "" + ChatColor.DARK_AQUA + affixes + ChatColor.RESET;
 		this.permission = permission;
 	}
 	public static final Signature DEFAULT = PLAYER;
