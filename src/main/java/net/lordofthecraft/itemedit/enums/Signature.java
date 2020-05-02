@@ -14,7 +14,7 @@ public enum Signature {
 	// STAFF AND DEFAULT SIGNATURES
 	ADMIN("ADMIN", ChatColor.DARK_RED, "An Admin", "❃", ItemEdit.PERMISSION_START + ".admin"),
 	MOD("MOD", ChatColor.BLUE, "A Moderator", "✲", ItemEdit.PERMISSION_START + ".mod"),
-	TECH("DEV", ChatColor.DARK_AQUA, "A Technician", "❖", ItemEdit.PERMISSION_START + ".tech"),
+	TECH("TECH", ChatColor.DARK_AQUA, "A Technician", "❖", ItemEdit.PERMISSION_START + ".tech"),
 	LORE("LORE", ChatColor.DARK_GREEN, "A Lore Herald", "✺", ItemEdit.PERMISSION_START + ".lore"),
 	EVENT("EVENT", ChatColor.GREEN, "An Event Actor", "✺", ItemEdit.PERMISSION_START + ".event"),
 	BUILD("BUILD", ChatColor.GOLD, "A Builder", "❂", ItemEdit.PERMISSION_START + ".build"),
