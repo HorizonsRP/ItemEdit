@@ -133,6 +133,11 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				updateTags(item, rarity, null, null, null);
+				ItemMeta meta = item.getItemMeta();
+				if (meta != null) {
+					String name = ChatColor.stripColor(meta.getDisplayName());
+					updateDisplayName(item, name);
+				}
 				return;
 			}
 		}
