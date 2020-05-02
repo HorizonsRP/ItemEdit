@@ -27,7 +27,7 @@ public class MainCommands extends BaseCommand {
 	private static StaffCommands staffCommands;
 
 	// Our local /edit clear sub command.
-	private static final ClearCommands CLEAR_COMMANDS = new ClearCommands();
+	//private static final ClearCommands CLEAR_COMMANDS = new ClearCommands();
 
 	// Error messages
 	private static final String NO_ITEM = ItemEdit.PREFIX + "Please hold an item in your main hand while editing.";
@@ -89,12 +89,12 @@ public class MainCommands extends BaseCommand {
 				item.setItemMeta(meta);
 			}
 		} else {
-			updateRarity(item, null, null, null, null);
+			updateTags(item, null, null, null, null);
 			updateDisplayName(item, name);
 		}
 	}
 
-	private void updateRarity(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type) {
+	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
@@ -126,6 +126,59 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
+	@Cmd(value="Set the rarity of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
+	public void rarity(CommandSender sender, Rarity rarity) {
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null) {
+				updateTags(item, rarity, null, null, null);
+				return;
+			}
+		}
+		msg(NO_ITEM);
+	}
+
+	@Cmd(value="Set the quality of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
+	public void quality(CommandSender sender, Quality quality) {
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null) {
+				updateTags(item, null, quality, null, null);
+				return;
+			}
+		}
+		msg(NO_ITEM);
+	}
+
+	@Cmd(value="Set the aura of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
+	public void aura(CommandSender sender, Aura aura) {
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null) {
+				updateTags(item, null, null, aura, null);
+				return;
+			}
+		}
+		msg(NO_ITEM);
+	}
+
+	@Cmd(value="Set the type of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
+	public void type(CommandSender sender, Type type) {
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null) {
+				updateTags(item, null, null, null, type);
+				return;
+			}
+		}
+		msg(NO_ITEM);
+	}
+
+	/*
 	@Cmd(value="Add a custom description for an item.", permission=ItemEdit.PERMISSION_START + ".desc")
 	@Flag(name="newline", description="Adds a new line. If a description was entered, adds the new line after.")
 	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission=ItemEdit.PERMISSION_START + ".free")
@@ -345,21 +398,17 @@ public class MainCommands extends BaseCommand {
 	@Cmd(value="Moderator access to edited items.", permission="itemedit.mod")
 	public BaseCommand staff() {
 		return staffCommands;
-	}
+	}*/
 
-	// Checks if the item is signed, legacy or otherwise.
+	// Checks if the item is signed
 	private static boolean isSigned(ItemStack item) {
-		if (transSQL.isItemMonikerSigned(item)) {
-			return true;
-		} else {
-			return ItemUtil.hasCustomTag(item, SIGNED_TAG);
-		}
+		return ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG);
 	}
 
 	// Checks if the item was signed by the given player
 	private static boolean notSignedBy(ItemStack item, Player p) {
-		if (ItemUtil.hasCustomTag(item, SIGNED_TAG)) {
-			String uuid = ItemUtil.getCustomTag(item, SIGNED_TAG).replace(":", " ").split(" ")[0];
+		if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG)) {
+			String uuid = ItemUtil.getCustomTag(item, ItemEdit.SIGNED_TAG).replace(":", " ").split(" ")[0];
 			return !UUID.fromString(uuid).equals(p.getUniqueId());
 		}
 		return true;
@@ -372,7 +421,7 @@ public class MainCommands extends BaseCommand {
 			preString = ItemUtil.getCustomTag(item, ItemEdit.EDITED_TAG) + "/";
 		}
 		ItemUtil.setCustomTag(item, ItemEdit.EDITED_TAG, preString + p.getUniqueId().toString() + ":" + System.currentTimeMillis());
-	}
+	}/*
 
 	/////////////////////
 	//// CLEAR CLASS ////
@@ -432,7 +481,7 @@ public class MainCommands extends BaseCommand {
 
 			if (meta != null) {
 				for (Enchantment enc : meta.getEnchants().keySet()) {
-					if (/*(enc instanceof SoulbindEnchant) ||*/
+					if ((enc instanceof SoulbindEnchant) ||
 						(!descOnly && !sigOnly && (enc instanceof Glow))) {
 						meta.removeEnchant(enc);
 					}
@@ -463,6 +512,6 @@ public class MainCommands extends BaseCommand {
 			}
 		}
 
-	}
+	}*/
 
 }
