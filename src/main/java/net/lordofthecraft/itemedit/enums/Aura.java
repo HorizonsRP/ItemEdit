@@ -9,19 +9,19 @@ import java.util.List;
 
 public enum Aura {
 
-	MUNDANE(   "Mundane",    ChatColor.DARK_GRAY,    ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".mundane"),
-	ARCANE(    "Arcane",     ChatColor.GOLD,         ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".arcane"),
-	ELEMENTAL( "Elemental",  ChatColor.GREEN,        ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".elemental"),
-	DEMONIC(   "Demonic",    ChatColor.DARK_RED,     ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".demonic"),
-	CELESTIAL( "Celestial",  ChatColor.YELLOW,       ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".celestial"),
-	FEYLIKE(   "Feylike",    ChatColor.LIGHT_PURPLE, ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".feylike"),
-	CHAOTIC(   "Chaotic",    ChatColor.DARK_BLUE,    ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".chaotic"),
-	DEIFIC(    "Deific",     ChatColor.DARK_AQUA,    ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".deific"),
-	DRACONIC(  "Draconic",   ChatColor.RED,          ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".draconic"),
-	WEBBED(    "Webbed",     ChatColor.WHITE,        ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".webbed"),
-	SERPENTINE("Serpentine", ChatColor.DARK_GREEN,   ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".serpentine"),
-	VOIDAL(    "Voidal",     ChatColor.DARK_PURPLE,  ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".voidal"),
-	ABYSSAL(   "Abyssal",    ChatColor.GRAY,         ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".abyssal");
+	MUNDANE(   "Mundane",    ChatColor.DARK_GRAY,   ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".mundane"),
+	ARCANE(    "Arcane",     ChatColor.LIGHT_PURPLE,ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".arcane"),
+	ELEMENTAL( "Elemental",  ChatColor.GREEN,       ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".elemental"),
+	DEMONIC(   "Demonic",    ChatColor.DARK_RED,    ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".demonic"),
+	CELESTIAL( "Celestial",  ChatColor.GOLD,        ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".celestial"),
+	FEYLIKE(   "Feylike",    ChatColor.YELLOW,      ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".feylike"),
+	CHAOTIC(   "Chaotic",    ChatColor.DARK_BLUE,   ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".chaotic"),
+	DEIFIC(    "Deific",     ChatColor.DARK_AQUA,   ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".deific"),
+	DRACONIC(  "Draconic",   ChatColor.RED,         ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".draconic"),
+	WEBBED(    "Webbed",     ChatColor.WHITE,       ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".webbed"),
+	SERPENTINE("Serpentine", ChatColor.DARK_GREEN,  ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".serpentine"),
+	VOIDAL(    "Voidal",     ChatColor.DARK_PURPLE, ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".voidal"),
+	ABYSSAL(   "Abyssal",    ChatColor.GRAY,        ItemEdit.PERMISSION_START + "." + ItemEdit.AURA_PERM + ".abyssal");
 
 	private String name;
 	private ChatColor color;
