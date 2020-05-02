@@ -96,7 +96,35 @@ public class MainCommands extends BaseCommand {
 	}
 
 	private void updateRarity(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type) {
-		String newTags = Tags.formatTags(rarity, quality, aura, type);
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			List<String> lore = meta.getLore();
+			Tags tags = new Tags(item);
+			tags.setRarity(rarity);
+			tags.setQuality(quality);
+			tags.setAura(aura);
+			tags.setType(type);
+			tags.applyTagToItem(item);
+
+			if (lore != null && lore.size() > 0) {
+				int start = 0;
+				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
+					start++;
+				}
+				List<String> desc = new ArrayList<>();
+				desc.add(tags.formatTags());
+				for (int i = start; i < lore.size(); i++) {
+					desc.add(lore.get(i));
+				}
+				lore = desc;
+			} else {
+				lore = new ArrayList<>();
+				lore.add(tags.formatTags());
+			}
+
+			meta.setLore(lore);
+			item.setItemMeta(meta);
+		}
 	}
 
 	@Cmd(value="Add a custom description for an item.", permission=ItemEdit.PERMISSION_START + ".desc")

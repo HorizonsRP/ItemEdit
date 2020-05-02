@@ -18,6 +18,16 @@ public class Tags {
 	private Type type;
 	private int itemID;
 
+	public Tags(Rarity rarity, Quality quality, Aura aura, Type type, boolean strongAura, int itemID) {
+		this.rarity =  (rarity != null) ?   rarity : Rarity.DEFAULT;
+		this.quality = (quality != null) ? quality : Quality.DEFAULT;
+		this.aura =    (aura != null) ?       aura : Aura.DEFAULT;
+		this.type =    (type != null) ?       type : Type.DEFAULT;
+
+		this.strongAura = strongAura;
+		this.itemID = itemID;
+	}
+
 	public Tags(ItemStack item) {
 		String[] data = new String[]{};
 		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
@@ -70,22 +80,30 @@ public class Tags {
 	}
 
 	// SET //
-	public void setRarity(@NotNull Rarity rarity) {
-		this.rarity = rarity;
+	public void setRarity(Rarity rarity) {
+		if (rarity != null) {
+			this.rarity = rarity;
+		}
 	}
-	public void setQuality(@NotNull Quality quality) {
-		this.quality = quality;
+	public void setQuality(Quality quality) {
+		if (quality != null) {
+			this.quality = quality;
+		}
 	}
-	public void setAura(@NotNull Aura aura) {
-		this.aura = aura;
+	public void setAura(Aura aura) {
+		if (aura != null) {
+			this.aura = aura;
+		}
 	}
-	public void setStrongAura(@NotNull boolean strongAura) {
+	public void setStrongAura(boolean strongAura) {
 		this.strongAura = strongAura;
 	}
-	public void setType(@NotNull Type type) {
-		this.type = type;
+	public void setType(Type type) {
+		if (type != null) {
+			this.type = type;
+		}
 	}
-	public void setLFItemID(@NotNull int itemID) {
+	public void setLFItemID(int itemID) {
 		this.itemID = itemID;
 	}
 
