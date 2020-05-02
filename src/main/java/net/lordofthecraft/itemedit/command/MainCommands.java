@@ -389,12 +389,10 @@ public class MainCommands extends BaseCommand {
 						lore = new ArrayList<>();
 					}
 
-					boolean roleplayName = (type.equals(Signature.ROLEPLAY) || hasFlag("rp"));
-
-					if (type.equals(Signature.PLAYER) || type.equals(Signature.ROLEPLAY) || type.permission.startsWith(ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM)) {
-						lore.addAll(Signature.getSignature(p, type, roleplayName, !hasFlag("mod")));
+					if (type.equals(Signature.PLAYER) || type.permission.startsWith(ItemEdit.PERMISSION_START + "." + ItemEdit.SIGNATURE_PERM)) {
+						lore.add(Signature.getSignature(p, type, hasFlag("rp"), !hasFlag("mod")));
 					} else {
-						lore.addAll(Signature.getSignature(p, type, roleplayName, true));
+						lore.add(Signature.getSignature(p, type, hasFlag("rp"), true));
 					}
 
 					meta.setLore(lore);

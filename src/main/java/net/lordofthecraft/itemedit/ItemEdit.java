@@ -18,7 +18,7 @@ public final class ItemEdit extends JavaPlugin {
 	public static final String PREFIX = ChatColor.AQUA + "";
 	public static final String ALT_COLOR = ChatColor.GOLD + "";
 	public static final String PERMISSION_START = "itemedit";
-	public static final String BONUS_SIGNATURE_PERM = "signature";
+	public static final String SIGNATURE_PERM = "signature";
 
 	public static final boolean DEBUGGING = true;
 
@@ -53,7 +53,7 @@ public final class ItemEdit extends JavaPlugin {
 		if (this.getConfig().getInt("MAX-WIDTH") > 10) {
 			maxWidth = this.getConfig().getInt("MAX-WIDTH");
 		} else {
-			maxWidth = 50;
+			maxWidth = 35;
 		}
 
 		// Grab the max lines for descriptions.
