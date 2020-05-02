@@ -33,7 +33,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: co.lotc:tythan-bukkit:0.7.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: co.lotc:tythan-common:0.7.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.luckperms:api:5.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: net.korvic.rppersonas:RPPersonas:1.13.2-R0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.korvic:rppersonas:1.13.2-R0.1" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.14" level="project" />
   </component>
 </module>

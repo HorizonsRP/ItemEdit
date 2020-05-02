@@ -1,6 +1,7 @@
 package net.lordofthecraft.itemedit.enums;
 
 import co.lotc.core.agnostic.Sender;
+import net.korvic.rppersonas.RPPersonas;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.command.MainCommands;
 import org.bukkit.ChatColor;
@@ -62,7 +63,7 @@ public enum Signature {
 		if (roleplay) {
 			//Grab Persona name.
 			if (ItemEdit.get().getServer().getPluginManager().isPluginEnabled("RPPersonas")) {
-				name = p.getName();
+				name = RPPersonas.get().getPersonaHandler().getLoadedPersona(p).getNickName();
 			}
 
 			// Still add this even if we fail to find any persona name.
