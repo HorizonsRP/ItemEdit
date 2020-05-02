@@ -61,9 +61,9 @@ public enum Signature {
 		String name = p.getName();
 		if (roleplay) {
 			//Grab Persona name.
-			/*if (ItemEdit.get().getServer().getPluginManager().isPluginEnabled("ArcheCore")) {
+			if (ItemEdit.get().getServer().getPluginManager().isPluginEnabled("RPPersonas")) {
 				name = p.getName();
-			}*/
+			}
 
 			// Still add this even if we fail to find any persona name.
 			name += " (" + p.getName() + ") ";

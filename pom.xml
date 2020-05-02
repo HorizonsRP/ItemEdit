@@ -41,6 +41,12 @@
             <version>5.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.korvic</groupId>
+            <artifactId>rppersonas</artifactId>
+            <version>1.13.2-R0.1</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
         <dependency>
             <groupId>commons-codec</groupId>
