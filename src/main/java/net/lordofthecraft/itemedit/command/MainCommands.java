@@ -89,12 +89,12 @@ public class MainCommands extends BaseCommand {
 				item.setItemMeta(meta);
 			}
 		} else {
-			updateTags(item, null, null, null, null);
+			updateTags(item, null, null, null, null, false);
 			updateDisplayName(item, name);
 		}
 	}
 
-	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type) {
+	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type, boolean strongAura) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
@@ -103,6 +103,7 @@ public class MainCommands extends BaseCommand {
 			tags.setQuality(quality);
 			tags.setAura(aura);
 			tags.setType(type);
+			tags.setStrongAura(strongAura);
 
 			if (lore != null && lore.size() > 0) {
 				int start = 0;
@@ -126,13 +127,21 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
+	private void updateGlow(ItemStack item) {
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			meta.addEnchant(GLOW, 1, true);
+			item.setItemMeta(meta);
+		}
+	}
+
 	@Cmd(value="Set the rarity of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
 	public void rarity(CommandSender sender, Rarity rarity) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, rarity, null, null, null);
+				updateTags(item, rarity, null, null, null, false);
 				ItemMeta meta = item.getItemMeta();
 				if (meta != null) {
 					String name = ChatColor.stripColor(meta.getDisplayName());
@@ -150,7 +159,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, quality, null, null);
+				updateTags(item, null, quality, null, null, false);
 				return;
 			}
 		}
@@ -158,12 +167,13 @@ public class MainCommands extends BaseCommand {
 	}
 
 	@Cmd(value="Set the aura of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
-	public void aura(CommandSender sender, Aura aura) {
+	public void aura(CommandSender sender, Aura aura, boolean strong) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, null, aura, null);
+				updateTags(item, null, null, aura, null, strong);
+				updateGlow(item);
 				return;
 			}
 		}
@@ -176,7 +186,7 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, null, null, type);
+				updateTags(item, null, null, null, type, false);
 				return;
 			}
 		}
