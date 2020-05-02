@@ -39,13 +39,12 @@ public enum Signature {
 	ORNATE("ORNATE", ChatColor.GRAY, "Player", "❁", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".ornate"),
 	SNOWMAN("SNOWMAN", ChatColor.GRAY, "Player", "☃", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".snowman");*/
 
+	// INSTANCE //
 	public final String name;
 	public final ChatColor color;
 	public final String aRank;
 	public final String affixes;
 	public final String permission;
-
-	private static final String DGRAY_ITALIC = ChatColor.DARK_GRAY + "" + ChatColor.ITALIC;
 
 	Signature(String name, ChatColor color, String aRank, String affixes, String permission) {
 		this.name = name;
@@ -54,9 +53,12 @@ public enum Signature {
 		this.affixes = ChatColor.RESET + "" + ChatColor.DARK_AQUA + affixes + ChatColor.RESET;
 		this.permission = permission;
 	}
+
+	// STATIC //
+	private static final String DGRAY_ITALIC = ChatColor.DARK_GRAY + "" + ChatColor.ITALIC;
 	public static final Signature DEFAULT = PLAYER;
 
-	public static String getSignature(Player p, Signature type, boolean roleplay, boolean showRealName) {
+	public static String formatSignature(Player p, Signature type, boolean roleplay, boolean showRealName) {
 		String name = p.getName();
 		if (roleplay) {
 			//Grab Persona name.
@@ -77,7 +79,6 @@ public enum Signature {
 				return type;
 			}
 		}
-
 		return DEFAULT;
 	}
 
@@ -89,6 +90,17 @@ public enum Signature {
 			}
 		}
 		return list;
+	}
+
+	// TAGS //
+	private static final ChatColor BRACKET_COLOR = ChatColor.GRAY;
+	private static final String DIVIDER = BRACKET_COLOR + " | ";
+
+	public static String formatTags(Rarity rarity, Quality quality, Aura aura, Type type) {
+		return formatTags(rarity, quality, aura, type, false);
+	}
+	public static String formatTags(Rarity rarity, Quality quality, Aura aura, Type type, boolean boldAura) {
+		return BRACKET_COLOR + "[" + rarity.getTag() + DIVIDER + quality.getTag() + DIVIDER + aura.getTag(boldAura) + DIVIDER + type.getTag() + BRACKET_COLOR + "]";
 	}
 
 }

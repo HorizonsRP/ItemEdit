@@ -358,10 +358,10 @@ public class MainCommands extends BaseCommand {
 	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
 	@Flag(name="rp", description="Allows signing with your RP name")
 	public void sign(CommandSender sender,
-					 @Default("ROLEPLAY") Signature type) {
+					 @Default("ROLEPLAY") Signature signature) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			validate(p.hasPermission(type.permission), NO_SIGNATURE_PERM);
+			validate(p.hasPermission(signature.permission), NO_SIGNATURE_PERM);
 			ItemStack item = transSQL.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
 				if (isSigned(item)) {
@@ -389,10 +389,10 @@ public class MainCommands extends BaseCommand {
 						lore = new ArrayList<>();
 					}
 
-					if (type.equals(Signature.PLAYER) || type.permission.startsWith(ItemEdit.PERMISSION_START + "." + ItemEdit.SIGNATURE_PERM)) {
-						lore.add(Signature.getSignature(p, type, hasFlag("rp"), !hasFlag("mod")));
+					if (signature.equals(Signature.PLAYER) || signature.permission.startsWith(ItemEdit.PERMISSION_START + "." + ItemEdit.SIGNATURE_PERM)) {
+						lore.add(Signature.formatSignature(p, signature, hasFlag("rp"), !hasFlag("mod")));
 					} else {
-						lore.add(Signature.getSignature(p, type, hasFlag("rp"), true));
+						lore.add(Signature.formatSignature(p, signature, hasFlag("rp"), true));
 					}
 
 					meta.setLore(lore);

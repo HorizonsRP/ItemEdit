@@ -23,7 +23,7 @@ public enum Type {
 		this.name = name;
 	}
 
-	public String getTag(boolean bold) {
+	public String getTag() {
 		return ChatColor.DARK_GRAY + this.name;
 	}
 

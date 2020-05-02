@@ -2,8 +2,7 @@ name: ItemEdit
 version: 1.13.2-R0.1
 main: net.lordofthecraft.itemedit.ItemEdit
 api-version: "1.13"
-depend: [Tythan, CustomItem]
-softdepend: [Foundation, Obelisk]
+depend: [Tythan]
 commands:
   edit:
     command: /<command>
