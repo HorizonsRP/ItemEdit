@@ -292,7 +292,7 @@ public class MainCommands extends BaseCommand {
 	 * @return Return a list of String wherein each string is one page.
 	 */
 	private List<String> getDescAsPages(ItemStack item) {
-		return null;
+		return new ArrayList<>();
 	}
 
 	/**
