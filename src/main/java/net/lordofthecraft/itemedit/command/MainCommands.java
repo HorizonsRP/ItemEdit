@@ -165,6 +165,7 @@ public class MainCommands extends BaseCommand {
 				public void onBookClose() {
 					List<String> desc = getMeta().getPages();
 					completeDesc(item, desc);
+					getItem().setAmount(0);
 				}
 			};
 
@@ -183,6 +184,24 @@ public class MainCommands extends BaseCommand {
 	}
 
 	/**
+	 * Updates the colour using the given item's existing name.
+	 * @param item The item to update.
+	 */
+	private void updateDisplayName(ItemStack item) {
+		String name = null;
+		if (item != null) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				name = ChatColor.stripColor(meta.getDisplayName());
+			}
+		}
+
+		if (name != null) {
+			updateDisplayName(item, name);
+		}
+	}
+
+	/**
 	 * Update the display name of the given item, coloured based on the rarity of the item.
 	 * If the item doesn't have any tags on it, it adds the tags then tries to set the name
 	 * once again.
@@ -198,8 +217,12 @@ public class MainCommands extends BaseCommand {
 				item.setItemMeta(meta);
 			}
 		} else {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				meta.setDisplayName(name);
+				item.setItemMeta(meta);
+			}
 			updateTags(item);
-			updateDisplayName(item, name);
 		}
 	}
 
@@ -243,17 +266,12 @@ public class MainCommands extends BaseCommand {
 				tags.setLFItemID(id);
 			}
 
-			if (lore != null && lore.size() > 0) {
-				int start = 0;
-				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
-					start++;
+			if (lore != null) {
+				if (lore.size() > 0) {
+					lore.set(0, tags.formatTags());
+				} else {
+					lore.add(tags.formatTags());
 				}
-				List<String> desc = new ArrayList<>();
-				desc.add(tags.formatTags());
-				for (int i = start; i < lore.size(); i++) {
-					desc.add(lore.get(i));
-				}
-				lore = desc;
 			} else {
 				lore = new ArrayList<>();
 				lore.add(tags.formatTags());
@@ -262,6 +280,7 @@ public class MainCommands extends BaseCommand {
 			meta.setLore(lore);
 			item.setItemMeta(meta);
 			tags.applyTagToItem(item);
+			updateDisplayName(item);
 		}
 	}
 
@@ -312,7 +331,8 @@ public class MainCommands extends BaseCommand {
 			}
 		}
 
-		String[] descByWord = combinedDesc.toString().split(" ");
+		String descBreaksFixed = combinedDesc.toString().replace("\n", " \n");
+		String[] descByWord = descBreaksFixed.split(" ");
 		for (int i = 0; i < descByWord.length; i++) {
 			descByWord[i] = ChatColor.stripColor(descByWord[i]);
 			if (descByWord[i].startsWith("%")) {
