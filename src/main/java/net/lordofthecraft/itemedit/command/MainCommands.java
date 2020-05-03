@@ -1,9 +1,9 @@
 package net.lordofthecraft.itemedit.command;
 
+import co.lotc.core.bukkit.convo.BookStream;
 import co.lotc.core.bukkit.util.ItemUtil;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
-import co.lotc.core.command.annotate.Default;
 import co.lotc.core.command.annotate.Flag;
 import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemEdit;
@@ -78,80 +78,6 @@ public class MainCommands extends BaseCommand {
 			}
 		}
 		msg(NO_ITEM);
-	}
-
-	private void updateDisplayName(ItemStack item, String name) {
-		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
-			Tags tags = new Tags(item);
-			ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				meta.setDisplayName(tags.getRarity().getColor() + name);
-				item.setItemMeta(meta);
-			}
-		} else {
-			updateTags(item, null, null, null, null, -1, 0);
-			updateDisplayName(item, name);
-		}
-	}
-
-	// strongAura | -1 = No Change, 0 = False, 1 = True
-	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type, int strongAura, int id) {
-		ItemMeta meta = item.getItemMeta();
-		if (meta != null) {
-			List<String> lore = meta.getLore();
-			Tags tags = new Tags(item);
-			tags.setRarity(rarity);
-			tags.setQuality(quality);
-			tags.setAura(aura);
-			tags.setType(type);
-			if (strongAura > -1) {
-				if (strongAura > 0) {
-					tags.setStrongAura(true);
-				} else {
-					tags.setStrongAura(false);
-				}
-			}
-
-			if (id > 0) {
-				tags.setLFItemID(id);
-			}
-
-			if (lore != null && lore.size() > 0) {
-				int start = 0;
-				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
-					start++;
-				}
-				List<String> desc = new ArrayList<>();
-				desc.add(tags.formatTags());
-				for (int i = start; i < lore.size(); i++) {
-					desc.add(lore.get(i));
-				}
-				lore = desc;
-			} else {
-				lore = new ArrayList<>();
-				lore.add(tags.formatTags());
-			}
-
-			meta.setLore(lore);
-			item.setItemMeta(meta);
-			tags.applyTagToItem(item);
-		}
-	}
-
-	private void updateGlow(ItemStack item, boolean enable) {
-		ItemMeta meta = item.getItemMeta();
-		if (meta != null) {
-			if (enable) {
-				meta.addEnchant(GLOW, 1, true);
-			} else {
-				for (Enchantment enc : meta.getEnchants().keySet()) {
-					if (enc instanceof Glow) {
-						meta.removeEnchant(enc);
-					}
-				}
-			}
-			item.setItemMeta(meta);
-		}
 	}
 
 	@Cmd(value="Set the rarity of the given item.", permission=ItemEdit.PERMISSION_START + ".rarity")
@@ -229,86 +155,236 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	/*
-	@Cmd(value="Add a custom description for an item.", permission=ItemEdit.PERMISSION_START + ".desc")
-	@Flag(name="newline", description="Adds a new line. If a description was entered, adds the new line after.")
-	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission=ItemEdit.PERMISSION_START + ".free")
-	public void desc(CommandSender sender, String[] desc) {
+	@Cmd(value="Add or edit a custom description for an item.", permission=ItemEdit.PERMISSION_START + ".desc")
+	public void desc(CommandSender sender) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
-			if (item != null && item.getType() != Material.AIR) {
-				if (isSigned(item)) {
-					msg(SIGNED_ALREADY);
-					return;
+			BookStream stream = new BookStream() {
+				@Override
+				public void onBookClose() {
+					List<String> desc = getMeta().getPages();
+					completeDesc(item, desc);
 				}
+			};
 
-				int maxLines = .getMaxLines(p);
-				if (item.getItemMeta() != null && item.getItemMeta().getLore() != null &&
-					item.getItemMeta().getLore().size() > maxLines) {
-					msg(MAX_LENGTH);
-					return;
-				}
-
-				if (!applyDesc(item, desc, maxLines, hasFlag("newline"))) {
-					msg(MAX_LENGTH);
-					return;
-				} else {
-					finalizeEdit(p, item);
-				}
-
-				return;
+			ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
+			BookMeta meta = (BookMeta) book.getItemMeta();
+			if (meta != null) {
+				meta.setPages(getDescAsPages(item));
 			}
+			book.setItemMeta(meta);
+
+			stream.setBookData(book);
+			stream.open(p);
+			return;
 		}
 		msg(NO_ITEM);
 	}
 
-	public static boolean applyDesc(ItemStack item, String[] desc, int maxLines, boolean linebreak) {
-		ItemMeta meta = item.getItemMeta();
-		List<String> newDesc = null;
-		if (meta != null) {
-			newDesc = meta.getLore();
-			if (newDesc == null) {
-				newDesc = new ArrayList<>();
+	/**
+	 * Update the display name of the given item, coloured based on the rarity of the item.
+	 * If the item doesn't have any tags on it, it adds the tags then tries to set the name
+	 * once again.
+	 * @param item The item to name.
+	 * @param name The name to use.
+	 */
+	private void updateDisplayName(ItemStack item, String name) {
+		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
+			Tags tags = new Tags(item);
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				meta.setDisplayName(tags.getRarity().getColor() + name);
+				item.setItemMeta(meta);
 			}
-
-			StringBuilder thisString = new StringBuilder();
-			if (newDesc.size() > 0) {
-				thisString = new StringBuilder(ChatColor.stripColor(newDesc.get(newDesc.size() - 1)));
-				newDesc.remove(newDesc.size() - 1);
-			}
-
-			for (String word : desc) {
-				int currentLength = 0;
-				if (thisString.toString().length() > 0) {
-					currentLength = thisString.toString().length() + 1;
-				}
-				String[] result = processWord(currentLength, ChatColor.stripColor(word));
-				while (result.length > 1) {
-					thisString.append(result[0]);
-					newDesc.add(DESC_PREFIX + thisString.toString());
-
-					thisString = new StringBuilder();
-					result = processWord(0, result[1]);
-				}
-				thisString.append(result[0]);
-			}
-			newDesc.add(DESC_PREFIX + thisString.toString());
-
-			if (linebreak) {
-				newDesc.add("");
-			}
-
-			if (newDesc.size() > maxLines) {
-				return false;
-			}
-			meta.setLore(newDesc);
-			item.setItemMeta(meta);
+		} else {
+			updateTags(item);
+			updateDisplayName(item, name);
 		}
-		return true;
 	}
 
-	public static String[] processWord(int currentLength, String word) {
+	/**
+	 * Re-applies the tags with whatever is on it, or default.
+	 * @param item The item to apply basic tags too.
+	 */
+	private void updateTags(ItemStack item) {
+		updateTags(item, null, null, null, null, -1, 0);
+	}
+
+	/**
+	 * Apply a tag set to the given item. If it has no tags it gives it the default. If a description exists it will
+	 * be pushed down by one line.
+	 * @param item The item to tag.
+	 * @param rarity (Optional) The rarity to set.
+	 * @param quality (Optional) The quality to set.
+	 * @param aura (Optional) The aura to set.
+	 * @param type (Optional) The type to set.
+	 * @param strongAura Whether the aura is strong or not. -1 = No Change, 0 = False, 1 = True
+	 * @param id Arbitrary item ID for future use with professions.
+	 */
+	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type, int strongAura, int id) {
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			List<String> lore = meta.getLore();
+			Tags tags = new Tags(item);
+			tags.setRarity(rarity);
+			tags.setQuality(quality);
+			tags.setAura(aura);
+			tags.setType(type);
+			if (strongAura > -1) {
+				if (strongAura > 0) {
+					tags.setStrongAura(true);
+				} else {
+					tags.setStrongAura(false);
+				}
+			}
+
+			if (id > 0) {
+				tags.setLFItemID(id);
+			}
+
+			if (lore != null && lore.size() > 0) {
+				int start = 0;
+				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
+					start++;
+				}
+				List<String> desc = new ArrayList<>();
+				desc.add(tags.formatTags());
+				for (int i = start; i < lore.size(); i++) {
+					desc.add(lore.get(i));
+				}
+				lore = desc;
+			} else {
+				lore = new ArrayList<>();
+				lore.add(tags.formatTags());
+			}
+
+			meta.setLore(lore);
+			item.setItemMeta(meta);
+			tags.applyTagToItem(item);
+		}
+	}
+
+	/**
+	 * Toggle glow on or off.
+	 * @param item Item to glow.
+	 * @param enable Whether to glow or not.
+	 */
+	private void updateGlow(ItemStack item, boolean enable) {
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			if (enable) {
+				meta.addEnchant(GLOW, 1, true);
+			} else {
+				for (Enchantment enc : meta.getEnchants().keySet()) {
+					if (enc instanceof Glow) {
+						meta.removeEnchant(enc);
+					}
+				}
+			}
+			item.setItemMeta(meta);
+		}
+	}
+
+	/**
+	 * Convert a desc into a list of pages for an MC book.
+	 * @param item The item to take the description from.
+	 * @return Return a list of String wherein each string is one page.
+	 */
+	private List<String> getDescAsPages(ItemStack item) {
+		return null;
+	}
+
+	/**
+	 * Take a list of strings from an MC book and convert them into
+	 * a description of the appropriate width, then apply said desc
+	 * to the given item.
+	 * @param item The item to describe.
+	 * @param desc The list of pages as Strings.
+	 */
+	private void completeDesc(ItemStack item, List<String> desc) {
+		StringBuilder combinedDesc = new StringBuilder();
+		for (String str : desc) {
+			if (combinedDesc.length() > 0) {
+				combinedDesc.append(" ").append(str);
+			} else {
+				combinedDesc.append(str);
+			}
+		}
+
+		String[] descByWord = combinedDesc.toString().split(" ");
+		for (int i = 0; i < descByWord.length; i++) {
+			descByWord[i] = ChatColor.stripColor(descByWord[i]);
+			if (descByWord[i].startsWith("%")) {
+				descByWord[i] = (ItemEdit.PREFIX + descByWord[i] + DESC_PREFIX);
+			}
+		}
+
+		updateTags(item);
+		String finalDesc = formatDesc(descByWord);
+
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			List<String> lore = meta.getLore();
+			if (lore != null) {
+				if (lore.size() == 1) {
+					lore.add(finalDesc);
+				} else if (lore.size() > 1) {
+					lore.set(1, finalDesc);
+				}
+			}
+			meta.setLore(lore);
+			item.setItemMeta(meta);
+		}
+	}
+
+	/**
+	 * A list of individual words to be converted into a singular
+	 * string with \n line breaks and hyphenations to keep the width
+	 * of the desc appropriate.
+	 * @param words A list of individual words.
+	 * @return The formatted string with \n line breaks.
+	 */
+	private static String formatDesc(String[] words) {
+		List<String> desc = new ArrayList<>();
+		StringBuilder thisString = new StringBuilder();
+
+		for (String word : words) {
+			int currentLength = 0;
+			if (thisString.toString().length() > 0) {
+				currentLength = thisString.toString().length() + 1;
+			}
+			String[] result = processWord(currentLength, ChatColor.stripColor(word));
+			while (result.length > 1) {
+				thisString.append(result[0]);
+				desc.add(DESC_PREFIX + thisString.toString());
+
+				thisString = new StringBuilder();
+				result = processWord(0, result[1]);
+			}
+			thisString.append(result[0]);
+		}
+		desc.add(DESC_PREFIX + thisString.toString());
+
+		StringBuilder finalDesc = new StringBuilder();
+		for (String str : desc) {
+			if (finalDesc.length() > 0) {
+				finalDesc.append("\n").append(str);
+			} else {
+				finalDesc.append(str);
+			}
+		}
+		return finalDesc.toString();
+	}
+
+	/**
+	 * Check to see if the current word needs to be hyphenated or not.
+	 * @param currentLength The current length of the lore line,
+	 * @param word The word in question.
+	 * @return Return either a singular word if it doesn't get cut, or
+	 * return the first part to apply, and the second part to carry on.
+	 */
+	private static String[] processWord(int currentLength, String word) {
 		String first = word;
 		String second = null;
 
@@ -348,44 +424,7 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
-	@Cmd(value="Add a glowing effect to an item as if it were enchanted.", permission=ItemEdit.PERMISSION_START + ".glow")
-	@Flag(name="mod", description="Adds glow to the item regardless of signature.", permission=ItemEdit.PERMISSION_START + ".mod")
-	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission=ItemEdit.PERMISSION_START + ".free")
-	public void glow(CommandSender sender) {
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			ItemStack item = transSQL.getItemInHand(p);
-			if (item != null && item.getType() != Material.AIR) {
-				if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
-					msg(SIGNED_ALREADY);
-					return;
-				}
-
-				int tokensUsed = transSQL.safeToChargePlayer(p);
-				// If item has been edited and is does not have the paper tag (if relevent), or if
-				// a staff is using the -staff flag, then the edit is free regardless.
-				if ((ItemUtil.hasCustomTag(item, ItemEdit.EDITED_TAG) &&
-					 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
-					hasFlag("staff")) {
-					tokensUsed = 0;
-				} else if (tokensUsed == 0) {
-					msg(NO_TOKENS);
-					return;
-				}
-
-				ItemMeta meta = item.getItemMeta();
-				if (meta != null) {
-					meta.addEnchant(GLOW, 1, true);
-					item.setItemMeta(meta);
-				}
-
-				finalizeEdit(p, item, tokensUsed, false);
-				return;
-			}
-		}
-		msg(NO_ITEM);
-	}
-
+	/*
 	// Finalization & Clearing //
 	@Cmd(value="Sign an item to lock in the information. Can be cleared later if needed.", permission="itemedit.sign")
 	@Flag(name="mod", description="Prevents the username from being written on player approved signs.", permission="itemedit.mod")
