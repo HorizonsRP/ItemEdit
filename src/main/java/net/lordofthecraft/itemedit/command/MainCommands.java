@@ -26,7 +26,6 @@ public class MainCommands extends BaseCommand {
 	// Sub command for moderators
 	private static StaffCommands staffCommands;
 
-	// Our local /edit clear sub command.
 	//private static final ClearCommands CLEAR_COMMANDS = new ClearCommands();
 
 	// Error messages
@@ -41,6 +40,7 @@ public class MainCommands extends BaseCommand {
 	private static String nameTooLong; // This one is based on Max Width so it's set on instance creation.
 
 	// Application short-hands
+	private static final String LINE_BREAK_PARSE = "#%cl:#;@";
 	private static final String DESC_PREFIX = ChatColor.GRAY + "" + ChatColor.ITALIC;
 	private static final Glow GLOW = new Glow(new NamespacedKey(ItemEdit.get(), ItemEdit.get().getDescription().getName()));
 
@@ -165,7 +165,6 @@ public class MainCommands extends BaseCommand {
 				public void onBookClose() {
 					List<String> desc = getMeta().getPages();
 					completeDesc(item, desc);
-					getItem().setAmount(0);
 				}
 			};
 
@@ -317,41 +316,74 @@ public class MainCommands extends BaseCommand {
 	/**
 	 * Take a list of strings from an MC book and convert them into
 	 * a description of the appropriate width, then apply said desc
-	 * to the given item.
+	 * to the given item following format standards.
 	 * @param item The item to describe.
 	 * @param desc The list of pages as Strings.
 	 */
 	private void completeDesc(ItemStack item, List<String> desc) {
+
+		// Clear linebreaks and combine.
 		StringBuilder combinedDesc = new StringBuilder();
 		for (String str : desc) {
 			if (combinedDesc.length() > 0) {
-				combinedDesc.append(" ").append(str);
+				combinedDesc.append(" ");
+			}
+			if (str.contains("\n")) {
+				String[] lineBreaks = str.split("\\R", -1);
+				for (int i = 0; i < lineBreaks.length; i++) {
+					combinedDesc.append(ChatColor.stripColor(lineBreaks[i]));
+					if (i < lineBreaks.length-1) {
+						combinedDesc.append(" " + LINE_BREAK_PARSE + " ");
+					}
+				}
 			} else {
-				combinedDesc.append(str);
+				combinedDesc.append(ChatColor.stripColor(str));
 			}
 		}
 
-		String descBreaksFixed = combinedDesc.toString().replace("\n", "\n ");
-		String[] descByWord = descBreaksFixed.split(" ");
+		// Split into individual words and highlights.
+		String[] descByWord = combinedDesc.toString().split(" ");
 		for (int i = 0; i < descByWord.length; i++) {
-			descByWord[i] = ChatColor.stripColor(descByWord[i]);
-			if (descByWord[i].startsWith("%")) {
-				descByWord[i] = (ItemEdit.PREFIX + descByWord[i] + DESC_PREFIX);
+			if (descByWord[i].startsWith("%") || descByWord[i].endsWith("%")) {
+
+				if (descByWord[i].startsWith("%")) {
+					descByWord[i] = descByWord[i].substring(1);
+				}
+				if (descByWord[i].endsWith("%")) {
+					descByWord[i] = descByWord[i].substring(0, descByWord[i].length()-1);
+				}
+
+				descByWord[i] = (ItemEdit.PREFIX + ChatColor.ITALIC + descByWord[i] + DESC_PREFIX);
 			}
 		}
 
+		// Update the tags just in case, then format our description into a set of lore.
 		updateTags(item);
-		String finalDesc = formatDesc(descByWord);
+		List<String> finalDesc = formatDesc(descByWord);
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
 			if (lore != null) {
-				if (lore.size() == 1) {
-					lore.add(finalDesc);
-				} else if (lore.size() > 1) {
-					lore.set(1, finalDesc);
+				String tags = null;
+				String approved = null;
+				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG) && lore.size() > 0) {
+					tags = lore.get(0);
 				}
+				if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG) && lore.size() > 0) {
+					approved = lore.get(lore.size()-1);
+				}
+
+				// Reset our arraylist and fill it in order.
+				lore = new ArrayList<>();
+				if (tags != null) {
+					lore.add(tags);
+				}
+				lore.addAll(finalDesc);
+				if (approved != null) {
+					lore.add(approved);
+				}
+
 				meta.setLore(lore);
 				item.setItemMeta(meta);
 			}
@@ -359,36 +391,41 @@ public class MainCommands extends BaseCommand {
 	}
 
 	/**
-	 * A list of individual words to be converted into a singular
-	 * string with \n line breaks and hyphenations to keep the width
-	 * of the desc appropriate.
+	 * A list of individual words to be converted into a list of string
+	 * with hyphenations to keep the width of the desc appropriate.
 	 * @param words A list of individual words.
-	 * @return The formatted string with \n line breaks.
+	 * @return The formatted list of strings.
 	 */
-	private static String formatDesc(String[] words) {
-		StringBuilder desc = new StringBuilder();
+	private static List<String> formatDesc(String[] words) {
+		List<String> desc = new ArrayList<>();
+		StringBuilder currentLine = new StringBuilder(DESC_PREFIX);
 		int currentLength = 0;
 
 		for (String word : words) {
-			String[] result = processWord(currentLength, word);
-			while (result.length > 1) {
-				if (currentLength > 0) {
-					desc.append(" ");
+			if (!word.equals(LINE_BREAK_PARSE)) {
+				String[] result = processWord(currentLength, word);
+
+				while (result.length > 1) {
+					currentLine.append(result[0]);
+
+					desc.add(currentLine.toString());
+					currentLine = new StringBuilder(DESC_PREFIX);
+					currentLength = 0;
+
+					result = processWord(0, result[1]);
 				}
-				desc.append(result[0]).append("\n").append(DESC_PREFIX);
+
+				currentLine.append(result[0]);
+				currentLength += result[0].length();
+			} else {
+				desc.add(currentLine.toString());
+				currentLine = new StringBuilder(DESC_PREFIX);
 				currentLength = 0;
-
-				result = processWord(currentLength, result[1]);
 			}
-
-			if (currentLength > 0) {
-				desc.append(" ");
-			}
-			desc.append(result[0]);
-
-			currentLength += result[0].length();
 		}
-		return desc.toString();
+
+		desc.add(currentLine.toString());
+		return desc;
 	}
 
 	/**
@@ -402,7 +439,13 @@ public class MainCommands extends BaseCommand {
 		String first = word;
 		String second = null;
 
+		// If we need to preface with a space, then include that as part of the calculation.
+		if (currentLength > 0) {
+			currentLength++;
+		}
+
 		if (first.length() > ItemEdit.getMaxWidth()) {
+			// Subtract an extra 1 to make room for the hyphen character.
 			int size = ItemEdit.getMaxWidth() - currentLength - 1;
 
 			if (size > 0) {
