@@ -331,7 +331,7 @@ public class MainCommands extends BaseCommand {
 			}
 		}
 
-		String descBreaksFixed = combinedDesc.toString().replace("\n", " \n");
+		String descBreaksFixed = combinedDesc.toString().replace("\n", "\n ");
 		String[] descByWord = descBreaksFixed.split(" ");
 		for (int i = 0; i < descByWord.length; i++) {
 			descByWord[i] = ChatColor.stripColor(descByWord[i]);
@@ -352,9 +352,9 @@ public class MainCommands extends BaseCommand {
 				} else if (lore.size() > 1) {
 					lore.set(1, finalDesc);
 				}
+				meta.setLore(lore);
+				item.setItemMeta(meta);
 			}
-			meta.setLore(lore);
-			item.setItemMeta(meta);
 		}
 	}
 
@@ -366,43 +366,37 @@ public class MainCommands extends BaseCommand {
 	 * @return The formatted string with \n line breaks.
 	 */
 	private static String formatDesc(String[] words) {
-		List<String> desc = new ArrayList<>();
-		StringBuilder thisString = new StringBuilder();
+		StringBuilder desc = new StringBuilder();
+		int currentLength = 0;
 
 		for (String word : words) {
-			int currentLength = 0;
-			if (thisString.toString().length() > 0) {
-				currentLength = thisString.toString().length() + 1;
-			}
-			String[] result = processWord(currentLength, ChatColor.stripColor(word));
+			String[] result = processWord(currentLength, word);
 			while (result.length > 1) {
-				thisString.append(result[0]);
-				desc.add(DESC_PREFIX + thisString.toString());
+				if (currentLength > 0) {
+					desc.append(" ");
+				}
+				desc.append(result[0]).append("\n").append(DESC_PREFIX);
+				currentLength = 0;
 
-				thisString = new StringBuilder();
-				result = processWord(0, result[1]);
+				result = processWord(currentLength, result[1]);
 			}
-			thisString.append(result[0]);
-		}
-		desc.add(DESC_PREFIX + thisString.toString());
 
-		StringBuilder finalDesc = new StringBuilder();
-		for (String str : desc) {
-			if (finalDesc.length() > 0) {
-				finalDesc.append("\n").append(str);
-			} else {
-				finalDesc.append(str);
+			if (currentLength > 0) {
+				desc.append(" ");
 			}
+			desc.append(result[0]);
+
+			currentLength += result[0].length();
 		}
-		return finalDesc.toString();
+		return desc.toString();
 	}
 
 	/**
 	 * Check to see if the current word needs to be hyphenated or not.
 	 * @param currentLength The current length of the lore line,
 	 * @param word The word in question.
-	 * @return Return either a singular word if it doesn't get cut, or
-	 * return the first part to apply, and the second part to carry on.
+	 * @return Return either a singular word if it doesn't get cut, or return
+	 * the first part to apply, and the second part to carry on to the next line.
 	 */
 	private static String[] processWord(int currentLength, String word) {
 		String first = word;
