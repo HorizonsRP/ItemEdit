@@ -14,11 +14,12 @@ public enum Type {
 	CREATURE("Creature",    ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".creature"),
 	WOOD(    "Wood",        ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".wood"),
 	METAL(   "Metal",       ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".metal"),
+	GEM(     "Gem",         ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".gem"),
 	ALCHEMY( "Alchemical",  ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".alch"),
 	CLOTH(   "Cloth",       ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".cloth"),
-	TOOL(    "Tool",        ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".tool"),
 	FOOD(    "Food",        ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".food"),
-	GEM(     "Gem",         ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".gem"),
+	TOOL(    "Tool",        ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".tool"),
+	APPAREL( "Apparel",     ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".apparel"),
 	MISC(    "Miscellanea", ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".misc");
 
 	public static Type DEFAULT = MISC;
