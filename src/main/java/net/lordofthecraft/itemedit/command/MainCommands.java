@@ -487,7 +487,7 @@ public class MainCommands extends BaseCommand {
 				}
 
 				currentLine.append(result[0]);
-				currentLength += result[0].length();
+				currentLength += ChatColor.stripColor(result[0]).length();
 			} else {
 				desc.add(currentLine.toString());
 				currentLine = new StringBuilder(DESC_PREFIX);
@@ -536,12 +536,12 @@ public class MainCommands extends BaseCommand {
 				second = first;
 				first = "";
 			}
-		} else if (currentLength + first.length() > ItemEdit.getMaxWidth()) {
+		} else if (currentLength + ChatColor.stripColor(first).length() > ItemEdit.getMaxWidth()) {
 			second = first;
 			first = "";
 		}
 
-		if (currentLength > 0 && first.length() > 0) {
+		if (currentLength > 0 && ChatColor.stripColor(first).length() > 0) {
 			first = " " + first;
 		}
 
