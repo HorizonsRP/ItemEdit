@@ -169,12 +169,13 @@ public class MainCommands extends BaseCommand {
 				}
 				book.setItemMeta(meta);
 
-
+				Tags tags = new Tags(item);
+				String highlight = tags.getQuality().getColor();
 				BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book!") {
 					@Override
 					public void onBookClose() {
 						List<String> desc = getMeta().getPages();
-						completeDesc(item, desc);
+						completeDesc(item, desc, highlight);
 					}
 				};
 
@@ -360,7 +361,7 @@ public class MainCommands extends BaseCommand {
 	 * @param item The item to describe.
 	 * @param desc The list of pages as Strings.
 	 */
-	private void completeDesc(ItemStack item, List<String> desc) {
+	private void completeDesc(ItemStack item, List<String> desc, String highlight) {
 
 		// Clear linebreaks and combine.
 		StringBuilder combinedDesc = new StringBuilder();
@@ -393,7 +394,7 @@ public class MainCommands extends BaseCommand {
 					descByWord[i] = descByWord[i].substring(0, descByWord[i].length()-1);
 				}
 
-				descByWord[i] = (ItemEdit.PREFIX + ChatColor.ITALIC + descByWord[i] + DESC_PREFIX);
+				descByWord[i] = (highlight + ChatColor.ITALIC + descByWord[i] + DESC_PREFIX);
 			}
 		}
 

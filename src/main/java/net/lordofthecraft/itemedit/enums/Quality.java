@@ -48,6 +48,13 @@ public enum Quality {
 	public String getPermission() {
 		return this.permission;
 	}
+	public String getColor() {
+		String output = this.color + "";
+		if (this.magic) {
+			output += ChatColor.MAGIC;
+		}
+		return output;
+	}
 
 	public static Quality getByName(String name) {
 		for (Quality quality : values()) {
