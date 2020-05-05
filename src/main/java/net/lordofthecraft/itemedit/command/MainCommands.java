@@ -327,21 +327,26 @@ public class MainCommands extends BaseCommand {
 					end--;
 				}
 
-				StringBuilder fullString = new StringBuilder();
+				StringBuilder fullStringBuilder = new StringBuilder();
 				for (int i = start; i < end; i++) {
 					String str = ChatColor.stripColor(lore.get(i));
 					if (str.endsWith("-")) {
-						fullString.append(str.substring(0, str.length()-1));
+						fullStringBuilder.append(str.substring(0, str.length()-1));
 					} else {
-						fullString.append(str).append(" ");
+						fullStringBuilder.append(str).append(" ");
 					}
 				}
 
-				ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
-				BookMeta bookMeta = (BookMeta) book.getItemMeta();
-				if (bookMeta != null) {
-					bookMeta.setPages(fullString.toString());
-					output.addAll(bookMeta.getPages());
+				int pages = (int) Math.ceil(fullStringBuilder.length()/255d);
+				String fullString = fullStringBuilder.toString();
+				for (int i = 1; i <= pages; i++) {
+					int j = (i-1)*255;
+					int k = i*255;
+
+					if (fullString.length() < k) {
+						k = fullString.length();
+					}
+					output.add(fullString.substring(j, k));
 				}
 			}
 		}
