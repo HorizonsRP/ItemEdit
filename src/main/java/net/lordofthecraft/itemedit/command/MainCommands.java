@@ -160,13 +160,6 @@ public class MainCommands extends BaseCommand {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
-			BookStream stream = new BookStream() {
-				@Override
-				public void onBookClose() {
-					List<String> desc = getMeta().getPages();
-					completeDesc(item, desc);
-				}
-			};
 
 			ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
 			BookMeta meta = (BookMeta) book.getItemMeta();
@@ -175,7 +168,14 @@ public class MainCommands extends BaseCommand {
 			}
 			book.setItemMeta(meta);
 
-			stream.setBookData(book);
+			BookStream stream = new BookStream(book, ItemEdit.PREFIX + "Edit in this book!") {
+				@Override
+				public void onBookClose() {
+					List<String> desc = getMeta().getPages();
+					completeDesc(item, desc);
+				}
+			};
+
 			stream.open(p);
 			return;
 		}
