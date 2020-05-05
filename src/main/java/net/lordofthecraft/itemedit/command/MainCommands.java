@@ -104,7 +104,11 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
+				Tags tags = new Tags(item);
+				String oldColor = tags.getQuality().getColor();
+				String newColor = quality.getColor();
 				updateTags(item, null, quality, null, null, -1, 0);
+				updateDescHighlights(item, oldColor, newColor);
 				return;
 			}
 		}
@@ -352,6 +356,32 @@ public class MainCommands extends BaseCommand {
 			}
 		}
 		return output;
+	}
+
+	private void updateDescHighlights(ItemStack item, String previousColor, String newColor) {
+		if (item != null) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				List<String> lore = meta.getLore();
+				if (lore != null) {
+					int start = 0;
+					int end = lore.size();
+					if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
+						start++;
+					}
+					if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG)) {
+						end--;
+					}
+
+					for (int i = start; i < end; i++) {
+						lore.set(i, lore.get(i).replace(previousColor, newColor));
+					}
+
+					meta.setLore(lore);
+					item.setItemMeta(meta);
+				}
+			}
+		}
 	}
 
 	/**
