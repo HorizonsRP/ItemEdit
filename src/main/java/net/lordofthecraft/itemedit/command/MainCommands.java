@@ -170,7 +170,7 @@ public class MainCommands extends BaseCommand {
 				book.setItemMeta(meta);
 
 
-				BookStream stream = new BookStream(book, ItemEdit.PREFIX + "Edit in this book!") {
+				BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book!") {
 					@Override
 					public void onBookClose() {
 						List<String> desc = getMeta().getPages();
