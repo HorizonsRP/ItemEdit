@@ -358,6 +358,13 @@ public class MainCommands extends BaseCommand {
 		return output;
 	}
 
+	/**
+	 * Replaces any instance of previousColor within the description with newColor. This
+	 * is generally used for updating the highlight colours after the fact.
+	 * @param item The item to update.
+	 * @param previousColor The string to search for.
+	 * @param newColor The string to replace it with.
+	 */
 	private void updateDescHighlights(ItemStack item, String previousColor, String newColor) {
 		if (item != null) {
 			ItemMeta meta = item.getItemMeta();
