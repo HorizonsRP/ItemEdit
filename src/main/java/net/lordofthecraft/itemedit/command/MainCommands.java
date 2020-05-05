@@ -161,23 +161,26 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 
-			ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
-			BookMeta meta = (BookMeta) book.getItemMeta();
-			if (meta != null) {
-				meta.setPages(getDescAsPages(item));
-			}
-			book.setItemMeta(meta);
-
-			BookStream stream = new BookStream(book, ItemEdit.PREFIX + "Edit in this book!") {
-				@Override
-				public void onBookClose() {
-					List<String> desc = getMeta().getPages();
-					completeDesc(item, desc);
+			if (item != null && !item.getType().equals(Material.AIR)) {
+				ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
+				BookMeta meta = (BookMeta) book.getItemMeta();
+				if (meta != null) {
+					meta.setPages(getDescAsPages(item));
 				}
-			};
+				book.setItemMeta(meta);
 
-			stream.open(p);
-			return;
+
+				BookStream stream = new BookStream(book, ItemEdit.PREFIX + "Edit in this book!") {
+					@Override
+					public void onBookClose() {
+						List<String> desc = getMeta().getPages();
+						completeDesc(item, desc);
+					}
+				};
+
+				stream.open(p);
+				return;
+			}
 		}
 		msg(NO_ITEM);
 	}
@@ -310,7 +313,39 @@ public class MainCommands extends BaseCommand {
 	 * @return Return a list of String wherein each string is one page.
 	 */
 	private List<String> getDescAsPages(ItemStack item) {
-		return new ArrayList<>();
+		List<String> output = new ArrayList<>();
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			List<String> lore = meta.getLore();
+			if (lore != null) {
+				int start = 0;
+				int end = lore.size();
+				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
+					start++;
+				}
+				if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG)) {
+					end--;
+				}
+
+				StringBuilder fullString = new StringBuilder();
+				for (int i = start; i < end; i++) {
+					String str = ChatColor.stripColor(lore.get(i));
+					if (str.endsWith("-")) {
+						fullString.append(str.substring(0, str.length()-1));
+					} else {
+						fullString.append(str).append(" ");
+					}
+				}
+
+				ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
+				BookMeta bookMeta = (BookMeta) book.getItemMeta();
+				if (bookMeta != null) {
+					bookMeta.setPages(fullString.toString());
+					output.addAll(bookMeta.getPages());
+				}
+			}
+		}
+		return output;
 	}
 
 	/**
