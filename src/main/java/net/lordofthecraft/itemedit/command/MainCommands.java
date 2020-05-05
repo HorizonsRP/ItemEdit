@@ -1,6 +1,6 @@
 package net.lordofthecraft.itemedit.command;
 
-import co.lotc.core.bukkit.convo.BookStream;
+import co.lotc.core.bukkit.book.BookStream;
 import co.lotc.core.bukkit.util.ItemUtil;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
