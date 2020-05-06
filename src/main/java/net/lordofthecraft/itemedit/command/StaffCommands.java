@@ -31,7 +31,7 @@ public class StaffCommands extends BaseCommand {
 			}
 
 			if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
-				output.append(ItemEdit.ALT_COLOR).append("Signed By:").append(tagPlayerInfo(item, ItemEdit.APPROVED_TAG));
+				output.append("\n").append(ItemEdit.ALT_COLOR).append("Approved By:").append(tagPlayerInfo(item, ItemEdit.APPROVED_TAG));
 			}
 
 			if (output.length() <= 0) {
@@ -83,12 +83,6 @@ public class StaffCommands extends BaseCommand {
 			builder.append(ItemEdit.PREFIX).append(value).append("\n");
 		}
 		return builder.toString();
-	}
-
-	@Cmd(value="Changes the VIP cooldown between tokens refreshing in days.", permission="itemedit.admin")
-	public void setVIPCooldown(@Arg(value="Days")@Range(min=1, max=90)int days) {
-		ItemEdit.get().setRefreshTime(days);
-		msg(ItemEdit.PREFIX + "VIP refresh days set to " + days + ".");
 	}
 
 	@Cmd(value="Changes the width of described items in character count.", permission="itemedit.admin")

@@ -61,10 +61,6 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
 				if (ableToEdit(p, item)) {
-					if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
-						msg(APPROVED_ALREADY);
-						return;
-					}
 					StringBuilder thisName = new StringBuilder();
 					for (String s : name) {
 						if (thisName.length() > 0) {
@@ -607,7 +603,14 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
-	private static boolean ableToEdit(Player p, ItemStack item) {
+	/**
+	 * Returns if the player has the override edit permission for the approval.
+	 * @param player The player to check for permission.
+	 * @param item The item to get the approval from.
+	 * @return Return true by default, return false if the player lacks the override
+	 * permission node for the approval found.
+	 */
+	private static boolean ableToEdit(Player player, ItemStack item) {
 		if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
@@ -624,7 +627,7 @@ public class MainCommands extends BaseCommand {
 					}
 
 					if (currentApproval != null) {
-						return p.hasPermission(currentApproval.permission + ".edit");
+						return player.hasPermission(currentApproval.permission + ".edit");
 					}
 				}
 			}
@@ -632,118 +635,17 @@ public class MainCommands extends BaseCommand {
 		return true;
 	}
 
-	// Checks if the item is signed
-	private static boolean isSigned(ItemStack item) {
-		return ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG);
-	}
-
-	// Checks if the item was signed by the given player
-	private static boolean notSignedBy(ItemStack item, Player p) {
-		if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
-			String uuid = ItemUtil.getCustomTag(item, ItemEdit.APPROVED_TAG).replace(":", " ").split(" ")[0];
-			return !UUID.fromString(uuid).equals(p.getUniqueId());
-		}
-		return true;
-	}
-
-	// Replaces the item in hand with the given edits after applying the appropriate tags and charging the player.
-	private static void finalizeEdit(Player p, ItemStack item) {
+	/**
+	 * Adds a formatted edit tag to the given item.
+	 * @param player The player who's editing the item.
+	 * @param item The item to apply the tag to.
+	 */
+	private static void finalizeEdit(Player player, ItemStack item) {
 		String preString = "";
 		if (ItemUtil.hasCustomTag(item, ItemEdit.EDITED_TAG)) {
 			preString = ItemUtil.getCustomTag(item, ItemEdit.EDITED_TAG) + "/";
 		}
-		ItemUtil.setCustomTag(item, ItemEdit.EDITED_TAG, preString + p.getUniqueId().toString() + ":" + System.currentTimeMillis());
-	}/*
-
-	/////////////////////
-	//// CLEAR CLASS ////
-	/////////////////////
-
-	public static class ClearCommands extends BaseCommand {
-
-		@Cmd(value="Clear all custom lore from an item so you can start over.")
-		@Flag(name="mod", description="Overrides signature lock on clearing an item.", permission="itemedit.mod")
-		public void all(CommandSender sender) {
-			String message = clearTypes(sender, hasFlag("mod"), false, false);
-			if (message != null) {
-				msg(message);
-			}
-		}
-
-		@Cmd(value="Clear the description from an item.")
-		@Flag(name="mod", description="Overrides signature lock on clearing an item.", permission="itemedit.mod")
-		public void desc(CommandSender sender) {
-			String message = clearTypes(sender, hasFlag("mod"), true, false);
-			if (message != null) {
-				msg(message);
-			}
-		}
-
-		@Cmd(value="Clear the signature from an item.")
-		@Flag(name="mod", description="Overrides signature lock on clearing an item.", permission="itemedit.mod")
-		public void signature(CommandSender sender) {
-			String message = clearTypes(sender, hasFlag("mod"), false, true);
-			if (message != null) {
-				msg(message);
-			}
-		}
-
-		// Intermediary to avoid duplicate code.
-		private String clearTypes(CommandSender sender, boolean mod, boolean descOnly, boolean sigOnly) {
-			if (sender instanceof Player) {
-				Player p = (Player) sender;
-				ItemStack item = transSQL.getItemInHand(p);
-				if (item != null && item.getType() != Material.AIR) {
-					if (ItemUtil.hasCustomTag(item, ItemEdit.EDITED_TAG) || transSQL.isItemMonikerSigned(item)) {
-						if (!mod && isSigned(item) && notSignedBy(item, p)) {
-							return SIGNED_ALREADY;
-						} else {
-							clearData(item, descOnly, sigOnly);
-							finalizeEdit(p, item, 0, false);
-						}
-					}
-					return null;
-				}
-			}
-			return NO_ITEM;
-		}
-
-		private void clearData(ItemStack item, boolean descOnly, boolean sigOnly) {
-			ItemMeta meta = item.getItemMeta();
-
-			if (meta != null) {
-				for (Enchantment enc : meta.getEnchants().keySet()) {
-					if ((enc instanceof SoulbindEnchant) ||
-						(!descOnly && !sigOnly && (enc instanceof Glow))) {
-						meta.removeEnchant(enc);
-					}
-				}
-
-				if (descOnly) {
-					meta.setLore(null);
-				} else if (sigOnly) {
-					List<String> lore = meta.getLore();
-					if (lore != null) {
-						while (lore.size() > 0) {
-							String lastLine = lore.get(lore.size() - 1);
-							lore.remove(lore.size() - 1);
-							if (lastLine.contains("Approved" + ChatColor.RESET) ||
-								(lastLine.contains("Approved") && lastLine.contains(Character.toString((char) 0x2605)))) {
-								break;
-							}
-						}
-					}
-					meta.setLore(lore);
-				} else {
-					meta.setLore(null);
-					meta.setDisplayName(null);
-				}
-
-				ItemUtil.removeCustomTag(meta, SIGNED_TAG);
-				item.setItemMeta(meta);
-			}
-		}
-
-	}*/
+		ItemUtil.setCustomTag(item, ItemEdit.EDITED_TAG, preString + player.getUniqueId().toString() + ":" + System.currentTimeMillis());
+	}
 
 }
