@@ -1,6 +1,7 @@
 package net.lordofthecraft.itemedit.command;
 
 import co.lotc.core.bukkit.book.BookStream;
+import co.lotc.core.bukkit.util.BookUtil;
 import co.lotc.core.bukkit.util.ItemUtil;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
@@ -40,7 +41,6 @@ public class MainCommands extends BaseCommand {
 	private static String nameTooLong; // This one is based on Max Width so it's set on instance creation.
 
 	// Application short-hands
-	private static final String LINE_BREAK_PARSE = "#%cl:#;@";
 	private static final String DESC_PREFIX = ChatColor.GRAY + "" + ChatColor.ITALIC;
 	private static final Glow GLOW = new Glow(new NamespacedKey(ItemEdit.get(), ItemEdit.get().getDescription().getName()));
 
@@ -178,8 +178,7 @@ public class MainCommands extends BaseCommand {
 				BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book!") {
 					@Override
 					public void onBookClose() {
-						List<String> desc = getMeta().getPages();
-						completeDesc(item, desc, highlight);
+						completeDesc(item, BookUtil.getPagesAsArray(getMeta()), highlight);
 					}
 				};
 
@@ -398,47 +397,29 @@ public class MainCommands extends BaseCommand {
 	 * @param item The item to describe.
 	 * @param desc The list of pages as Strings.
 	 */
-	private void completeDesc(ItemStack item, List<String> desc, String highlight) {
+	private void completeDesc(ItemStack item, String[] desc, String highlight) {
 
-		// Clear linebreaks and combine.
-		StringBuilder combinedDesc = new StringBuilder();
-		for (String str : desc) {
-			if (combinedDesc.length() > 0) {
-				combinedDesc.append(" ");
-			}
-			if (str.contains("\n")) {
-				String[] lineBreaks = str.split("\\R", -1);
-				for (int i = 0; i < lineBreaks.length; i++) {
-					combinedDesc.append(ChatColor.stripColor(lineBreaks[i]));
-					if (i < lineBreaks.length-1) {
-						combinedDesc.append(" " + LINE_BREAK_PARSE + " ");
-					}
+		// Format highlights.
+		for (int i = 0; i < desc.length; i++) {
+			desc[i] = ChatColor.stripColor(desc[i]);
+
+			if (desc[i].startsWith("%") || desc[i].endsWith("%")) {
+				if (desc[i].startsWith("%")) {
+					desc[i] = desc[i].substring(1);
 				}
-			} else {
-				combinedDesc.append(ChatColor.stripColor(str));
-			}
-		}
-
-		// Split into individual words and highlights.
-		String[] descByWord = combinedDesc.toString().split(" ");
-		for (int i = 0; i < descByWord.length; i++) {
-			if (descByWord[i].startsWith("%") || descByWord[i].endsWith("%")) {
-
-				if (descByWord[i].startsWith("%")) {
-					descByWord[i] = descByWord[i].substring(1);
-				}
-				if (descByWord[i].endsWith("%")) {
-					descByWord[i] = descByWord[i].substring(0, descByWord[i].length()-1);
+				if (desc[i].endsWith("%")) {
+					desc[i] = desc[i].substring(0, desc[i].length()-1);
 				}
 
-				descByWord[i] = (highlight + ChatColor.ITALIC + descByWord[i] + DESC_PREFIX);
+				desc[i] = (highlight + ChatColor.ITALIC + desc[i] + DESC_PREFIX);
 			}
 		}
 
 		// Update the tags just in case, then format our description into a set of lore.
 		updateTags(item);
-		List<String> finalDesc = formatDesc(descByWord);
+		List<String> finalDesc = formatDesc(desc);
 
+		// Grab our current data as it exists then put it back in with the description included.
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
@@ -480,7 +461,7 @@ public class MainCommands extends BaseCommand {
 		int currentLength = 0;
 
 		for (String word : words) {
-			if (!word.equals(LINE_BREAK_PARSE)) {
+			if (!word.equals("\n")) {
 				String[] result = processWord(currentLength, word);
 
 				while (result.length > 1) {
