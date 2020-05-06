@@ -30,8 +30,8 @@ public class StaffCommands extends BaseCommand {
 				output.append(ItemEdit.ALT_COLOR).append("Edited By:").append(tagPlayerInfo(item, ItemEdit.EDITED_TAG));
 			}
 
-			if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG)) {
-				output.append(ItemEdit.ALT_COLOR).append("Signed By:").append(tagPlayerInfo(item, ItemEdit.SIGNED_TAG));
+			if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
+				output.append(ItemEdit.ALT_COLOR).append("Signed By:").append(tagPlayerInfo(item, ItemEdit.APPROVED_TAG));
 			}
 
 			if (output.length() <= 0) {

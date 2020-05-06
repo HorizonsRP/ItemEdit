@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
-import java.util.UUID;
 
 public final class ItemEdit extends JavaPlugin {
 
@@ -23,13 +22,13 @@ public final class ItemEdit extends JavaPlugin {
 	public static final String QUALITY_PERM = "quality";
 	public static final String AURA_PERM = "aura";
 	public static final String TYPE_PERM = "type";
-	public static final String SIGNATURE_PERM = "signature";
+	public static final String APPROVAL_PERM = "signature";
 
 	public static final boolean DEBUGGING = true;
 
 	// Tags set by Tythan for identification
 	public static final String EDITED_TAG = "editor-uuid";
-	public static final String SIGNED_TAG = "signed-uuid";
+	public static final String APPROVED_TAG = "signed-uuid";
 	public static final String INFO_TAG = "item-data";
 
 	private static int maxWidth;
@@ -91,10 +90,10 @@ public final class ItemEdit extends JavaPlugin {
 
 	// Auto-populate our SignTypes
 	private void registerParameters() {
-		Commands.defineArgumentType(Signature.class)
+		Commands.defineArgumentType(Approval.class)
 				.defaultName("Signature")
-				.completer((s,$) -> Signature.getAvailable(s))
-				.mapperWithSender((sender, type) -> Signature.getByName(type))
+				.completer((s,$) -> Approval.getAvailable(s))
+				.mapperWithSender((sender, type) -> Approval.getByName(type))
 				.register();
 
 		Commands.defineArgumentType(Rarity.class)

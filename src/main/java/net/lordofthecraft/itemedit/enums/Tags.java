@@ -51,11 +51,11 @@ public class Tags {
 	}
 
 	public String toString() {
-		String auraName = aura.getName();
+		String auraName = aura.name;
 		if (strongAura) {
 			auraName += "%";
 		}
-		return rarity.getName() + ":" + quality.getName() + ":" + auraName + ":" + type.getName() + ":" + itemID;
+		return rarity.name + ":" + quality.name + ":" + auraName + ":" + type.name + ":" + itemID;
 	}
 
 	// GET //

@@ -25,9 +25,9 @@ public enum Aura {
 
 	public static Aura DEFAULT = MUNDANE;
 
-	private String name;
+	public String name;
 	private ChatColor color;
-	private String permission;
+	public String permission;
 
 	Aura(String name, ChatColor color, String permission) {
 		this.name = name;
@@ -42,17 +42,9 @@ public enum Aura {
 		}
 		return color + this.name;
 	}
-
-	public String getName() {
-		return this.name;
-	}
-	public String getPermission() {
-		return this.permission;
-	}
-
 	public static Aura getByName(String name) {
 		for (Aura aura : values()) {
-			if (aura.getName().equalsIgnoreCase(name)) {
+			if (aura.name.equalsIgnoreCase(name)) {
 				return aura;
 			}
 		}

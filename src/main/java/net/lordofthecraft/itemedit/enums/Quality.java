@@ -23,9 +23,9 @@ public enum Quality {
 	public static Quality DEFAULT = FAILURE;
 
 	private boolean magic;
-	private String name;
+	public String name;
 	private ChatColor color;
-	private String permission;
+	public String permission;
 
 	Quality(boolean magic, String name, ChatColor color, String permission) {
 		this.magic = magic;
@@ -41,13 +41,6 @@ public enum Quality {
 		}
 		return color + this.name;
 	}
-
-	public String getName() {
-		return this.name;
-	}
-	public String getPermission() {
-		return this.permission;
-	}
 	public String getColor() {
 		String output = this.color + "";
 		if (this.magic) {
@@ -58,7 +51,7 @@ public enum Quality {
 
 	public static Quality getByName(String name) {
 		for (Quality quality : values()) {
-			if (quality.getName().equalsIgnoreCase(name)) {
+			if (quality.name.equalsIgnoreCase(name)) {
 				return quality;
 			}
 		}

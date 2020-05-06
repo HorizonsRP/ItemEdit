@@ -24,8 +24,8 @@ public enum Type {
 
 	public static Type DEFAULT = MISC;
 
-	private String name;
-	private String permission;
+	public String name;
+	public String permission;
 
 	Type(String name, String permission) {
 		this.name = name;
@@ -36,16 +36,9 @@ public enum Type {
 		return ChatColor.DARK_GRAY + this.name;
 	}
 
-	public String getName() {
-		return this.name;
-	}
-	public String getPermission() {
-		return this.permission;
-	}
-
 	public static Type getByName(String name) {
 		for (Type type : values()) {
-			if (type.getName().equalsIgnoreCase(name)) {
+			if (type.name.equalsIgnoreCase(name)) {
 				return type;
 			}
 		}

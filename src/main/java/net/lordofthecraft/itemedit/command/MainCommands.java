@@ -5,6 +5,7 @@ import co.lotc.core.bukkit.util.BookUtil;
 import co.lotc.core.bukkit.util.ItemUtil;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
+import co.lotc.core.command.annotate.Default;
 import co.lotc.core.command.annotate.Flag;
 import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemEdit;
@@ -34,9 +35,9 @@ public class MainCommands extends BaseCommand {
 	private static final String NO_TOKENS = ItemEdit.PREFIX + "You do not have enough edit tokens to edit this item!";
 	private static final String NO_NAME_SET = ItemEdit.PREFIX + "Please set a custom name before setting a custom colour.";
 	private static final String COLOR_ERROR = ItemEdit.PREFIX + "You do not have permission to use this color type.";
-	private static final String SIGNED_ALREADY = ItemEdit.PREFIX + "This item has already been signed!";
+	private static final String APPROVED_ALREADY = ItemEdit.PREFIX + "This item has already been signed!";
 	private static final String SIGNED_OTHERWISE = ItemEdit.PREFIX + "You were not the one to sign this item!";
-	private static final String NO_SIGNATURE_PERM = ItemEdit.PREFIX + "You do not have permission to use that signature.";
+	private static final String NO_APPROVAL_PERM = ItemEdit.PREFIX + "You do not have permission to use that signature.";
 	private static final String MAX_LENGTH = ItemEdit.PREFIX + "You have reached the maximum length on that item.";
 	private static String nameTooLong; // This one is based on Max Width so it's set on instance creation.
 
@@ -60,7 +61,7 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
 				if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
-					msg(SIGNED_ALREADY);
+					msg(APPROVED_ALREADY);
 					return;
 				}
 				StringBuilder thisName = new StringBuilder();
@@ -187,6 +188,40 @@ public class MainCommands extends BaseCommand {
 			}
 		}
 		msg(NO_ITEM);
+	}
+
+	@Cmd(value="Approve an item to lock in the information. Can be cleared later if needed.", permission="itemedit.approve")
+	public void approve(CommandSender sender, @Default("PLAYER") Approval approval) {
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			validate(p.hasPermission(approval.permission), NO_APPROVAL_PERM);
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null && item.getType() != Material.AIR) {
+				ItemMeta meta = item.getItemMeta();
+				if (meta != null) {
+					List<String> lore = meta.getLore();
+					if (lore != null) {
+						String approvalString = approval.formatApproval(p);
+						if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
+							lore.set(lore.size()-1, approvalString);
+						} else {
+							lore.add(approvalString);
+						}
+						meta.setLore(lore);
+						item.setItemMeta(meta);
+						ItemUtil.setCustomTag(item, ItemEdit.APPROVED_TAG, p.getUniqueId().toString() + ":" + System.currentTimeMillis());
+					}
+				}
+				finalizeEdit(p, item);
+				return;
+			}
+		}
+		msg(NO_ITEM);
+	}
+
+	@Cmd(value="Moderator access to edited items.", permission="itemedit.mod")
+	public BaseCommand staff() {
+		return staffCommands;
 	}
 
 	/**
@@ -327,7 +362,7 @@ public class MainCommands extends BaseCommand {
 				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
 					start++;
 				}
-				if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG)) {
+				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
 					end--;
 				}
 
@@ -375,7 +410,7 @@ public class MainCommands extends BaseCommand {
 					if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
 						start++;
 					}
-					if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG)) {
+					if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
 						end--;
 					}
 
@@ -429,7 +464,7 @@ public class MainCommands extends BaseCommand {
 				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG) && lore.size() > 0) {
 					tags = lore.get(0);
 				}
-				if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG) && lore.size() > 0) {
+				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG) && lore.size() > 0) {
 					approved = lore.get(lore.size()-1);
 				}
 
@@ -540,81 +575,15 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
-	/*
-	// Finalization & Clearing //
-	@Cmd(value="Sign an item to lock in the information. Can be cleared later if needed.", permission="itemedit.sign")
-	@Flag(name="mod", description="Prevents the username from being written on player approved signs.", permission="itemedit.mod")
-	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission="itemedit.free")
-	@Flag(name="rp", description="Allows signing with your RP name")
-	public void sign(CommandSender sender,
-					 @Default("ROLEPLAY") Signature signature) {
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			validate(p.hasPermission(signature.permission), NO_SIGNATURE_PERM);
-			ItemStack item = transSQL.getItemInHand(p);
-			if (item != null && item.getType() != Material.AIR) {
-				if (isSigned(item)) {
-					msg(SIGNED_ALREADY);
-					return;
-				}
-
-				// Check if it has a tag first and foremost, otherwise check how many tokens it would cost.
-				int tokensUsed = transSQL.safeToChargePlayer(p);
-				// If item has been edited and is does not have the paper tag (if relevent), or if
-				// a staff is using the -staff flag, then the edit is free regardless.
-				if ((ItemUtil.hasCustomTag(item, ItemEdit.EDITED_TAG) &&
-					 (item.getType() != Material.PAPER || !ItemUtil.hasCustomTag(item, PAPER_FREEBIE))) ||
-					hasFlag("staff")) {
-					tokensUsed = 0;
-				} else if (tokensUsed == 0) {
-					msg(NO_TOKENS);
-					return;
-				}
-
-				ItemMeta meta = item.getItemMeta();
-				if (meta != null) {
-					List<String> lore = meta.getLore();
-					if (lore == null) {
-						lore = new ArrayList<>();
-					}
-
-					if (signature.equals(Signature.PLAYER) || signature.permission.startsWith(ItemEdit.PERMISSION_START + "." + ItemEdit.SIGNATURE_PERM)) {
-						lore.add(Signature.formatSignature(p, signature, hasFlag("rp"), !hasFlag("mod")));
-					} else {
-						lore.add(Signature.formatSignature(p, signature, hasFlag("rp"), true));
-					}
-
-					meta.setLore(lore);
-					item.setItemMeta(meta);
-				}
-
-				ItemUtil.setCustomTag(item, SIGNED_TAG, p.getUniqueId().toString() + ":" + System.currentTimeMillis());
-				finalizeEdit(p, item);
-				return;
-			}
-		}
-		msg(NO_ITEM);
-	}
-
-	@Cmd(value="Clears edited info. Use flag -mod to override signatures.", permission="itemedit.clear")
-	public BaseCommand clear() {
-		return CLEAR_COMMANDS;
-	}
-
-	@Cmd(value="Moderator access to edited items.", permission="itemedit.mod")
-	public BaseCommand staff() {
-		return staffCommands;
-	}*/
-
 	// Checks if the item is signed
 	private static boolean isSigned(ItemStack item) {
-		return ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG);
+		return ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG);
 	}
 
 	// Checks if the item was signed by the given player
 	private static boolean notSignedBy(ItemStack item, Player p) {
-		if (ItemUtil.hasCustomTag(item, ItemEdit.SIGNED_TAG)) {
-			String uuid = ItemUtil.getCustomTag(item, ItemEdit.SIGNED_TAG).replace(":", " ").split(" ")[0];
+		if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
+			String uuid = ItemUtil.getCustomTag(item, ItemEdit.APPROVED_TAG).replace(":", " ").split(" ")[0];
 			return !UUID.fromString(uuid).equals(p.getUniqueId());
 		}
 		return true;

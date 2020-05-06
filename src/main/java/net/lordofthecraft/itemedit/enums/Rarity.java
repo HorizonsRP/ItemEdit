@@ -23,9 +23,9 @@ public enum Rarity {
 
 	private boolean magic;
 	private boolean bold;
-	private String name;
+	public final String name;
 	private ChatColor color;
-	private String permission;
+	public final String permission;
 
 	Rarity(boolean magic, boolean bold, String name, ChatColor color, String permission) {
 		this.magic = magic;
@@ -37,13 +37,6 @@ public enum Rarity {
 
 	public String getTag() {
 		return getColor() + this.name;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-	public String getPermission() {
-		return this.permission;
 	}
 	public String getColor() {
 		String output = this.color + "";
@@ -59,7 +52,7 @@ public enum Rarity {
 	// STATIC //
 	public static Rarity getByName(String name) {
 		for (Rarity rarity : values()) {
-			if (rarity.getName().equalsIgnoreCase(name)) {
+			if (rarity.name.equalsIgnoreCase(name)) {
 				return rarity;
 			}
 		}

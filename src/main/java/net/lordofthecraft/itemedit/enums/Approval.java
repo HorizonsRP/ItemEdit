@@ -1,7 +1,6 @@
 package net.lordofthecraft.itemedit.enums;
 
 import co.lotc.core.agnostic.Sender;
-import net.korvic.rppersonas.RPPersonas;
 import net.lordofthecraft.itemedit.ItemEdit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -9,7 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum Signature {
+public enum Approval {
 
 	// STAFF AND DEFAULT SIGNATURES
 	ADMIN("ADMIN", ChatColor.DARK_RED, "An Admin", "❃", ItemEdit.PERMISSION_START + ".admin"),
@@ -46,7 +45,7 @@ public enum Signature {
 	public final String affixes;
 	public final String permission;
 
-	Signature(String name, ChatColor color, String aRank, String affixes, String permission) {
+	Approval(String name, ChatColor color, String aRank, String affixes, String permission) {
 		this.name = name;
 		this.color = color;
 		this.aRank = aRank;
@@ -54,29 +53,18 @@ public enum Signature {
 		this.permission = permission;
 	}
 
-	// STATIC //
-	private static final String DGRAY_ITALIC = ChatColor.DARK_GRAY + "" + ChatColor.ITALIC;
-	public static final Signature DEFAULT = PLAYER;
-
-	public static String formatSignature(Player p, Signature type, boolean roleplay, boolean showRealName) {
-		String name = p.getName();
-		if (roleplay) {
-			//Grab Persona name.
-			if (ItemEdit.get().getServer().getPluginManager().isPluginEnabled("RPPersonas")) {
-				name = RPPersonas.get().getPersonaHandler().getLoadedPersona(p).getNickName();
-			}
-
-			// Still add this even if we fail to find any persona name.
-			name += DGRAY_ITALIC + " (" + type.color + ChatColor.ITALIC + p.getName() + DGRAY_ITALIC + ")";
-		}
-
-		return DGRAY_ITALIC + "Created By " + type.aRank + " " + type.color + name;
+	public String formatApproval(Player p) {
+		return DGRAY_ITALIC + "Created By " + this.aRank + " (" + this.color + p.getName() + DGRAY_ITALIC + ")";
 	}
 
-	public static Signature getByName(String string) {
-		for (Signature signature : values()) {
-			if (signature.name.equalsIgnoreCase(string)) {
-				return signature;
+	// STATIC //
+	private static final String DGRAY_ITALIC = ChatColor.DARK_GRAY + "" + ChatColor.ITALIC;
+	public static final Approval DEFAULT = PLAYER;
+
+	public static Approval getByName(String string) {
+		for (Approval approval : values()) {
+			if (approval.name.equalsIgnoreCase(string)) {
+				return approval;
 			}
 		}
 		return DEFAULT;
@@ -84,9 +72,9 @@ public enum Signature {
 
 	public static List<String> getAvailable(Sender player) {
 		ArrayList<String> list = new ArrayList<>();
-		for (Signature signature : values()) {
-			if (player.hasPermission(signature.permission)) {
-				list.add(signature.name);
+		for (Approval approval : values()) {
+			if (player.hasPermission(approval.permission)) {
+				list.add(approval.name);
 			}
 		}
 		return list;
