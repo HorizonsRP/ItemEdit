@@ -4,9 +4,9 @@ net\lordofthecraft\itemedit\enums\Type.class
 net\lordofthecraft\itemedit\command\StaffCommands.class
 net\lordofthecraft\itemedit\enums\Tags.class
 net\lordofthecraft\itemedit\command\BaseCommand.class
-net\lordofthecraft\itemedit\enums\Signature.class
 net\lordofthecraft\itemedit\enums\Rarity.class
 net\lordofthecraft\itemedit\Glow.class
+net\lordofthecraft\itemedit\enums\Approval.class
 net\lordofthecraft\itemedit\enums\Quality.class
 net\lordofthecraft\itemedit\ItemEdit.class
 net\lordofthecraft\itemedit\enums\Aura.class

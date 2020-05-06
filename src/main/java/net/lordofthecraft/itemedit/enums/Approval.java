@@ -54,7 +54,7 @@ public enum Approval {
 	}
 
 	public String formatApproval(Player p) {
-		return DGRAY_ITALIC + "Created By " + this.aRank + " (" + this.color + p.getName() + DGRAY_ITALIC + ")";
+		return DGRAY_ITALIC + "Created By " + this.aRank + " (" + this.color + ChatColor.ITALIC + p.getName() + DGRAY_ITALIC + ")";
 	}
 
 	// STATIC //
