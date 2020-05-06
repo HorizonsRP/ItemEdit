@@ -60,21 +60,25 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
-				if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
-					msg(APPROVED_ALREADY);
-					return;
-				}
-				StringBuilder thisName = new StringBuilder();
-				for (String s : name) {
-					if (thisName.length() > 0) {
-						thisName.append(" ").append(s);
-					} else {
-						thisName.append(s);
+				if (ableToEdit(p, item)) {
+					if (!hasFlag("mod") && isSigned(item) && notSignedBy(item, p)) {
+						msg(APPROVED_ALREADY);
+						return;
 					}
+					StringBuilder thisName = new StringBuilder();
+					for (String s : name) {
+						if (thisName.length() > 0) {
+							thisName.append(" ").append(s);
+						} else {
+							thisName.append(s);
+						}
+					}
+					validate(thisName.toString().length() <= ItemEdit.getMaxWidth(), nameTooLong);
+					updateDisplayName(item, thisName.toString());
+					finalizeEdit(p, item);
+				} else {
+					msg(APPROVED_ALREADY);
 				}
-				validate(thisName.toString().length() <= ItemEdit.getMaxWidth(), nameTooLong);
-				updateDisplayName(item, thisName.toString());
-				finalizeEdit(p, item);
 				return;
 			}
 		}
@@ -87,11 +91,15 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, rarity, null, null, null, -1, 0);
-				ItemMeta meta = item.getItemMeta();
-				if (meta != null) {
-					String name = ChatColor.stripColor(meta.getDisplayName());
-					updateDisplayName(item, name);
+				if (ableToEdit(p, item)) {
+					updateTags(item, rarity, null, null, null, -1, 0);
+					ItemMeta meta = item.getItemMeta();
+					if (meta != null) {
+						String name = ChatColor.stripColor(meta.getDisplayName());
+						updateDisplayName(item, name);
+					}
+				} else {
+					msg(APPROVED_ALREADY);
 				}
 				return;
 			}
@@ -105,11 +113,15 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				Tags tags = new Tags(item);
-				String oldColor = tags.getQuality().getColor();
-				String newColor = quality.getColor();
-				updateTags(item, null, quality, null, null, -1, 0);
-				updateDescHighlights(item, oldColor, newColor);
+				if (ableToEdit(p, item)) {
+					Tags tags = new Tags(item);
+					String oldColor = tags.getQuality().getColor();
+					String newColor = quality.getColor();
+					updateTags(item, null, quality, null, null, -1, 0);
+					updateDescHighlights(item, oldColor, newColor);
+				} else {
+					msg(APPROVED_ALREADY);
+				}
 				return;
 			}
 		}
@@ -122,12 +134,16 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				if (strong) {
-					updateTags(item, null, null, aura, null, 1, 0);
+				if (ableToEdit(p, item)) {
+					if (strong) {
+						updateTags(item, null, null, aura, null, 1, 0);
+					} else {
+						updateTags(item, null, null, aura, null, 0, 0);
+					}
+					updateGlow(item, strong);
 				} else {
-					updateTags(item, null, null, aura, null, 0, 0);
+					msg(APPROVED_ALREADY);
 				}
-				updateGlow(item, strong);
 				return;
 			}
 		}
@@ -140,7 +156,11 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, null, null, type, -1, 0);
+				if (ableToEdit(p, item)) {
+					updateTags(item, null, null, null, type, -1, 0);
+				} else {
+					msg(APPROVED_ALREADY);
+				}
 				return;
 			}
 		}
@@ -153,7 +173,11 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
-				updateTags(item, null, null, null, null, -1, id);
+				if (ableToEdit(p, item)) {
+					updateTags(item, null, null, null, null, -1, id);
+				} else {
+					msg(APPROVED_ALREADY);
+				}
 				return;
 			}
 		}
@@ -167,23 +191,27 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 
 			if (item != null && !item.getType().equals(Material.AIR)) {
-				ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
-				BookMeta meta = (BookMeta) book.getItemMeta();
-				if (meta != null) {
-					meta.setPages(getDescAsPages(item));
-				}
-				book.setItemMeta(meta);
-
-				Tags tags = new Tags(item);
-				String highlight = tags.getQuality().getColor();
-				BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book!") {
-					@Override
-					public void onBookClose() {
-						completeDesc(item, BookUtil.getPagesAsArray(getMeta()), highlight);
+				if (ableToEdit(p, item)) {
+					ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
+					BookMeta meta = (BookMeta) book.getItemMeta();
+					if (meta != null) {
+						meta.setPages(getDescAsPages(item));
 					}
-				};
+					book.setItemMeta(meta);
 
-				stream.open(p);
+					Tags tags = new Tags(item);
+					String highlight = tags.getQuality().getColor();
+					BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book!") {
+						@Override
+						public void onBookClose() {
+							completeDesc(item, BookUtil.getPagesAsArray(getMeta()), highlight);
+						}
+					};
+
+					stream.open(p);
+				} else {
+					msg(APPROVED_ALREADY);
+				}
 				return;
 			}
 		}
@@ -194,25 +222,29 @@ public class MainCommands extends BaseCommand {
 	public void approve(CommandSender sender, @Default("PLAYER") Approval approval) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
-			validate(p.hasPermission(approval.permission), NO_APPROVAL_PERM);
+			validate(p.hasPermission(approval.permission + ".use"), NO_APPROVAL_PERM);
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
-				ItemMeta meta = item.getItemMeta();
-				if (meta != null) {
-					List<String> lore = meta.getLore();
-					if (lore != null) {
-						String approvalString = approval.formatApproval(p);
-						if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
-							lore.set(lore.size()-1, approvalString);
-						} else {
-							lore.add(approvalString);
+				if (ableToEdit(p, item)) {
+					ItemMeta meta = item.getItemMeta();
+					if (meta != null) {
+						List<String> lore = meta.getLore();
+						if (lore != null) {
+							String approvalString = approval.formatApproval(p);
+							if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
+								lore.set(lore.size() - 1, approvalString);
+							} else {
+								lore.add(approvalString);
+							}
+							meta.setLore(lore);
+							item.setItemMeta(meta);
+							ItemUtil.setCustomTag(item, ItemEdit.APPROVED_TAG, p.getUniqueId().toString() + ":" + System.currentTimeMillis());
 						}
-						meta.setLore(lore);
-						item.setItemMeta(meta);
-						ItemUtil.setCustomTag(item, ItemEdit.APPROVED_TAG, p.getUniqueId().toString() + ":" + System.currentTimeMillis());
 					}
+					finalizeEdit(p, item);
+				} else {
+					msg(APPROVED_ALREADY);
 				}
-				finalizeEdit(p, item);
 				return;
 			}
 		}
@@ -573,6 +605,31 @@ public class MainCommands extends BaseCommand {
 		} else {
 			return new String[] { first, second };
 		}
+	}
+
+	private static boolean ableToEdit(Player p, ItemStack item) {
+		if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				List<String> lore = meta.getLore();
+				if (lore != null) {
+					String approvedLine = lore.get(lore.size()-1);
+					Approval currentApproval = null;
+
+					for (Approval approval : Approval.values()) {
+						if (approvedLine.contains(approval.aRank)) {
+							currentApproval = approval;
+							break;
+						}
+					}
+
+					if (currentApproval != null) {
+						return p.hasPermission(currentApproval.permission + ".edit");
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	// Checks if the item is signed

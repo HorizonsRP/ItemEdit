@@ -20,6 +20,10 @@ public enum Approval {
 	DESIGN("DESIGN", ChatColor.DARK_PURPLE, "A Designer", "❣", ItemEdit.PERMISSION_START + ".design"),
 	PLAYER("PLAYER", ChatColor.GRAY, "A Player", "◎", ItemEdit.PERMISSION_START + ".use");
 
+	// Permissions note: Add .use to use, and .edit to be able to edit over.
+	// e.g. Mods having PERM.mod.use, PERM.mod.edit, PERM.lore.edit, PERM.event.edit
+	// will make them able to use mod approval only, but able to edit over mod, lore, and event approval.
+
 	// VIP SIGNATURES
 	/*FLEURDELIS("FLEUR-DE-LIS", ChatColor.GRAY, "Player", "⚜", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".fleurdelis"),
 	SUN("SUN", ChatColor.GRAY, "Player", "☀", ItemEdit.PERMISSION_START + "." + ItemEdit.BONUS_SIGNATURE_PERM + ".sun"),
