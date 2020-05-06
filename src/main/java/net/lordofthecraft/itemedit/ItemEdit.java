@@ -39,10 +39,6 @@ public final class ItemEdit extends JavaPlugin {
 	public static int getMaxLines() {
 		return maxLines;
 	}
-	private static int refreshTime;
-	public static int getRefreshTime() {
-		return refreshTime;
-	}
 
 	private static ItemEdit instance;
 	public static ItemEdit get() {
@@ -66,13 +62,6 @@ public final class ItemEdit extends JavaPlugin {
 			maxLines = this.getConfig().getInt("MAX-LINES");
 		} else {
 			maxLines = 15;
-		}
-
-		// Grab our refresh time for VIP tokens.
-		if (this.getConfig().getInt("REFRESH-TIME-IN-DAYS") >= 0) {
-			refreshTime = this.getConfig().getInt("REFRESH-TIME-IN-DAYS");
-		} else {
-			refreshTime = 7;
 		}
 
 		// Register our auto-complete and glow enchant.
@@ -143,16 +132,16 @@ public final class ItemEdit extends JavaPlugin {
 		}
 	}
 
-	// Config Editors
-	public void setRefreshTime(int i) {
-		refreshTime = i;
-		getConfig().set("REFRESH-TIME-IN-DAYS", i);
-		saveConfig();
-	}
-
+	// Config Editor
 	public void setMaxWidth(int i) {
 		maxWidth = i;
 		getConfig().set("MAX-WIDTH", i);
+		saveConfig();
+	}
+
+	public void setMaxLines(int i) {
+		maxLines = i;
+		getConfig().set("MAX-LINES", i);
 		saveConfig();
 	}
 

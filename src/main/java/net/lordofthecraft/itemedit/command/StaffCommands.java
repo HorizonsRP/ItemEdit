@@ -86,9 +86,15 @@ public class StaffCommands extends BaseCommand {
 	}
 
 	@Cmd(value="Changes the width of described items in character count.", permission="itemedit.admin")
-	public void setDescWidth(@Arg(value="# of letters")@Range(min=1, max=100)int characters) {
+	public void setDescWidth(@Arg(value="# of letters")@Range(min=1, max=50)int characters) {
 		ItemEdit.get().setMaxWidth(characters);
-		msg(ItemEdit.PREFIX + "Lore and name width set to " + characters + ".");
+		msg(ItemEdit.PREFIX + "Lore and name max width set to " + characters + ".");
+	}
+
+	@Cmd(value="Changes the width of described items in character count.", permission="itemedit.admin")
+	public void setDescLength(@Arg(value="# of lines")@Range(min=1, max=20)int lines) {
+		ItemEdit.get().setMaxLines(lines);
+		msg(ItemEdit.PREFIX + "Lore and name max lines set to " + lines + ".");
 	}
 
 }
