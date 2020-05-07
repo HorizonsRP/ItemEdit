@@ -17,16 +17,31 @@ public class Tags {
 	private Type type;
 	private int itemID;
 
+	/**
+	 * Build a tag set with pre-set data.
+	 * @param rarity
+	 * @param quality
+	 * @param aura
+	 * @param type
+	 * @param auraClass Integer.MAX_VALUE is default. -1 is minor, 0 is normal, 1 is major.
+	 * @param itemID The Lost Fables item ID for future professions systems.
+	 */
 	public Tags(Rarity rarity, Quality quality, Aura aura, Type type, int auraClass, int itemID) {
 		this.rarity =  (rarity != null) ?   rarity : Rarity.DEFAULT;
 		this.quality = (quality != null) ? quality : Quality.DEFAULT;
 		this.aura =    (aura != null) ?       aura : Aura.DEFAULT;
 		this.type =    (type != null) ?       type : Type.DEFAULT;
 
-		this.auraClass = auraClass;
+		if (auraClass != Integer.MAX_VALUE) {
+			this.auraClass = auraClass;
+		}
 		this.itemID = itemID;
 	}
 
+	/**
+	 * @param item The item to check for.
+	 * @return A Tags object representing the same tags as the item provided.
+	 */
 	public static Tags getTags(ItemStack item) {
 		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
 			return getTags(ItemUtil.getCustomTag(item, ItemEdit.INFO_TAG));
@@ -34,10 +49,18 @@ public class Tags {
 		return null;
 	}
 
+	/**
+	 * @param rawData The item data to parse.
+	 * @return A Tags object representing the same tags as the data provided.
+	 */
 	public static Tags getTags(String rawData) {
 		return new Tags(rawData.split(":"));
 	}
 
+	/**
+	 * Private constructor for the getTags() methods.
+	 * @param data The raw data for a tag split by ':'
+	 */
 	private Tags(String[] data) {
 		String auraName = null;
 		if (data.length > 2) {
@@ -58,6 +81,10 @@ public class Tags {
 		itemID =   (data.length > 4) ?  Integer.parseInt(data[4]) : Integer.MAX_VALUE;
 	}
 
+	/**
+	 * @return Returns the raw data of this tag set. Use getTags(rawData) to build back
+	 * into a Tags object.
+	 */
 	public String toString() {
 		String auraName = aura.name;
 		if (auraClass > 0) {
@@ -81,7 +108,7 @@ public class Tags {
 	public boolean isAuraMinor() {
 		return auraClass < 0;
 	}
-	public boolean isAuraStrong() {
+	public boolean isAuraMajor() {
 		return auraClass > 0;
 	}
 	public Type getType() {
@@ -107,6 +134,11 @@ public class Tags {
 			this.aura = aura;
 		}
 	}
+
+	/**
+	 * Sets the Aura's Class. When in doubt use setAura.. Minor(), Normal(), and Major().
+	 * @param auraClass The class of this aura. -1 = Minor, 0 = Normal, 1 = Major.
+	 */
 	public void setAuraClass(int auraClass) {
 		this.auraClass = auraClass;
 	}
@@ -116,7 +148,7 @@ public class Tags {
 	public void setAuraNormal() {
 		this.auraClass = 0;
 	}
-	public void setAuraStrong() {
+	public void setAuraMajor() {
 		this.auraClass = 1;
 	}
 	public void setType(Type type) {
@@ -125,10 +157,15 @@ public class Tags {
 		}
 	}
 	public void setLFItemID(int itemID) {
-		this.itemID = itemID;
+		if (itemID > 0) {
+			this.itemID = itemID;
+		}
 	}
 
-	// FORMAT //
+	/**
+	 * @return Returns this set of tags as a singular formatted string.
+	 * e.g. [Very Common | Cheap | Mundane | Tool] with proper color.
+	 */
 	public String formatTags() {
 		String output = BRACKET_COLOR + "[";
 
@@ -143,6 +180,10 @@ public class Tags {
 		return output + BRACKET_COLOR + "]";
 	}
 
+	/**
+	 * Applies the Tythan ItemUtil tag to an item - NO LORE CHANGE.
+	 * @param item The item to apply the tag to.
+	 */
 	public void applyTagToItem(ItemStack item) {
 		ItemUtil.setCustomTag(item, ItemEdit.INFO_TAG, this.toString());
 	}
