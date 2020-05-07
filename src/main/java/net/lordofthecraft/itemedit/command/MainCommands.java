@@ -197,10 +197,12 @@ public class MainCommands extends BaseCommand {
 
 					Tags tags = new Tags(item);
 					String highlight = tags.getQuality().getColor();
+					ChatColor bulletpoint = tags.getRarity().getRawColor();
+
 					BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book!") {
 						@Override
 						public void onBookClose() {
-							completeDesc(item, BookUtil.getPagesAsArray(getMeta()), highlight);
+							completeDesc(item, BookUtil.getPagesAsArray(getMeta().getPages()), highlight, bulletpoint);
 						}
 					};
 
@@ -460,12 +462,12 @@ public class MainCommands extends BaseCommand {
 	 * @param item The item to describe.
 	 * @param desc The list of pages as Strings.
 	 */
-	private void completeDesc(ItemStack item, String[] desc, String highlight) {
-
-		// Format highlights.
+	private void completeDesc(ItemStack item, String[] desc, String highlight, ChatColor bulletpoint) {
 		for (int i = 0; i < desc.length; i++) {
+			// Remove any colour.
 			desc[i] = ChatColor.stripColor(desc[i]);
 
+			// Add Highlights
 			if (desc[i].startsWith("%") || desc[i].endsWith("%")) {
 				if (desc[i].startsWith("%")) {
 					desc[i] = desc[i].substring(1);
@@ -475,6 +477,14 @@ public class MainCommands extends BaseCommand {
 				}
 
 				desc[i] = (highlight + ChatColor.ITALIC + desc[i] + DESC_PREFIX);
+			}
+
+			// Replace bulletpoints.
+			if (desc[i].contains("[*")) {
+				desc[i] = desc[i].replace("[*1]", bulletpoint + "･" + DESC_PREFIX);
+				desc[i] = desc[i].replace("[*]",  bulletpoint + "•" + DESC_PREFIX);
+				desc[i] = desc[i].replace("[*4]", bulletpoint + "●" + DESC_PREFIX);
+				desc[i] = desc[i].replace("[**]", bulletpoint + "❖" + DESC_PREFIX);
 			}
 		}
 

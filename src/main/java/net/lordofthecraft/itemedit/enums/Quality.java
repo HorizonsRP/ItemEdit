@@ -48,6 +48,9 @@ public enum Quality {
 		}
 		return output;
 	}
+	public ChatColor getRawColor() {
+		return this.color;
+	}
 
 	public static Quality getByName(String name) {
 		for (Quality quality : values()) {

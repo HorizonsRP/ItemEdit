@@ -48,6 +48,9 @@ public enum Rarity {
 		}
 		return output;
 	}
+	public ChatColor getRawColor() {
+		return this.color;
+	}
 
 	// STATIC //
 	public static Rarity getByName(String name) {

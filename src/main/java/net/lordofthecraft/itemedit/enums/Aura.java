@@ -42,6 +42,10 @@ public enum Aura {
 		}
 		return color + this.name;
 	}
+	public ChatColor getRawColor() {
+		return this.color;
+	}
+
 	public static Aura getByName(String name) {
 		for (Aura aura : values()) {
 			if (aura.name.equalsIgnoreCase(name)) {
