@@ -45,7 +45,7 @@ public enum Aura {
 		} else if (auraClass < 0) {
 			color += ChatColor.ITALIC;
 		}
-		return color + this.name;
+		return color + this.name.replace('_', ' ');
 	}
 
 	/**

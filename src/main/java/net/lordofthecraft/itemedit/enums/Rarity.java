@@ -9,7 +9,7 @@ import java.util.List;
 
 public enum Rarity {
 
-	VCOMMON(  false, false, "Very Common", ChatColor.DARK_GRAY,   ItemEdit.PERMISSION_START + "." + ItemEdit.RARITY_PERM + ".verycommon"),
+	VCOMMON(  false, false, "Very_Common", ChatColor.DARK_GRAY,   ItemEdit.PERMISSION_START + "." + ItemEdit.RARITY_PERM + ".verycommon"),
 	COMMON(   false, false, "Common",      ChatColor.WHITE,       ItemEdit.PERMISSION_START + "." + ItemEdit.RARITY_PERM + ".common"),
 	UNCOMMON( false, false, "Uncommon",    ChatColor.DARK_GREEN,  ItemEdit.PERMISSION_START + "." + ItemEdit.RARITY_PERM + ".uncommon"),
 	RARE(     false, false, "Rare",        ChatColor.DARK_AQUA,   ItemEdit.PERMISSION_START + "." + ItemEdit.RARITY_PERM + ".rare"),
@@ -39,7 +39,7 @@ public enum Rarity {
 	 * @return Returns the color and name together for the given Rarity including magic/obfuscated and bold prefixes.
 	 */
 	public String getTag() {
-		return getColor() + this.name;
+		return getColor() + this.name.replace('_', ' ');
 	}
 
 	/**

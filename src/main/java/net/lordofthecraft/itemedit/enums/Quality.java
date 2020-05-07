@@ -38,7 +38,7 @@ public enum Quality {
 	 * @return Returns the color and name together for the given Quality including magic/obfuscated prefix.
 	 */
 	public String getTag() {
-		return getColor() + this.name;
+		return getColor() + this.name.replace('_', ' ');
 	}
 
 	/**

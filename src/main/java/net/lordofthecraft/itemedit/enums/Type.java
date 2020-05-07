@@ -36,7 +36,7 @@ public enum Type {
 	 * @return Returns the color and name together for the given Type.
 	 */
 	public String getTag() {
-		return ChatColor.DARK_GRAY + this.name;
+		return ChatColor.DARK_GRAY + this.name.replace('_', ' ');
 	}
 
 	/**
