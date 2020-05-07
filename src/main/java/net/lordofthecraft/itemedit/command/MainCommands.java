@@ -238,7 +238,7 @@ public class MainCommands extends BaseCommand {
 							}
 							meta.setLore(lore);
 							item.setItemMeta(meta);
-							ItemUtil.setCustomTag(item, ItemEdit.APPROVED_TAG, p.getUniqueId().toString() + ":" + System.currentTimeMillis());
+							ItemUtil.setCustomTag(item, ItemEdit.APPROVED_TAG, p.getUniqueId().toString() + ":" + System.currentTimeMillis() + ":" + approval.name);
 						}
 					}
 					finalizeEdit(p, item);
@@ -624,24 +624,10 @@ public class MainCommands extends BaseCommand {
 	 */
 	private static boolean ableToEdit(Player player, ItemStack item) {
 		if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
-			ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				List<String> lore = meta.getLore();
-				if (lore != null) {
-					String approvedLine = lore.get(lore.size()-1);
-					Approval currentApproval = null;
-
-					for (Approval approval : Approval.values()) {
-						if (approvedLine.contains(approval.aRank)) {
-							currentApproval = approval;
-							break;
-						}
-					}
-
-					if (currentApproval != null) {
-						return player.hasPermission(currentApproval.permission + ".edit");
-					}
-				}
+			String[] data = ItemUtil.getCustomTag(item, ItemEdit.APPROVED_TAG).split(":");
+			if (data.length > 2 && data[2] != null) {
+				Approval approval = Approval.getByName(data[2]);
+				return player.hasPermission(approval.permission + ".edit");
 			}
 		}
 		return true;

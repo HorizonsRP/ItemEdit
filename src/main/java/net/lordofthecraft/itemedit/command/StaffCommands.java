@@ -50,12 +50,13 @@ public class StaffCommands extends BaseCommand {
 
 		for (String tag : tags) {
 			value = tag;
-			String[] thisTag = tag.replace(":", " ").split(" ");
+			String[] thisTag = tag.split(":");
 
-			if (thisTag.length >= 1 && thisTag[0] != null && thisTag[0].length() == length) {
+			if (thisTag.length > 0 && thisTag[0] != null && thisTag[0].length() == length) {
 				value = thisTag[0];
 				String date = "";
 				String playerName = "";
+				String rankName = "";
 
 				Player editor = Bukkit.getPlayer(UUID.fromString(thisTag[0]));
 				if (editor != null) {
@@ -67,9 +68,13 @@ public class StaffCommands extends BaseCommand {
 					}
 				}
 
-				if (thisTag.length >= 2 && thisTag[1] != null) {
+				if (thisTag.length > 1 && thisTag[1] != null) {
 					DateFormat format = new SimpleDateFormat("dd MMM yyyy HH:mm Z");
 					date = format.format(new Date(Long.parseLong(thisTag[1])));
+				}
+
+				if (thisTag.length > 2 && thisTag[2] != null) {
+					rankName = thisTag[2];
 				}
 
 				if (date.length() > 0) {
@@ -77,6 +82,9 @@ public class StaffCommands extends BaseCommand {
 				}
 				if (playerName.length() > 0) {
 					value += ItemEdit.PREFIX + " | " + ItemEdit.ALT_COLOR + playerName;
+				}
+				if (rankName.length() > 0) {
+					value += ItemEdit.PREFIX + " | " + ItemEdit.ALT_COLOR + rankName;
 				}
 
 			}
