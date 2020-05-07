@@ -6,7 +6,6 @@ import co.lotc.core.bukkit.util.ItemUtil;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
-import co.lotc.core.command.annotate.Flag;
 import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.enums.*;
@@ -86,7 +85,7 @@ public class MainCommands extends BaseCommand {
 			if (item != null) {
 				if (ableToEdit(p, item)) {
 					Tags tags = new Tags(item);
-					updateTags(item, rarity, null, null, null, -1, 0);
+					updateTags(item, rarity, null, null, null, Integer.MAX_VALUE, 0);
 					ItemMeta meta = item.getItemMeta();
 					if (meta != null) {
 						String name = ChatColor.stripColor(meta.getDisplayName());
@@ -115,7 +114,7 @@ public class MainCommands extends BaseCommand {
 					Tags tags = new Tags(item);
 					String oldColor = tags.getQuality().getColor();
 					String newColor = quality.getColor();
-					updateTags(item, null, quality, null, null, -1, 0);
+					updateTags(item, null, quality, null, null, Integer.MAX_VALUE, 0);
 					replaceWithinDesc(item, oldColor, newColor);
 				} else {
 					msg(APPROVED_ALREADY);
@@ -127,18 +126,18 @@ public class MainCommands extends BaseCommand {
 	}
 
 	@Cmd(value="Set the aura of the given item.", permission=ItemEdit.PERMISSION_START + ".aura")
-	public void aura(CommandSender sender, Aura aura, boolean strong) {
+	public void aura(CommandSender sender, Aura aura, @Default(value="0")int auraClass) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
-					if (strong) {
-						updateTags(item, null, null, aura, null, 1, 0);
+					updateTags(item, null, null, aura, null, auraClass, 0);
+					if (auraClass > 0) {
+						updateGlow(item, true);
 					} else {
-						updateTags(item, null, null, aura, null, 0, 0);
+						updateGlow(item, false);
 					}
-					updateGlow(item, strong);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -155,7 +154,7 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
-					updateTags(item, null, null, null, type, -1, 0);
+					updateTags(item, null, null, null, type, Integer.MAX_VALUE, 0);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -172,7 +171,7 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
-					updateTags(item, null, null, null, null, -1, id);
+					updateTags(item, null, null, null, null, Integer.MAX_VALUE, id);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -304,7 +303,7 @@ public class MainCommands extends BaseCommand {
 	 * @param item The item to apply basic tags too.
 	 */
 	private void updateTags(ItemStack item) {
-		updateTags(item, null, null, null, null, -1, 0);
+		updateTags(item, null, null, null, null, Integer.MAX_VALUE, 0);
 	}
 
 	/**
@@ -315,10 +314,10 @@ public class MainCommands extends BaseCommand {
 	 * @param quality (Optional) The quality to set.
 	 * @param aura (Optional) The aura to set.
 	 * @param type (Optional) The type to set.
-	 * @param strongAura Whether the aura is strong or not. -1 = No Change, 0 = False, 1 = True
+	 * @param auraClass Whether the aura is normal, minor, or major. 0 = Normal, -1 = Minor, 1 = Major. Integer.MAX_VALUE uses what exists or default.
 	 * @param id Arbitrary item ID for future use with professions.
 	 */
-	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type, int strongAura, int id) {
+	private void updateTags(ItemStack item, Rarity rarity, Quality quality, Aura aura, Type type, int auraClass, int id) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
@@ -327,12 +326,9 @@ public class MainCommands extends BaseCommand {
 			tags.setQuality(quality);
 			tags.setAura(aura);
 			tags.setType(type);
-			if (strongAura > -1) {
-				if (strongAura > 0) {
-					tags.setStrongAura(true);
-				} else {
-					tags.setStrongAura(false);
-				}
+
+			if (auraClass != Integer.MAX_VALUE) {
+				tags.setAuraClass(auraClass);
 			}
 
 			if (id > 0) {

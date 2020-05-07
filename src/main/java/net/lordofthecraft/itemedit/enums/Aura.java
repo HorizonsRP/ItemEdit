@@ -35,10 +35,12 @@ public enum Aura {
 		this.permission = permission;
 	}
 
-	public String getTag(boolean bold) {
+	public String getTag(int auraClass) {
 		String color = this.color + "";
-		if (bold) {
+		if (auraClass > 0) {
 			color += ChatColor.BOLD;
+		} else if (auraClass < 0) {
+			color += ChatColor.ITALIC;
 		}
 		return color + this.name;
 	}

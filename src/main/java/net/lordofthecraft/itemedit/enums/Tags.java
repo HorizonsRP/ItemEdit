@@ -13,17 +13,17 @@ public class Tags {
 	private Rarity rarity;
 	private Quality quality;
 	private Aura aura;
-	private boolean strongAura = false;
+	private int auraClass = 0;
 	private Type type;
 	private int itemID;
 
-	public Tags(Rarity rarity, Quality quality, Aura aura, Type type, boolean strongAura, int itemID) {
+	public Tags(Rarity rarity, Quality quality, Aura aura, Type type, int auraClass, int itemID) {
 		this.rarity =  (rarity != null) ?   rarity : Rarity.DEFAULT;
 		this.quality = (quality != null) ? quality : Quality.DEFAULT;
 		this.aura =    (aura != null) ?       aura : Aura.DEFAULT;
 		this.type =    (type != null) ?       type : Type.DEFAULT;
 
-		this.strongAura = strongAura;
+		this.auraClass = auraClass;
 		this.itemID = itemID;
 	}
 
@@ -39,7 +39,10 @@ public class Tags {
 			auraName = data[2];
 			if (auraName.endsWith("%")) {
 				auraName = auraName.replace("%", "");
-				strongAura = true;
+				auraClass = 1;
+			} else if (auraName.endsWith("@")) {
+				auraName = auraName.replace("@", "");
+				auraClass = -1;
 			}
 		}
 
@@ -52,8 +55,10 @@ public class Tags {
 
 	public String toString() {
 		String auraName = aura.name;
-		if (strongAura) {
+		if (auraClass > 0) {
 			auraName += "%";
+		} else if (auraClass < 0) {
+			auraName += "@";
 		}
 		return rarity.name + ":" + quality.name + ":" + auraName + ":" + type.name + ":" + itemID;
 	}
@@ -68,8 +73,11 @@ public class Tags {
 	public Aura getAura() {
 		return aura;
 	}
+	public boolean isAuraMinor() {
+		return auraClass < 0;
+	}
 	public boolean isAuraStrong() {
-		return strongAura;
+		return auraClass > 0;
 	}
 	public Type getType() {
 		return type;
@@ -94,8 +102,17 @@ public class Tags {
 			this.aura = aura;
 		}
 	}
-	public void setStrongAura(boolean strongAura) {
-		this.strongAura = strongAura;
+	public void setAuraClass(int auraClass) {
+		this.auraClass = auraClass;
+	}
+	public void setAuraMinor() {
+		this.auraClass = -1;
+	}
+	public void setAuraNormal() {
+		this.auraClass = 0;
+	}
+	public void setAuraStrong() {
+		this.auraClass = 1;
 	}
 	public void setType(Type type) {
 		if (type != null) {
@@ -114,7 +131,7 @@ public class Tags {
 		output += DIVIDER;
 		output += (quality != null) ? quality.getTag() : Quality.DEFAULT.getTag();
 		output += DIVIDER;
-		output += (aura != null) ? aura.getTag(strongAura) : Aura.DEFAULT.getTag(strongAura);
+		output += (aura != null) ? aura.getTag(auraClass) : Aura.DEFAULT.getTag(auraClass);
 		output += DIVIDER;
 		output += (type != null) ? type.getTag() : Type.DEFAULT.getTag();
 
