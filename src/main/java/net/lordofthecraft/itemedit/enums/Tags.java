@@ -27,13 +27,18 @@ public class Tags {
 		this.itemID = itemID;
 	}
 
-	public Tags(ItemStack item) {
-		String[] data = new String[]{};
+	public Tags getTags(ItemStack item) {
 		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
-			String value = ItemUtil.getCustomTag(item, ItemEdit.INFO_TAG);
-			data = value.split(":");
+			return getTags(ItemUtil.getCustomTag(item, ItemEdit.INFO_TAG));
 		}
+		return null;
+	}
 
+	public Tags getTags(String rawData) {
+		return new Tags(rawData.split(":"));
+	}
+
+	private Tags(String[] data) {
 		String auraName = null;
 		if (data.length > 2) {
 			auraName = data[2];
