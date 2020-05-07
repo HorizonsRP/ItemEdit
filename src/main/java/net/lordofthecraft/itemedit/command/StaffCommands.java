@@ -41,6 +41,12 @@ public class StaffCommands extends BaseCommand {
 		}
 	}
 
+	/**
+	 * Return a formatted version of the tags on an item for easy browsing.
+	 * @param item The item to check.
+	 * @param fullTag The tag to make reference to. Only accepts approval and edit tags.
+	 * @return A formatted string representing the UUID, timestamp, approver rank, and username if found.
+	 */
 	private String tagPlayerInfo(ItemStack item, String fullTag) {
 		String value = ItemUtil.getCustomTag(item, fullTag);
 

@@ -255,7 +255,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Moderator access to edited items.", permission="itemedit.mod")
+	@Cmd(value="Moderator access to edited items.", permission="itemedit.staff")
 	public BaseCommand staff() {
 		return staffCommands;
 	}
