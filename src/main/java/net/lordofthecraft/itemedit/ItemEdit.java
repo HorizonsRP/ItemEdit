@@ -15,8 +15,9 @@ import java.lang.reflect.Field;
 
 public final class ItemEdit extends JavaPlugin {
 
-	public static final String PREFIX = ChatColor.AQUA + "";
-	public static final String ALT_COLOR = ChatColor.GOLD + "";
+	public static final String PREFIX = ChatColor.DARK_AQUA + "";
+	public static final String ALT_COLOR = ChatColor.WHITE + "";
+
 	public static final String PERMISSION_START = "itemedit";
 	public static final String RARITY_PERM = "rarity";
 	public static final String QUALITY_PERM = "quality";
