@@ -21,7 +21,6 @@ import org.bukkit.inventory.meta.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class MainCommands extends BaseCommand {
 
@@ -88,11 +87,16 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
+					Tags tags = new Tags(item);
 					updateTags(item, rarity, null, null, null, -1, 0);
 					ItemMeta meta = item.getItemMeta();
 					if (meta != null) {
 						String name = ChatColor.stripColor(meta.getDisplayName());
 						updateDisplayName(item, name);
+
+						String oldColor = tags.getRarity().getRawColor() + "";
+						String newColor = rarity.getRawColor() + "";
+						replaceWithinDesc(item, oldColor, newColor);
 					}
 				} else {
 					msg(APPROVED_ALREADY);
@@ -114,7 +118,7 @@ public class MainCommands extends BaseCommand {
 					String oldColor = tags.getQuality().getColor();
 					String newColor = quality.getColor();
 					updateTags(item, null, quality, null, null, -1, 0);
-					updateDescHighlights(item, oldColor, newColor);
+					replaceWithinDesc(item, oldColor, newColor);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -429,7 +433,7 @@ public class MainCommands extends BaseCommand {
 	 * @param previousColor The string to search for.
 	 * @param newColor The string to replace it with.
 	 */
-	private void updateDescHighlights(ItemStack item, String previousColor, String newColor) {
+	private void replaceWithinDesc(ItemStack item, String previousColor, String newColor) {
 		if (item != null) {
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
