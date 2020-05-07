@@ -5,15 +5,14 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Very basic extension of an Enchantment. Nothing special about it. It's made exclusively to add
+ * a glowing effect to an item without having enchantment text.
+ */
 public class Glow extends Enchantment {
 	public Glow(NamespacedKey key) {
 		super(key);
 	}
-
-	// 1.12 constructor
-	/*public Glow(int id) {
-		super(id);
-	}*/
 
 	@Override
 	public String getName() {

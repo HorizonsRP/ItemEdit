@@ -50,12 +50,12 @@ public enum Approval {
 	public static final Approval DEFAULT = PLAYER;
 
 	/**
-	 * @param string The name to check for.
-	 * @return Returns the matching approval type for the name provided.
+	 * @param name The quality name to search for.
+	 * @return Returns the Approval object if found for the given name.
 	 */
-	public static Approval getByName(String string) {
+	public static Approval getByName(String name) {
 		for (Approval approval : values()) {
-			if (approval.name.equalsIgnoreCase(string)) {
+			if (approval.name.equalsIgnoreCase(name)) {
 				return approval;
 			}
 		}

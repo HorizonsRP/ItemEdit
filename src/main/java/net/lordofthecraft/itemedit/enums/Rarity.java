@@ -35,9 +35,16 @@ public enum Rarity {
 		this.permission = permission;
 	}
 
+	/**
+	 * @return Returns the color and name together for the given Rarity including magic/obfuscated and bold prefixes.
+	 */
 	public String getTag() {
 		return getColor() + this.name;
 	}
+
+	/**
+	 * @return Returns the color for the given Rarity including magic/obfuscated and bold prefixes.
+	 */
 	public String getColor() {
 		String output = this.color + "";
 		if (this.bold) {
@@ -48,11 +55,18 @@ public enum Rarity {
 		}
 		return output;
 	}
+
+	/**
+	 * @return Returns only the color for the given Rarity.
+	 */
 	public ChatColor getRawColor() {
 		return this.color;
 	}
 
-	// STATIC //
+	/**
+	 * @param name The rarity name to search for.
+	 * @return Returns the Rarity object if found for the given name.
+	 */
 	public static Rarity getByName(String name) {
 		for (Rarity rarity : values()) {
 			if (rarity.name.equalsIgnoreCase(name)) {
@@ -62,6 +76,10 @@ public enum Rarity {
 		return null;
 	}
 
+	/**
+	 * @param player The player who's permissions we reference.
+	 * @return Returns a list of Rarity types based on the given player's permissions.
+	 */
 	public static List<String> getAvailable(Sender player) {
 		ArrayList<String> list = new ArrayList<>();
 		for (Rarity rarity : values()) {

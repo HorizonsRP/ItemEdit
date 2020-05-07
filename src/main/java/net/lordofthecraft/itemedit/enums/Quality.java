@@ -34,13 +34,16 @@ public enum Quality {
 		this.permission = permission;
 	}
 
+	/**
+	 * @return Returns the color and name together for the given Quality including magic/obfuscated prefix.
+	 */
 	public String getTag() {
-		String color = this.color + "";
-		if (this.magic) {
-			color += ChatColor.MAGIC;
-		}
-		return color + this.name;
+		return getColor() + this.name;
 	}
+
+	/**
+	 * @return Returns the color for the given Quality including magic/obfuscated prefix.
+	 */
 	public String getColor() {
 		String output = this.color + "";
 		if (this.magic) {
@@ -48,10 +51,18 @@ public enum Quality {
 		}
 		return output;
 	}
+
+	/**
+	 * @return Returns only the color for the given Quality.
+	 */
 	public ChatColor getRawColor() {
 		return this.color;
 	}
 
+	/**
+	 * @param name The quality name to search for.
+	 * @return Returns the Quality object if found for the given name.
+	 */
 	public static Quality getByName(String name) {
 		for (Quality quality : values()) {
 			if (quality.name.equalsIgnoreCase(name)) {
@@ -61,6 +72,10 @@ public enum Quality {
 		return null;
 	}
 
+	/**
+	 * @param player The player who's permissions we reference.
+	 * @return Returns a list of Quality types based on the given player's permissions.
+	 */
 	public static List<String> getAvailable(Sender player) {
 		ArrayList<String> list = new ArrayList<>();
 		for (Quality quality : values()) {

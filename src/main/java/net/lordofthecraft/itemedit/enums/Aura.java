@@ -35,6 +35,9 @@ public enum Aura {
 		this.permission = permission;
 	}
 
+	/**
+	 * @return Returns the color and name together for the given Aura.
+	 */
 	public String getTag(int auraClass) {
 		String color = this.color + "";
 		if (auraClass > 0) {
@@ -44,10 +47,18 @@ public enum Aura {
 		}
 		return color + this.name;
 	}
+
+	/**
+	 * @return Returns only the color for the given Aura.
+	 */
 	public ChatColor getRawColor() {
 		return this.color;
 	}
 
+	/**
+	 * @param name The aura name to search for.
+	 * @return Returns the Aura object if found for the given name.
+	 */
 	public static Aura getByName(String name) {
 		for (Aura aura : values()) {
 			if (aura.name.equalsIgnoreCase(name)) {
@@ -57,6 +68,10 @@ public enum Aura {
 		return null;
 	}
 
+	/**
+	 * @param player The player who's permissions we reference.
+	 * @return Returns a list of Aura types based on the given player's permissions.
+	 */
 	public static List<String> getAvailable(Sender player) {
 		ArrayList<String> list = new ArrayList<>();
 		for (Aura aura : values()) {

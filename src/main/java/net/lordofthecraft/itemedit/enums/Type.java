@@ -32,10 +32,17 @@ public enum Type {
 		this.permission = permission;
 	}
 
+	/**
+	 * @return Returns the color and name together for the given Type.
+	 */
 	public String getTag() {
 		return ChatColor.DARK_GRAY + this.name;
 	}
 
+	/**
+	 * @param name The type name to search for.
+	 * @return Returns the Type object if found for the given name.
+	 */
 	public static Type getByName(String name) {
 		for (Type type : values()) {
 			if (type.name.equalsIgnoreCase(name)) {
@@ -45,6 +52,10 @@ public enum Type {
 		return null;
 	}
 
+	/**
+	 * @param player The player who's permissions we reference.
+	 * @return Returns a list of Types based on the given player's permissions.
+	 */
 	public static List<String> getAvailable(Sender player) {
 		ArrayList<String> list = new ArrayList<>();
 		for (Type type : values()) {
