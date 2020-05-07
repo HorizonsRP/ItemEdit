@@ -84,16 +84,18 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
-					Tags tags = new Tags(item);
+					Tags tags = Tags.getTags(item);
 					updateTags(item, rarity, null, null, null, Integer.MAX_VALUE, 0);
 					ItemMeta meta = item.getItemMeta();
 					if (meta != null) {
 						String name = ChatColor.stripColor(meta.getDisplayName());
 						updateDisplayName(item, name);
 
-						String oldColor = tags.getRarity().getRawColor() + "";
-						String newColor = rarity.getRawColor() + "";
-						replaceWithinDesc(item, oldColor, newColor);
+						if (tags != null) {
+							String oldColor = tags.getRarity().getRawColor() + "";
+							String newColor = rarity.getRawColor() + "";
+							replaceWithinDesc(item, oldColor, newColor);
+						}
 					}
 				} else {
 					msg(APPROVED_ALREADY);
@@ -111,11 +113,13 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
-					Tags tags = new Tags(item);
-					String oldColor = tags.getQuality().getColor();
-					String newColor = quality.getColor();
+					Tags tags = Tags.getTags(item);
+					if (tags != null) {
+						String oldColor = tags.getQuality().getColor();
+						String newColor = quality.getColor();
+						replaceWithinDesc(item, oldColor, newColor);
+					}
 					updateTags(item, null, quality, null, null, Integer.MAX_VALUE, 0);
-					replaceWithinDesc(item, oldColor, newColor);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -196,7 +200,8 @@ public class MainCommands extends BaseCommand {
 					}
 					book.setItemMeta(meta);
 
-					Tags tags = new Tags(item);
+					Tags tags = Tags.getTags(item);
+					assert tags != null;
 					String highlight = tags.getQuality().getColor();
 					ChatColor bulletpoint = tags.getRarity().getRawColor();
 
@@ -282,7 +287,8 @@ public class MainCommands extends BaseCommand {
 	 */
 	private void updateDisplayName(ItemStack item, String name) {
 		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
-			Tags tags = new Tags(item);
+			Tags tags = Tags.getTags(item);
+			assert tags != null;
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
 				meta.setDisplayName(tags.getRarity().getColor() + name);
@@ -321,35 +327,37 @@ public class MainCommands extends BaseCommand {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
-			Tags tags = new Tags(item);
-			tags.setRarity(rarity);
-			tags.setQuality(quality);
-			tags.setAura(aura);
-			tags.setType(type);
+			Tags tags = Tags.getTags(item);
+			if (tags != null) {
+				tags.setRarity(rarity);
+				tags.setQuality(quality);
+				tags.setAura(aura);
+				tags.setType(type);
 
-			if (auraClass != Integer.MAX_VALUE) {
-				tags.setAuraClass(auraClass);
-			}
+				if (auraClass != Integer.MAX_VALUE) {
+					tags.setAuraClass(auraClass);
+				}
 
-			if (id > 0) {
-				tags.setLFItemID(id);
-			}
+				if (id > 0) {
+					tags.setLFItemID(id);
+				}
 
-			if (lore != null) {
-				if (lore.size() > 0) {
-					lore.set(0, tags.formatTags());
+				if (lore != null) {
+					if (lore.size() > 0) {
+						lore.set(0, tags.formatTags());
+					} else {
+						lore.add(tags.formatTags());
+					}
 				} else {
+					lore = new ArrayList<>();
 					lore.add(tags.formatTags());
 				}
-			} else {
-				lore = new ArrayList<>();
-				lore.add(tags.formatTags());
-			}
 
-			meta.setLore(lore);
-			item.setItemMeta(meta);
-			tags.applyTagToItem(item);
-			updateDisplayName(item);
+				meta.setLore(lore);
+				item.setItemMeta(meta);
+				tags.applyTagToItem(item);
+				updateDisplayName(item);
+			}
 		}
 	}
 

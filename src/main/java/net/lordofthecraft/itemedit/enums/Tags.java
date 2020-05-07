@@ -27,14 +27,14 @@ public class Tags {
 		this.itemID = itemID;
 	}
 
-	public Tags getTags(ItemStack item) {
+	public static Tags getTags(ItemStack item) {
 		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
 			return getTags(ItemUtil.getCustomTag(item, ItemEdit.INFO_TAG));
 		}
 		return null;
 	}
 
-	public Tags getTags(String rawData) {
+	public static Tags getTags(String rawData) {
 		return new Tags(rawData.split(":"));
 	}
 

@@ -78,7 +78,9 @@ public final class ItemEdit extends JavaPlugin {
 		// Plugin shutdown logic
 	}
 
-	// Auto-populate our SignTypes
+	/**
+	 * Register parameter types for Approval, Rarity, Quality, Aura, and Type in Tythan CMD Util.
+	 */
 	private void registerParameters() {
 		Commands.defineArgumentType(Approval.class)
 				.defaultName("Approval")
@@ -111,42 +113,52 @@ public final class ItemEdit extends JavaPlugin {
 				.register();
 	}
 
-	// Registers our glow enchantment for /edit glow use.
+	/**
+	 * Register our custom glow enchantment.
+	 */
 	private void registerGlow() {
 		try {
 			Field f = Enchantment.class.getDeclaredField("acceptingNew");
 			f.setAccessible(true);
 			f.set(null, true);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
 			NamespacedKey key = new NamespacedKey(this, getDescription().getName());
 			Glow glow = new Glow(key);
 			Enchantment.registerEnchantment(glow);
-		}
-		catch (IllegalArgumentException ignore) {
-		}
-		catch(Exception e){
+		} catch (IllegalArgumentException ignore) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	// Config Editor
+	/**
+	 * Updates the max character width accepted when formatting a description.
+	 * @param i The number of characters.
+	 */
 	public void setMaxWidth(int i) {
 		maxWidth = i;
 		getConfig().set("MAX-WIDTH", i);
 		saveConfig();
 	}
 
+	/**
+	 * Updates the max amount of lines accepted when formatting a description.
+	 * @param i The number of lines.
+	 */
 	public void setMaxLines(int i) {
 		maxLines = i;
 		getConfig().set("MAX-LINES", i);
 		saveConfig();
 	}
 
-	// Grabs the item in main hand for the player.
+	/**
+	 * Grabs the item in the player's main hand.
+	 * @param player The player to get the item from.
+	 * @return The ItemStack pointer for the item in hand.
+	 */
 	public static ItemStack getItemInHand(Player player) {
 		if (player.getInventory().getItemInMainHand().getType() != Material.AIR) {
 			return player.getInventory().getItemInMainHand();
