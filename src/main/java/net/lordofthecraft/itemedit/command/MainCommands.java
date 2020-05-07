@@ -51,8 +51,6 @@ public class MainCommands extends BaseCommand {
 
 	// Edit Types //
 	@Cmd(value="Set a custom name for an item.", permission=ItemEdit.PERMISSION_START + ".name")
-	@Flag(name="mod", description="Sets the name regardless of signature.", permission=ItemEdit.PERMISSION_START + ".mod")
-	@Flag(name="staff", description="Items for staff purposes do not require tokens.", permission=ItemEdit.PERMISSION_START + ".free")
 	public void name(CommandSender sender,
 					 @Arg(value="Name", description="The name you wish to give the item.") String[] name) {
 		if (sender instanceof Player) {

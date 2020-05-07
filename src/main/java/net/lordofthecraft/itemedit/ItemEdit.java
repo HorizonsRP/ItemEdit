@@ -80,27 +80,27 @@ public final class ItemEdit extends JavaPlugin {
 	// Auto-populate our SignTypes
 	private void registerParameters() {
 		Commands.defineArgumentType(Approval.class)
-				.defaultName("Signature")
+				.defaultName("Approval")
 				.completer((s,$) -> Approval.getAvailable(s))
-				.mapperWithSender((sender, type) -> Approval.getByName(type))
+				.mapperWithSender((sender, approval) -> Approval.getByName(approval))
 				.register();
 
 		Commands.defineArgumentType(Rarity.class)
 				.defaultName("Rarity")
 				.completer((s,$) -> Rarity.getAvailable(s))
-				.mapperWithSender((sender, type) -> Rarity.getByName(type))
+				.mapperWithSender((sender, rarity) -> Rarity.getByName(rarity))
 				.register();
 
 		Commands.defineArgumentType(Quality.class)
 				.defaultName("Quality")
 				.completer((s,$) -> Quality.getAvailable(s))
-				.mapperWithSender((sender, type) -> Quality.getByName(type))
+				.mapperWithSender((sender, quality) -> Quality.getByName(quality))
 				.register();
 
 		Commands.defineArgumentType(Aura.class)
 				.defaultName("Aura")
 				.completer((s,$) -> Aura.getAvailable(s))
-				.mapperWithSender((sender, type) -> Aura.getByName(type))
+				.mapperWithSender((sender, aura) -> Aura.getByName(aura))
 				.register();
 
 		Commands.defineArgumentType(Type.class)
