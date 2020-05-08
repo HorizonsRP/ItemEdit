@@ -43,7 +43,8 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * Returns the item as per the information modified.
+	 * If any tags have been applied to this ItemBuilder, then one must run this
+	 * so the tags are fully applied to the item.
 	 */
 	public void applyTags() {
 		Tags originalTags = Tags.getTags(item);
@@ -97,59 +98,66 @@ public class ItemBuilder {
 		}
 	}
 
+	/**
+	 * @param name Set the name for this builder to the given string.
+	 */
 	public void setName(String name) {
 		updateDisplayName(item, name);
 	}
 
+	/**
+	 * @param rarity Set the rarity tag for this builder to the given rarity.
+	 */
 	public void setRarity(Rarity rarity) {
 		this.tags.setRarity(rarity);
-		/*Tags tags = Tags.getTags(item);
-		updateTags(item, rarity, null, null, null, Integer.MAX_VALUE, 0);
-		ItemMeta meta = item.getItemMeta();
-		if (meta != null) {
-			String name = ChatColor.stripColor(meta.getDisplayName());
-			updateDisplayName(item, name);
-
-			String oldColor = tags.getRarity().getRawColor() + "";
-			String newColor = rarity.getRawColor() + "";
-			replaceWithinDesc(item, oldColor, newColor);
-		}*/
 	}
 
+	/**
+	 * @param quality Set the quality tag for this builder to the given quality.
+	 */
 	public void setQuality(Quality quality) {
 		this.tags.setQuality(quality);
-		/*Tags tags = Tags.getTags(item);
-		String oldColor = tags.getQuality().getColor();
-		String newColor = quality.getColor();
-		replaceWithinDesc(item, oldColor, newColor);
-		updateTags(item, null, quality, null, null, Integer.MAX_VALUE, 0);*/
 	}
 
+	/**
+	 * @param aura Set the aura tag for this builder to the given aura.
+	 * @param auraClass Determins if the aura is Minor (-1), Normal (0), or Major (1).
+	 */
 	public void setAura(Aura aura, int auraClass) {
 		this.tags.setAura(aura);
 		this.tags.setAuraClass(auraClass);
-		/*updateTags(item, null, null, aura, null, auraClass, 0);
-		if (auraClass > 0) {
-			updateGlow(item, true);
-		} else {
-			updateGlow(item, false);
-		}*/
 	}
 
+	/**
+	 * @param type Set the type tag for this builder to the given type.
+	 */
 	public void setType(Type type) {
 		this.tags.setType(type);
-		//updateTags(item, null, null, null, type, Integer.MAX_VALUE, 0);
 	}
 
+	/**
+	 * @param id Set the LF Item ID for this builder to the given ID.
+	 */
 	public void setItemID(int id) {
 		this.tags.setLFItemID(id);
-		//updateTags(item, null, null, null, null, Integer.MAX_VALUE, id);
 	}
 
+	/**
+	 * Update the description of an item to the given list of words, using the highlight
+	 * and bulletpoint strings to prefix their appropriate parts.
+	 * @param desc A list of words with '\n' as their own individual word for line breaks.
+	 * @param highlight The prefix to apply to '%' marked words (start or end).
+	 * @param bulletpoint The prefix to apply to bulletpoint text ([*1], [*], [*4], [**]).
+	 */
 	public void setDesc(String[] desc, String highlight, ChatColor bulletpoint) {
 		completeDesc(item, desc, highlight, bulletpoint);
 	}
 
+	/**
+	 * Adds the approval for an item by the given player.
+	 * @param player The player to use for the approval.
+	 * @param approval The approval type to use.
+	 */
 	public void addApproval(Player player, Approval approval) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
@@ -169,6 +177,9 @@ public class ItemBuilder {
 		}
 	}
 
+	/**
+	 * Removes the approval tag from an item.
+	 */
 	public void removeApproval() {
 		if (item != null) {
 			if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
@@ -187,15 +198,24 @@ public class ItemBuilder {
 		}
 	}
 
+	/**
+	 * @return Whether this item can currently be placed or not.
+	 */
 	public boolean isPlaceable() {
 		return !ItemUtil.hasCustomTag(item, ItemEdit.NO_PLACEMENT_TAG);
 	}
 
+	/**
+	 * @return Whether this item can be placed AFTER it has been toggled.
+	 */
 	public boolean togglePlaceable() {
 		setPlaceable(!isPlaceable());
 		return isPlaceable();
 	}
 
+	/**
+	 * @param placeable Manually set whether an item can be placed using a boolean.
+	 */
 	public void setPlaceable(boolean placeable) {
 		if (placeable) {
 			ItemUtil.removeCustomTag(item, ItemEdit.NO_PLACEMENT_TAG);
