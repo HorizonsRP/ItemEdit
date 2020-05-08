@@ -74,11 +74,6 @@ public final class ItemEdit extends JavaPlugin {
 		Commands.build(getCommand("edit"), MainCommands::new);
 	}
 
-	@Override
-	public void onDisable() {
-		// Plugin shutdown logic
-	}
-
 	/**
 	 * Register parameter types for Approval, Rarity, Quality, Aura, and Type in Tythan CMD Util.
 	 */
