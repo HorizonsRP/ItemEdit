@@ -26,8 +26,6 @@ public class MainCommands extends BaseCommand {
 	// Sub command for moderators
 	private static StaffCommands staffCommands;
 
-	//private static final ClearCommands CLEAR_COMMANDS = new ClearCommands();
-
 	// Error messages
 	private static final String NO_ITEM = ItemEdit.PREFIX + "Please hold an item in your main hand while editing.";
 	private static final String NO_TOKENS = ItemEdit.PREFIX + "You do not have enough edit tokens to edit this item!";
@@ -57,6 +55,7 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
 				if (ableToEdit(p, item)) {
+					removeApproval(item);
 					StringBuilder thisName = new StringBuilder();
 					for (String s : name) {
 						if (thisName.length() > 0) {
@@ -84,6 +83,7 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
+					removeApproval(item);
 					Tags tags = Tags.getTags(item);
 					updateTags(item, rarity, null, null, null, Integer.MAX_VALUE, 0);
 					ItemMeta meta = item.getItemMeta();
@@ -111,6 +111,7 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
+					removeApproval(item);
 					Tags tags = Tags.getTags(item);
 					String oldColor = tags.getQuality().getColor();
 					String newColor = quality.getColor();
@@ -132,6 +133,7 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
+					removeApproval(item);
 					updateTags(item, null, null, aura, null, auraClass, 0);
 					if (auraClass > 0) {
 						updateGlow(item, true);
@@ -154,6 +156,7 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
+					removeApproval(item);
 					updateTags(item, null, null, null, type, Integer.MAX_VALUE, 0);
 				} else {
 					msg(APPROVED_ALREADY);
@@ -189,6 +192,7 @@ public class MainCommands extends BaseCommand {
 
 			if (item != null && !item.getType().equals(Material.AIR)) {
 				if (ableToEdit(p, item)) {
+					removeApproval(item);
 					ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
 					BookMeta meta = (BookMeta) book.getItemMeta();
 					if (meta != null) {
@@ -384,6 +388,27 @@ public class MainCommands extends BaseCommand {
 				}
 			}
 			item.setItemMeta(meta);
+		}
+	}
+
+	/**
+	 * Removes the approval tag from a given item, if it has one.
+	 * @param item The item to check.
+	 */
+	private void removeApproval(ItemStack item) {
+		if (item != null) {
+			if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
+				ItemMeta meta = item.getItemMeta();
+				if (meta != null) {
+					List<String> lore = meta.getLore();
+					if (lore != null) {
+						lore.remove(lore.size()-1);
+						meta.setLore(lore);
+						item.setItemMeta(meta);
+						ItemUtil.removeCustomTag(item, ItemEdit.APPROVED_TAG);
+					}
+				}
+			}
 		}
 	}
 
