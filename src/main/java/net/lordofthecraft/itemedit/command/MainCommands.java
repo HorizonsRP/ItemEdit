@@ -405,9 +405,9 @@ public class MainCommands extends BaseCommand {
 						lore.remove(lore.size()-1);
 						meta.setLore(lore);
 						item.setItemMeta(meta);
-						ItemUtil.removeCustomTag(item, ItemEdit.APPROVED_TAG);
 					}
 				}
+				ItemUtil.removeCustomTag(item, ItemEdit.APPROVED_TAG);
 			}
 		}
 	}
