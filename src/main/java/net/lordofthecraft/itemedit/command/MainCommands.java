@@ -243,6 +243,7 @@ public class MainCommands extends BaseCommand {
 							if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
 								lore.set(lore.size() - 1, approvalString);
 							} else {
+								lore.add("");
 								lore.add(approvalString);
 							}
 							meta.setLore(lore);
@@ -409,6 +410,7 @@ public class MainCommands extends BaseCommand {
 					List<String> lore = meta.getLore();
 					if (lore != null) {
 						lore.remove(lore.size()-1);
+						lore.remove(lore.size()-1);
 						meta.setLore(lore);
 						item.setItemMeta(meta);
 					}
@@ -435,7 +437,7 @@ public class MainCommands extends BaseCommand {
 					start++;
 				}
 				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
-					end--;
+					end -= 2;
 				}
 
 				StringBuilder fullStringBuilder = new StringBuilder();
@@ -488,7 +490,7 @@ public class MainCommands extends BaseCommand {
 						start++;
 					}
 					if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
-						end--;
+						end -= 2;
 					}
 
 					for (int i = start; i < end; i++) {
@@ -560,6 +562,7 @@ public class MainCommands extends BaseCommand {
 				}
 				lore.addAll(finalDesc);
 				if (approved != null) {
+					lore.add("");
 					lore.add(approved);
 				}
 
