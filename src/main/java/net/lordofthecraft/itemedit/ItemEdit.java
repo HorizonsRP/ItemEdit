@@ -31,6 +31,7 @@ public final class ItemEdit extends JavaPlugin {
 	public static final String EDITED_TAG = "editor-uuid";
 	public static final String APPROVED_TAG = "signed-uuid";
 	public static final String INFO_TAG = "item-data";
+	public static final String NO_PLACEMENT_TAG = "item-unplaceable";
 
 	private static int maxWidth;
 	public static int getMaxWidth() {
@@ -57,7 +58,6 @@ public final class ItemEdit extends JavaPlugin {
 		} else {
 			maxWidth = 35;
 		}
-
 		// Grab the max lines for descriptions.
 		if (this.getConfig().getInt("MAX-LINES") > 2) {
 			maxLines = this.getConfig().getInt("MAX-LINES");
@@ -65,9 +65,10 @@ public final class ItemEdit extends JavaPlugin {
 			maxLines = 15;
 		}
 
-		// Register our auto-complete and glow enchant.
+		// Register our auto-complete, glow enchant, and placement listener.
 		registerParameters();
 		registerGlow();
+		getServer().getPluginManager().registerEvents(new PlaceListener(), this);
 
 		// Initiate commands if everything else has been successful.
 		Commands.build(getCommand("edit"), MainCommands::new);

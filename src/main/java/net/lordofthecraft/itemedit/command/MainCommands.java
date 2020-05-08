@@ -217,7 +217,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Approve an item to lock in the information. Can be cleared later if needed.", permission="itemedit.approve")
+	@Cmd(value="Approve an item to lock in the information. Can be cleared later if needed.", permission=ItemEdit.PERMISSION_START + ".approve")
 	public void approve(CommandSender sender, @Default("PLAYER") Approval approval) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
@@ -250,7 +250,24 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Moderator access to edited items.", permission="itemedit.staff")
+	@Cmd(value="Makes the item unable to be placed.", permission=ItemEdit.PERMISSION_START + ".placeable")
+	public void placeable(CommandSender sender) {
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null && !item.getType().equals(Material.AIR)) {
+				if (ItemUtil.hasCustomTag(item, ItemEdit.NO_PLACEMENT_TAG)) {
+					ItemUtil.removeCustomTag(item, ItemEdit.NO_PLACEMENT_TAG);
+					msg(ItemEdit.PREFIX + "This item can now be placed down.");
+				} else {
+					ItemUtil.setCustomTag(item, ItemEdit.NO_PLACEMENT_TAG, "!");
+					msg(ItemEdit.PREFIX + "This item can no longer be placed down.");
+				}
+			}
+		}
+	}
+
+	@Cmd(value="Moderator access to edited items.", permission=ItemEdit.PERMISSION_START + ".staff")
 	public BaseCommand staff() {
 		return staffCommands;
 	}
