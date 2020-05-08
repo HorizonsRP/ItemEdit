@@ -11,6 +11,7 @@ public class PlaceListener implements Listener {
 	public void onBlockPlace(BlockPlaceEvent e) {
 		if (ItemUtil.hasCustomTag(e.getItemInHand(), ItemEdit.NO_PLACEMENT_TAG)) {
 			e.setCancelled(true);
+			e.getPlayer().sendMessage(ItemEdit.PREFIX + "That item cannot be placed!");
 		}
 	}
 
