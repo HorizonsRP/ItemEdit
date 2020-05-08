@@ -11,3 +11,4 @@ net\lordofthecraft\itemedit\PlaceListener.class
 net\lordofthecraft\itemedit\enums\Quality.class
 net\lordofthecraft\itemedit\ItemEdit.class
 net\lordofthecraft\itemedit\enums\Aura.class
+net\lordofthecraft\itemedit\ItemBuilder.class

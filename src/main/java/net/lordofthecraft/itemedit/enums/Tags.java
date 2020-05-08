@@ -18,27 +18,6 @@ public class Tags {
 	private int itemID;
 
 	/**
-	 * Build a tag set with pre-set data.
-	 * @param rarity
-	 * @param quality
-	 * @param aura
-	 * @param type
-	 * @param auraClass Integer.MAX_VALUE is default. -1 is minor, 0 is normal, 1 is major.
-	 * @param itemID The Lost Fables item ID for future professions systems.
-	 */
-	public Tags(Rarity rarity, Quality quality, Aura aura, Type type, int auraClass, int itemID) {
-		this.rarity =  (rarity != null) ?   rarity : Rarity.DEFAULT;
-		this.quality = (quality != null) ? quality : Quality.DEFAULT;
-		this.aura =    (aura != null) ?       aura : Aura.DEFAULT;
-		this.type =    (type != null) ?       type : Type.DEFAULT;
-
-		if (auraClass != Integer.MAX_VALUE) {
-			this.auraClass = auraClass;
-		}
-		this.itemID = itemID;
-	}
-
-	/**
 	 * @param item The item to check for.
 	 * @return A Tags object representing the same tags as the item provided.
 	 */
@@ -127,6 +106,9 @@ public class Tags {
 	}
 	public boolean isAuraMajor() {
 		return auraClass > 0;
+	}
+	public int getAuraClass() {
+		return auraClass;
 	}
 	public Type getType() {
 		return type;
