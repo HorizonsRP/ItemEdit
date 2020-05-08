@@ -256,12 +256,14 @@ public class MainCommands extends BaseCommand {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && !item.getType().equals(Material.AIR)) {
-				if (ItemUtil.hasCustomTag(item, ItemEdit.NO_PLACEMENT_TAG)) {
-					ItemUtil.removeCustomTag(item, ItemEdit.NO_PLACEMENT_TAG);
-					msg(ItemEdit.PREFIX + "This item can now be placed down.");
-				} else {
-					ItemUtil.setCustomTag(item, ItemEdit.NO_PLACEMENT_TAG, "!");
-					msg(ItemEdit.PREFIX + "This item can no longer be placed down.");
+				if (ableToEdit(p, item)) {
+					if (ItemUtil.hasCustomTag(item, ItemEdit.NO_PLACEMENT_TAG)) {
+						ItemUtil.removeCustomTag(item, ItemEdit.NO_PLACEMENT_TAG);
+						msg(ItemEdit.PREFIX + "This item can now be placed down.");
+					} else {
+						ItemUtil.setCustomTag(item, ItemEdit.NO_PLACEMENT_TAG, "!");
+						msg(ItemEdit.PREFIX + "This item can no longer be placed down.");
+					}
 				}
 			}
 		}
