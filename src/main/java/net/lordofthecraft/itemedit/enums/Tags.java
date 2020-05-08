@@ -45,8 +45,9 @@ public class Tags {
 	public static Tags getTags(ItemStack item) {
 		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
 			return getTags(ItemUtil.getCustomTag(item, ItemEdit.INFO_TAG));
+		} else {
+			return getTags("");
 		}
-		return null;
 	}
 
 	/**
@@ -62,23 +63,39 @@ public class Tags {
 	 * @param data The raw data for a tag split by ':'
 	 */
 	private Tags(String[] data) {
+		// Parse aura name and class. % is Major/Bold/Glow, @ is Minor/Italic
 		String auraName = null;
 		if (data.length > 2) {
 			auraName = data[2];
 			if (auraName.endsWith("%")) {
 				auraName = auraName.replace("%", "");
-				auraClass = 1;
+				this.auraClass = 1;
 			} else if (auraName.endsWith("@")) {
 				auraName = auraName.replace("@", "");
-				auraClass = -1;
+				this.auraClass = -1;
 			}
 		}
 
-		rarity =   (data.length > 0) ?  Rarity.getByName(data[0]) : Rarity.DEFAULT;
-		quality =  (data.length > 1) ? Quality.getByName(data[1]) : Quality.DEFAULT;
-		aura =    (auraName != null) ?   Aura.getByName(auraName) : Aura.DEFAULT;
-		type =     (data.length > 3) ?    Type.getByName(data[3]) : Type.DEFAULT;
-		itemID =   (data.length > 4) ?  Integer.parseInt(data[4]) : Integer.MAX_VALUE;
+		// Verify no IndexOutOfBounds.
+		this.rarity =   (data.length > 0) ?  Rarity.getByName(data[0]) : Rarity.DEFAULT;
+		this.quality =  (data.length > 1) ? Quality.getByName(data[1]) : Quality.DEFAULT;
+		this.aura =    (auraName != null) ?   Aura.getByName(auraName) : Aura.DEFAULT;
+		this.type =     (data.length > 3) ?    Type.getByName(data[3]) : Type.DEFAULT;
+		this.itemID =   (data.length > 4) ?  Integer.parseInt(data[4]) : Integer.MAX_VALUE;
+
+		// Verify not null.
+		if (this.rarity == null) {
+			this.rarity = Rarity.DEFAULT;
+		}
+		if (this.quality == null) {
+			this.quality = Quality.DEFAULT;
+		}
+		if (this.aura == null) {
+			this.aura = Aura.DEFAULT;
+		}
+		if (this.type == null) {
+			this.type = Type.DEFAULT;
+		}
 	}
 
 	/**
@@ -140,7 +157,9 @@ public class Tags {
 	 * @param auraClass The class of this aura. -1 = Minor, 0 = Normal, 1 = Major.
 	 */
 	public void setAuraClass(int auraClass) {
-		this.auraClass = auraClass;
+		if (auraClass != Integer.MAX_VALUE) {
+			this.auraClass = auraClass;
+		}
 	}
 	public void setAuraMinor() {
 		this.auraClass = -1;

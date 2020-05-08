@@ -328,36 +328,28 @@ public class MainCommands extends BaseCommand {
 		if (meta != null) {
 			List<String> lore = meta.getLore();
 			Tags tags = Tags.getTags(item);
-			if (tags != null) {
-				tags.setRarity(rarity);
-				tags.setQuality(quality);
-				tags.setAura(aura);
-				tags.setType(type);
+			tags.setRarity(rarity);
+			tags.setQuality(quality);
+			tags.setAura(aura);
+			tags.setType(type);
+			tags.setAuraClass(auraClass);
+			tags.setLFItemID(id);
 
-				if (auraClass != Integer.MAX_VALUE) {
-					tags.setAuraClass(auraClass);
-				}
-
-				if (id > 0) {
-					tags.setLFItemID(id);
-				}
-
-				if (lore != null) {
-					if (lore.size() > 0) {
-						lore.set(0, tags.formatTags());
-					} else {
-						lore.add(tags.formatTags());
-					}
+			if (lore != null) {
+				if (lore.size() > 0) {
+					lore.set(0, tags.formatTags());
 				} else {
-					lore = new ArrayList<>();
 					lore.add(tags.formatTags());
 				}
-
-				meta.setLore(lore);
-				item.setItemMeta(meta);
-				tags.applyTagToItem(item);
-				updateDisplayName(item);
+			} else {
+				lore = new ArrayList<>();
+				lore.add(tags.formatTags());
 			}
+
+			meta.setLore(lore);
+			item.setItemMeta(meta);
+			tags.applyTagToItem(item);
+			updateDisplayName(item);
 		}
 	}
 
