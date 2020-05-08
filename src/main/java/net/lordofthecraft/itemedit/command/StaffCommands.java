@@ -1,5 +1,6 @@
 package net.lordofthecraft.itemedit.command;
 
+import co.lotc.core.bukkit.book.BookStream;
 import co.lotc.core.bukkit.util.ItemUtil;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
@@ -18,6 +19,17 @@ import java.util.Date;
 import java.util.UUID;
 
 public class StaffCommands extends BaseCommand {
+
+	@Cmd(value="Force an item to be returned to the player.")
+	public void forcereturn(CommandSender sender, Player player) {
+		BookStream stream = BookStream.getFor(player);
+		if (stream != null) {
+			stream.abort();
+			msg(ItemEdit.PREFIX + "Successfully aborted edit for " + player.getName() + ".");
+		} else {
+			msg(ItemEdit.PREFIX + "Failed to find an active BookStream for " + player.getName() + ".");
+		}
+	}
 
 	@Cmd(value="Gets information on the given item.")
 	public void iteminfo(CommandSender sender) {

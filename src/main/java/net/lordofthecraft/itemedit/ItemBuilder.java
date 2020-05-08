@@ -143,14 +143,25 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * Update the description of an item to the given list of words, using the highlight
-	 * and bulletpoint strings to prefix their appropriate parts.
-	 * @param desc A list of words with '\n' as their own individual word for line breaks.
-	 * @param highlight The prefix to apply to '%' marked words (start or end).
-	 * @param bulletpoint The prefix to apply to bulletpoint text ([*1], [*], [*4], [**]).
+	 * Update the description of an item to the given string. The string will
+	 * be parsed into each word split by a space, and the word parsed with '%'
+	 * indicating a highlight, or [*1], [*], [*4], and [**] being parsed as
+	 * bulletpoints.
+	 * @param desc A description string.
 	 */
-	public void setDesc(String[] desc, String highlight, ChatColor bulletpoint) {
-		completeDesc(item, desc, highlight, bulletpoint);
+	public void setDesc(String desc) {
+		String fixedDesc = desc.replace("\n", " \n ");
+		setDesc(fixedDesc.split(" "));
+	}
+
+	/**
+	 * Update the description of an item to the given array of strings. Each
+	 * string represents a singular word to be parsed with '%' indicating a
+	 * highlight, or [*1], [*], [*4], and [**] being parsed as bulletpoints.
+	 * @param desc Array of words.
+	 */
+	public void setDesc(String[] desc) {
+		completeDesc(item, desc);
 	}
 
 	/**
@@ -367,7 +378,10 @@ public class ItemBuilder {
 	 * @param item The item to describe.
 	 * @param desc The list of pages as Strings.
 	 */
-	private void completeDesc(ItemStack item, String[] desc, String highlight, ChatColor bulletpoint) {
+	private void completeDesc(ItemStack item, String[] desc) {
+		String highlight = tags.getQuality().getColor();
+		ChatColor bulletpoint = tags.getRarity().getRawColor();
+
 		for (int i = 0; i < desc.length; i++) {
 			// Remove any colour.
 			desc[i] = ChatColor.stripColor(desc[i]);

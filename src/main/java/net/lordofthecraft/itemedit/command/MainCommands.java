@@ -197,14 +197,10 @@ public class MainCommands extends BaseCommand {
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
 
-					Tags tags = Tags.getTags(item);
-					String highlight = tags.getQuality().getColor();
-					ChatColor bulletpoint = tags.getRarity().getRawColor();
-
 					BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book!") {
 						@Override
 						public void onBookClose() {
-							builder.setDesc(BookUtil.getPagesAsArray(getMeta().getPages()), highlight, bulletpoint);
+							builder.setDesc(BookUtil.getPagesAsArray(getMeta().getPages()));
 						}
 					};
 
