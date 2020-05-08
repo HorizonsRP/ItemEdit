@@ -95,6 +95,7 @@ public class MainCommands extends BaseCommand {
 						String newColor = rarity.getRawColor() + "";
 						replaceWithinDesc(item, oldColor, newColor);
 					}
+					finalizeEdit(p, item);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -117,6 +118,7 @@ public class MainCommands extends BaseCommand {
 					String newColor = quality.getColor();
 					replaceWithinDesc(item, oldColor, newColor);
 					updateTags(item, null, quality, null, null, Integer.MAX_VALUE, 0);
+					finalizeEdit(p, item);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -140,6 +142,7 @@ public class MainCommands extends BaseCommand {
 					} else {
 						updateGlow(item, false);
 					}
+					finalizeEdit(p, item);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -158,6 +161,7 @@ public class MainCommands extends BaseCommand {
 				if (ableToEdit(p, item)) {
 					removeApproval(item);
 					updateTags(item, null, null, null, type, Integer.MAX_VALUE, 0);
+					finalizeEdit(p, item);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -175,6 +179,7 @@ public class MainCommands extends BaseCommand {
 			if (item != null) {
 				if (ableToEdit(p, item)) {
 					updateTags(item, null, null, null, null, Integer.MAX_VALUE, id);
+					finalizeEdit(p, item);
 				} else {
 					msg(APPROVED_ALREADY);
 				}
@@ -211,6 +216,7 @@ public class MainCommands extends BaseCommand {
 						}
 					};
 
+					finalizeEdit(p, item);
 					stream.open(p);
 				} else {
 					msg(APPROVED_ALREADY);
