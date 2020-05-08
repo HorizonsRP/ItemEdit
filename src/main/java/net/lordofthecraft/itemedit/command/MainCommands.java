@@ -91,11 +91,9 @@ public class MainCommands extends BaseCommand {
 						String name = ChatColor.stripColor(meta.getDisplayName());
 						updateDisplayName(item, name);
 
-						if (tags != null) {
-							String oldColor = tags.getRarity().getRawColor() + "";
-							String newColor = rarity.getRawColor() + "";
-							replaceWithinDesc(item, oldColor, newColor);
-						}
+						String oldColor = tags.getRarity().getRawColor() + "";
+						String newColor = rarity.getRawColor() + "";
+						replaceWithinDesc(item, oldColor, newColor);
 					}
 				} else {
 					msg(APPROVED_ALREADY);
@@ -114,11 +112,9 @@ public class MainCommands extends BaseCommand {
 			if (item != null) {
 				if (ableToEdit(p, item)) {
 					Tags tags = Tags.getTags(item);
-					if (tags != null) {
-						String oldColor = tags.getQuality().getColor();
-						String newColor = quality.getColor();
-						replaceWithinDesc(item, oldColor, newColor);
-					}
+					String oldColor = tags.getQuality().getColor();
+					String newColor = quality.getColor();
+					replaceWithinDesc(item, oldColor, newColor);
 					updateTags(item, null, quality, null, null, Integer.MAX_VALUE, 0);
 				} else {
 					msg(APPROVED_ALREADY);
@@ -201,7 +197,6 @@ public class MainCommands extends BaseCommand {
 					book.setItemMeta(meta);
 
 					Tags tags = Tags.getTags(item);
-					assert tags != null;
 					String highlight = tags.getQuality().getColor();
 					ChatColor bulletpoint = tags.getRarity().getRawColor();
 
@@ -288,7 +283,6 @@ public class MainCommands extends BaseCommand {
 	private void updateDisplayName(ItemStack item, String name) {
 		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
 			Tags tags = Tags.getTags(item);
-			assert tags != null;
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
 				meta.setDisplayName(tags.getRarity().getColor() + name);
@@ -404,8 +398,13 @@ public class MainCommands extends BaseCommand {
 					}
 				}
 
-				int pages = (int) Math.ceil(fullStringBuilder.length()/255d);
 				String fullString = fullStringBuilder.toString();
+				fullString = fullString.replace("･", "[*1]");
+				fullString = fullString.replace("•", "[*]");
+				fullString = fullString.replace("●", "[*4]");
+				fullString = fullString.replace("❖", "[**]");
+
+				int pages = (int) Math.ceil(fullString.length()/255d);
 				for (int i = 1; i <= pages; i++) {
 					int j = (i-1)*255;
 					int k = i*255;
