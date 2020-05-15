@@ -39,12 +39,12 @@ public enum Approval {
 	}
 
 	/**
-	 * @param player The player to reference in the approval.
+	 * @param player The player to reference in the approval. If null or type PLUGIN, no player is referenced.
 	 * @return Returns an approval string of this type for the given player.
 	 */
 	public String formatApproval(Player player) {
 		String output = DGRAY_ITALIC + "Created By " + this.aRank;
-		if (this != PLUGIN) {
+		if (this != PLUGIN && player != null) {
 			output += " (" + this.color + ChatColor.ITALIC + player.getName() + DGRAY_ITALIC + ")";
 		}
 		return output;
