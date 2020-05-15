@@ -11,6 +11,7 @@ import java.util.List;
 public enum Approval {
 
 	// STAFF AND DEFAULT SIGNATURES
+	PLUGIN("PLUGIN", ChatColor.DARK_GRAY,   "A Plugin",       ItemEdit.PERMISSION_START + ".plugin"),
 	ADMIN( "ADMIN",  ChatColor.DARK_RED,    "An Admin",       ItemEdit.PERMISSION_START + ".admin"),
 	MOD(   "MOD",    ChatColor.BLUE,        "A Moderator",    ItemEdit.PERMISSION_START + ".mod"),
 	TECH(  "TECH",   ChatColor.DARK_AQUA,   "A Technician",   ItemEdit.PERMISSION_START + ".tech"),
@@ -42,7 +43,11 @@ public enum Approval {
 	 * @return Returns an approval string of this type for the given player.
 	 */
 	public String formatApproval(Player player) {
-		return DGRAY_ITALIC + "Created By " + this.aRank + " (" + this.color + ChatColor.ITALIC + player.getName() + DGRAY_ITALIC + ")";
+		String output = DGRAY_ITALIC + "Created By " + this.aRank;
+		if (this != PLUGIN) {
+			output += " (" + this.color + ChatColor.ITALIC + player.getName() + DGRAY_ITALIC + ")";
+		}
+		return output;
 	}
 
 	// STATIC //
