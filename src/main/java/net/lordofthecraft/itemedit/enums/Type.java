@@ -19,6 +19,8 @@ public enum Type {
 	CLOTH(   "Cloth",       ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".cloth"),
 	FOOD(    "Food",        ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".food"),
 	TOOL(    "Tool",        ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".tool"),
+	WEAPON(  "Weapon",      ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".weapon"),
+	CURRENCY( "Currency",   ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".currency"),
 	APPAREL( "Apparel",     ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".apparel"),
 	MISC(    "Miscellanea", ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".misc");
 
