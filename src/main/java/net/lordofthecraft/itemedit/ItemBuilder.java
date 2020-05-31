@@ -13,7 +13,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ItemBuilder {
 
@@ -151,7 +150,7 @@ public class ItemBuilder {
 	 * bulletpoints.
 	 * @param desc A description string.
 	 */
-	public void setDesc(UUID player, String desc) {
+	public void setDesc(Player player, String desc) {
 		String fixedDesc = desc.replace("\n", " \n ");
 		setDesc(player, fixedDesc.split(" "));
 	}
@@ -162,7 +161,7 @@ public class ItemBuilder {
 	 * highlight, or [*1], [*], [*4], and [**] being parsed as bulletpoints.
 	 * @param desc Array of words.
 	 */
-	public void setDesc(UUID player, String[] desc) {
+	public void setDesc(Player player, String[] desc) {
 		completeDesc(player, item, desc);
 	}
 
@@ -380,7 +379,7 @@ public class ItemBuilder {
 	 * @param item The item to describe.
 	 * @param desc The list of pages as Strings.
 	 */
-	private void completeDesc(UUID player, ItemStack item, String[] desc) {
+	private void completeDesc(Player player, ItemStack item, String[] desc) {
 		String highlight = tags.getQuality().getColor();
 		ChatColor bulletpoint = tags.getRarity().getRawColor();
 
@@ -438,10 +437,17 @@ public class ItemBuilder {
 					lore.add(approved);
 				}
 
-				int maxLines = PermissionsUtil.getMaxPermission(player, ItemEdit.PERMISSION_START + ".length", ItemEdit.getMaxLines());
+				int maxLines = Integer.MAX_VALUE;
+				if (player != null) {
+					maxLines = PermissionsUtil.getMaxPermission(player.getUniqueId(), ItemEdit.PERMISSION_START + ".length", ItemEdit.getMaxLines());
+				}
 
-				meta.setLore(lore);
-				item.setItemMeta(meta);
+				if (lore.size() <= maxLines) {
+					meta.setLore(lore);
+					item.setItemMeta(meta);
+				} else {
+					player.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines-1) + ItemEdit.PREFIX + " lines for a description.");
+				}
 			}
 		}
 	}
