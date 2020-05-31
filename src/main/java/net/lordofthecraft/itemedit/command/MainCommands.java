@@ -200,7 +200,7 @@ public class MainCommands extends BaseCommand {
 					BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book!") {
 						@Override
 						public void onBookClose() {
-							builder.setDesc(BookUtil.getPagesAsArray(getMeta().getPages()));
+							builder.setDesc(p.getUniqueId(), BookUtil.getPagesAsArray(getMeta().getPages()));
 						}
 					};
 
