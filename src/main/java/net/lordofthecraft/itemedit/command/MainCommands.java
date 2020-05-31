@@ -197,7 +197,7 @@ public class MainCommands extends BaseCommand {
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
 
-					BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book!") {
+					BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book! Sign with 'cancel' to cancel.") {
 						@Override
 						public void onBookClose() {
 							builder.setDesc(p, BookUtil.getPagesAsArray(getMeta().getPages()));
