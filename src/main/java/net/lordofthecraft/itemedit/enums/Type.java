@@ -19,14 +19,14 @@ public enum Type {
 	CLOTH(   "Cloth",       ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".cloth"),
 	FOOD(    "Food",        ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".food"),
 	TOOL(    "Tool",        ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".tool"),
-	LIGHT_WEAPON(  "Light Weapon",      ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".lweapon"),
-	MEDIUM_WEAPON(  "Medium Weapon",      ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".mweapon"),
-	HEAVY_WEAPON(  "Heavy Weapon",      ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".hweapon"),
+	LIGHT_WEAPON(  "Light_Weapon",      ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".lweapon"),
+	MEDIUM_WEAPON(  "Medium_Weapon",      ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".mweapon"),
+	HEAVY_WEAPON(  "Heavy_Weapon",      ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".hweapon"),
 	CURRENCY( "Currency",   ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".currency"),
 	APPAREL( "Apparel",     ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".apparel"),
-	LIGHT_ARMOR( "Light Armor",     ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".larmor"),
-	MEDIUM_ARMOR( "Medium Armor",     ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".marmor"),
-	HEAVY_ARMOR( "Heavy Armor",     ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".harmor"),
+	LIGHT_ARMOR( "Light_Armor",     ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".larmor"),
+	MEDIUM_ARMOR( "Medium_Armor",     ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".marmor"),
+	HEAVY_ARMOR( "Heavy_Armor",     ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".harmor"),
 	MISC(    "Miscellanea", ItemEdit.PERMISSION_START + "." + ItemEdit.TYPE_PERM + ".misc");
 
 	public static Type DEFAULT = MISC;
