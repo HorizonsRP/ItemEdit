@@ -100,6 +100,13 @@ public class ItemBuilder {
 	}
 
 	/**
+	 * @return Returns the current item in the ItemBuilder.
+	 */
+	public ItemStack getItem() {
+		return item;
+	}
+
+	/**
 	 * @param name Set the name for this builder to the given string.
 	 */
 	public void setName(String name) {
@@ -184,7 +191,12 @@ public class ItemBuilder {
 				}
 				meta.setLore(lore);
 				item.setItemMeta(meta);
-				ItemUtil.setCustomTag(item, ItemEdit.APPROVED_TAG, player.getUniqueId().toString() + ":" + System.currentTimeMillis() + ":" + approval.name);
+
+				String value = "";
+				if (!approval.equals(Approval.PLUGIN)) {
+					value = player.getUniqueId().toString() + ":" + System.currentTimeMillis() + ":" + approval.name;
+				}
+				ItemUtil.setCustomTag(item, ItemEdit.APPROVED_TAG, value);
 			}
 		}
 	}
