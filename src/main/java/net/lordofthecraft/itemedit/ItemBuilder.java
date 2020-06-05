@@ -148,7 +148,6 @@ public class ItemBuilder {
 	 */
 	public void setItemID(int id) {
 		this.tags.setLFItemID(id);
-		// TODO - If updated to 1.14+, store this ID in #setCustomModelData(id) for use with resource packs.
 	}
 
 	/**

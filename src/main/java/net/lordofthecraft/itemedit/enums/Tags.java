@@ -187,6 +187,7 @@ public class Tags {
 	 */
 	public void applyTagToItem(ItemStack item) {
 		ItemUtil.setCustomTag(item, ItemEdit.INFO_TAG, this.toString());
+		// TODO - If updated to 1.14+, store this ID in #setCustomModelData(id) for use with resource packs.
 	}
 
 }
