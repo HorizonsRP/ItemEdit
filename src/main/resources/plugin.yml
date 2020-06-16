@@ -78,6 +78,8 @@ permissions:
       itemedit.name: true
       itemedit.desc: true
       itemedit.approve: true
+      itemedit.potion: true
+      itemedit.use.use: true
 
   #Custom values per person/group.
   itemedit.length:

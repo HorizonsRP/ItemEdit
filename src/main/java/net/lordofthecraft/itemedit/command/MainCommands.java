@@ -12,6 +12,7 @@ import net.lordofthecraft.itemedit.ItemBuilder;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.enums.*;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
@@ -248,9 +249,38 @@ public class MainCommands extends BaseCommand {
 					} else {
 						msg(ItemEdit.PREFIX + "This item can no longer be placed down.");
 					}
+					return;
 				}
 			}
 		}
+		msg(NO_ITEM);
+	}
+
+	@Cmd(value="Edit the colour of a potion bottle.", permission=ItemEdit.PERMISSION_START + ".potion")
+	public void potion(CommandSender sender, int red, int green, int blue) {
+		if (sender instanceof Player) {
+			potion(sender, Color.fromRGB(red, green, blue));
+		}
+	}
+
+	@Cmd(value="Edit the colour of a potion bottle.", permission=ItemEdit.PERMISSION_START + ".potion")
+	public void potion(CommandSender sender, Color color) {
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null && !item.getType().equals(Material.AIR)) {
+				if (ableToEdit(p, item)) {
+					ItemBuilder builder = new ItemBuilder(item);
+					if (builder.setPotionColor(color)) {
+						msg(ItemEdit.PREFIX + "By the power of SCIENCE the liquid is now a different color.");
+					} else {
+						msg(ItemEdit.PREFIX + "Please hold a potion-type item in your hand.");
+					}
+					return;
+				}
+			}
+		}
+		msg(NO_ITEM);
 	}
 
 	@Cmd(value="Makes the item unable or able to be broken.", permission=ItemEdit.PERMISSION_START + ".unbreakable")
