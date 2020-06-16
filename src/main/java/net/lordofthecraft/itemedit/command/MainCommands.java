@@ -253,6 +253,21 @@ public class MainCommands extends BaseCommand {
 		}
 	}
 
+	@Cmd(value="Makes the item unable or able to be broken.", permission=ItemEdit.PERMISSION_START + ".unbreakable")
+	public void unbreakable(CommandSender sender, boolean yn) {
+		if (sender instanceof Player) {
+			Player p = (Player) sender;
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null && !item.getType().equals(Material.AIR)) {
+				if (ableToEdit(p, item)) {
+					ItemMeta im = item.getItemMeta();
+					im.setUnbreakable(yn);
+					item.setItemMeta(im);
+				}
+			}
+		}
+	}
+
 	@Cmd(value="Moderator access to edited items.", permission=ItemEdit.PERMISSION_START + ".staff")
 	public BaseCommand staff() {
 		return staffCommands;
