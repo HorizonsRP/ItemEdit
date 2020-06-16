@@ -7,16 +7,13 @@ import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
 import co.lotc.core.command.annotate.Range;
-import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemBuilder;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.enums.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
@@ -284,18 +281,23 @@ public class MainCommands extends BaseCommand {
 	}
 
 	@Cmd(value="Makes the item unable or able to be broken.", permission=ItemEdit.PERMISSION_START + ".unbreakable")
-	public void unbreakable(CommandSender sender, boolean yn) {
+	public void unbreakable(CommandSender sender) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && !item.getType().equals(Material.AIR)) {
 				if (ableToEdit(p, item)) {
-					ItemMeta im = item.getItemMeta();
-					im.setUnbreakable(yn);
-					item.setItemMeta(im);
+					ItemBuilder builder = new ItemBuilder(item);
+					if (builder.toggleUnbreakable()) {
+						msg(ItemEdit.PREFIX + "This item is now unbreakable.");
+					} else {
+						msg(ItemEdit.PREFIX + "This item is now breakable.");
+					}
+					return;
 				}
 			}
 		}
+		msg(NO_ITEM);
 	}
 
 	@Cmd(value="Moderator access to edited items.", permission=ItemEdit.PERMISSION_START + ".staff")
