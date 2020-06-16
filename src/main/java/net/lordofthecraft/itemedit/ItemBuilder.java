@@ -264,6 +264,29 @@ public class ItemBuilder {
 		}
 	}
 
+	/**
+	 * @return Whether this item is unbreakable AFTER it has been toggled.
+	 */
+	public boolean toggleUnbreakable() {
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			setUnbreakable(!meta.isUnbreakable());
+			return meta.isUnbreakable();
+		}
+		return false;
+	}
+
+	/**
+	 * @param breakable Manually set whether an item is unbreakable.
+	 */
+	public void setUnbreakable(boolean breakable) {
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			meta.setUnbreakable(breakable);
+			item.setItemMeta(meta);
+		}
+	}
+
 	//// PRIVATE ////
 	/**
 	 * Updates the colour using the given item's existing name.
