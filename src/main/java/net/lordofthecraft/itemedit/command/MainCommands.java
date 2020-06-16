@@ -283,7 +283,7 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
-	@Cmd(value="Makes the item unable or able to be broken.", permission=ItemEdit.PERMISSION_START + ".unbreakable")
+	@Cmd(value="Makes the item unable or able to break.", permission=ItemEdit.PERMISSION_START + ".unbreakable")
 	public void unbreakable(CommandSender sender, boolean yn) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
