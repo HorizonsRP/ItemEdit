@@ -15,7 +15,7 @@ public enum Quality {
 	ADEPT(   false, "Adept",       ChatColor.GREEN,        ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".adept"),
 	MODERATE(false, "Moderate",    ChatColor.AQUA,         ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".moderate"),
 	FINE(    false, "Fine",        ChatColor.BLUE,         ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".fine"),
-	ARTISIAN(false, "Artisian",    ChatColor.LIGHT_PURPLE, ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".artisian"),
+	ARTISIAN(false, "Artisan",    ChatColor.LIGHT_PURPLE, ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".artisian"),
 	MSTRCRFT(false, "Mastercraft", ChatColor.YELLOW,       ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".mastercraft"),
 	PERFECT( false, "Perfect",     ChatColor.RED,          ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".perfect"),
 	LASAGNA( true,  "Lasagna",     ChatColor.BLACK,        ItemEdit.PERMISSION_START + "." + ItemEdit.QUALITY_PERM + ".lasagna");

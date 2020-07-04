@@ -34,6 +34,9 @@ permissions:
   itemedit.placeable:
     default: true
     description: Makes an item incapable of being placed.
+  itemedit.unbreakable:
+    default: op
+    description: Makes an item unbreakable or not
 
   #Staff and base permissions.
   #Add itemedit.PERM.use to approve with the signature, and itemedit.PERM.edit to be able to edit over it.
