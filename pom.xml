@@ -32,13 +32,13 @@
         <dependency>
             <groupId>co.lotc</groupId>
             <artifactId>tythan-bukkit</artifactId>
-            <version>0.7.2</version>
+            <version>0.7.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>
-            <version>5.0</version>
+            <version>5.1</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
