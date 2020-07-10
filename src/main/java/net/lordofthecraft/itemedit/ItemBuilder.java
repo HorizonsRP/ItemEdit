@@ -153,6 +153,13 @@ public class ItemBuilder {
 	}
 
 	/**
+	 * @return The current LF Item ID for this item.
+	 */
+	public int getItemID() {
+		return this.tags.getLFItemID();
+	}
+
+	/**
 	 * Update the description of an item to the given string. The string will
 	 * be parsed into each word split by a space, and the word parsed with '%'
 	 * indicating a highlight, or [*1], [*], [*4], and [**] being parsed as
