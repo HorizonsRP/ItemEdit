@@ -5,6 +5,7 @@ import net.lordofthecraft.itemedit.ItemEdit;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public enum Rarity {
@@ -61,6 +62,38 @@ public enum Rarity {
 	 */
 	public ChatColor getRawColor() {
 		return this.color;
+	}
+
+	/**
+	 * Returns the next rarity relative to this one.
+	 * @param loop Whether we should loop on around if we reach the positive or negative end of the rarities.
+	 * @param difference Optional, by default 1. If you wish to go down in rarity set this to a negative number.
+	 * @return The next relative rarity.
+	 */
+	public Rarity getNextRarity(boolean loop, int difference) {
+		List<Rarity> rarities = Arrays.asList(Rarity.values());
+		int index = rarities.indexOf(this);
+		index += difference;
+
+		while (index < 0) {
+			if (loop) {
+				index += rarities.size();
+			} else {
+				index = 0;
+			}
+		}
+		while (index >= rarities.size()) {
+			if (loop) {
+				index -= rarities.size();
+			} else {
+				index = (rarities.size()-1);
+			}
+		}
+
+		return rarities.get(index);
+	}
+	public Rarity getNextRarity(boolean loop) {
+		return getNextRarity(loop, 1);
 	}
 
 	/**

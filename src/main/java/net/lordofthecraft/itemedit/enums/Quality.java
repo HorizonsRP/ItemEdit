@@ -5,6 +5,7 @@ import net.lordofthecraft.itemedit.ItemEdit;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public enum Quality {
@@ -57,6 +58,38 @@ public enum Quality {
 	 */
 	public ChatColor getRawColor() {
 		return this.color;
+	}
+
+	/**
+	 * Returns the next quality relative to this one.
+	 * @param loop Whether we should loop on around if we reach the positive or negative end of the qualities.
+	 * @param difference Optional, by default 1. If you wish to go down in quality set this to a negative number.
+	 * @return The next relative quality.
+	 */
+	public Quality getNextQuality(boolean loop, int difference) {
+		List<Quality> qualities = Arrays.asList(Quality.values());
+		int index = qualities.indexOf(this);
+		index += difference;
+
+		while (index < 0) {
+			if (loop) {
+				index += qualities.size();
+			} else {
+				index = 0;
+			}
+		}
+		while (index >= qualities.size()) {
+			if (loop) {
+				index -= qualities.size();
+			} else {
+				index = (qualities.size()-1);
+			}
+		}
+
+		return qualities.get(index);
+	}
+	public Quality getNextQuality(boolean loop) {
+		return getNextQuality(loop, 1);
 	}
 
 	/**

@@ -6,7 +6,7 @@
 
     <groupId>net.lordofthecraft</groupId>
     <artifactId>ItemEdit</artifactId>
-    <version>1.16.0.1</version>
+    <version>1.16.0.2</version>
     <packaging>jar</packaging>
 
     <name>ItemEdit</name>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>co.lotc</groupId>
             <artifactId>tythan-bukkit</artifactId>
-            <version>0.7.3</version>
+            <version>0.7.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
