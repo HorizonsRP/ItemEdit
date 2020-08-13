@@ -63,6 +63,7 @@ public class MainCommands extends BaseCommand {
 					validate(thisName.toString().length() <= ItemEdit.getMaxWidth(), nameTooLong);
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
+					builder.setEditingPlayer(p);
 					builder.setName(thisName.toString());
 					finalizeEdit(p, item);
 				} else {
@@ -83,6 +84,7 @@ public class MainCommands extends BaseCommand {
 				if (ableToEdit(p, item)) {
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
+					builder.setEditingPlayer(p);
 					builder.setRarity(rarity);
 					builder.applyTags();
 					finalizeEdit(p, item);
@@ -104,6 +106,7 @@ public class MainCommands extends BaseCommand {
 				if (ableToEdit(p, item)) {
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
+					builder.setEditingPlayer(p);
 					builder.setQuality(quality);
 					builder.applyTags();
 					finalizeEdit(p, item);
@@ -125,6 +128,7 @@ public class MainCommands extends BaseCommand {
 				if (ableToEdit(p, item)) {
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
+					builder.setEditingPlayer(p);
 					builder.setAura(aura, auraClass);
 					builder.applyTags();
 					finalizeEdit(p, item);
@@ -146,6 +150,7 @@ public class MainCommands extends BaseCommand {
 				if (ableToEdit(p, item)) {
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
+					builder.setEditingPlayer(p);
 					builder.setType(type);
 					builder.applyTags();
 					finalizeEdit(p, item);
@@ -166,6 +171,7 @@ public class MainCommands extends BaseCommand {
 			if (item != null) {
 				if (ableToEdit(p, item)) {
 					ItemBuilder builder = new ItemBuilder(item);
+					builder.setEditingPlayer(p);
 					builder.setItemID(id);
 					builder.applyTags();
 					finalizeEdit(p, item);
@@ -195,11 +201,12 @@ public class MainCommands extends BaseCommand {
 
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
+					builder.setEditingPlayer(p);
 
 					BookStream stream = new BookStream(p, book, ItemEdit.PREFIX + "Edit in this book! Sign with 'cancel' to cancel.") {
 						@Override
 						public void onBookClose() {
-							builder.setDesc(p, BookUtil.getPagesAsArray(getMeta().getPages()));
+							builder.setDesc(BookUtil.getPagesAsArray(getMeta().getPages()));
 						}
 					};
 
@@ -269,6 +276,7 @@ public class MainCommands extends BaseCommand {
 			if (item != null && !item.getType().equals(Material.AIR)) {
 				if (ableToEdit(p, item)) {
 					ItemBuilder builder = new ItemBuilder(item);
+					builder.setEditingPlayer(p);
 					if (builder.setPotionColor(color)) {
 						msg(ItemEdit.PREFIX + "By the power of SCIENCE the liquid is now a different color.");
 					} else {
