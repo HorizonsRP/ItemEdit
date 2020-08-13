@@ -325,30 +325,24 @@ public class ItemBuilder {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
-
-			String createdText;
-			if (editingPlayer != null) {
-				createdText = Approval.DEFAULT.formatApproval(editingPlayer, false);
-			} else {
-				createdText = Approval.PLUGIN.formatApproval(null, false);
-			}
-
 			if (lore != null) {
 				if (lore.size() > 0) {
 					lore.set(0, tags.formatTags());
-					if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG) && lore.size() > 2) {
-						lore.set(lore.size()-2, createdText);
+					if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
+						if (lore.size() > 2) {
+							lore.set(lore.size() - 2, getApprovalLines().get(1));
+						}
 					} else if (lore.size() > 1) {
-						lore.set(lore.size()-1, createdText);
+						lore.set(lore.size()-1, getApprovalLines().get(1));
 					}
 				} else {
 					lore.add(tags.formatTags());
-					lore.add(createdText);
+					lore.addAll(getApprovalLines());
 				}
 			} else {
 				lore = new ArrayList<>();
 				lore.add(tags.formatTags());
-				lore.add(createdText);
+				lore.addAll(getApprovalLines());
 			}
 			meta.setLore(lore);
 			item.setItemMeta(meta);
@@ -501,8 +495,8 @@ public class ItemBuilder {
 				}
 
 				// Reset our arraylist and fill it in order.
-				int extraLines = 0;
 				lore = new ArrayList<>();
+				int extraLines = 0;
 
 				// TAGS
 				if (tags != null) {
@@ -514,18 +508,12 @@ public class ItemBuilder {
 				lore.addAll(finalDesc);
 
 				// CREATED
-				lore.add("");
+				lore.addAll(getApprovalLines());
 				extraLines += 2; // Don't count the blank line or the created line towards the max lines limit.
-				if (editingPlayer != null) {
-					lore.add(Approval.DEFAULT.formatApproval(editingPlayer, false));
-				} else {
-					lore.add(Approval.PLUGIN.formatApproval(null, false));
-				}
 
-				// Check our atomic boolean async, then run our actual item edits sync once PermissionsUtil is complete.
+				// Check for the max allowed lines. If it's good then we update the item.
 				AtomicInteger maxLines = new AtomicInteger(ItemEdit.getMaxLines());
 				AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, editingPlayer.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
-
 				while (!complete.get()) {}
 				if (lore.size() <= (maxLines.get() + extraLines)) {
 					meta.setLore(lore);
@@ -555,6 +543,20 @@ public class ItemBuilder {
 				}.runTaskTimer(ItemEdit.get(), 0, 4);*/
 			}
 		}
+	}
+
+	/**
+	 * @return Returns the line break and the approval formatting for the current editing player.
+	 */
+	private List<String> getApprovalLines() {
+		List<String> output = new ArrayList<>();
+		output.add("");
+		if (editingPlayer != null) {
+			output.add(Approval.DEFAULT.formatApproval(editingPlayer, false));
+		} else {
+			output.add(Approval.PLUGIN.formatApproval(null, false));
+		}
+		return output;
 	}
 
 	/**

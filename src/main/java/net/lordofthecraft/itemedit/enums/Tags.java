@@ -191,6 +191,7 @@ public class Tags {
 		if (meta != null) {
 			ItemUtil.setCustomTag(meta, ItemEdit.INFO_TAG, this.toString());
 			meta.setCustomModelData(itemID);
+			item.setItemMeta(meta);
 		}
 	}
 
