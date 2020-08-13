@@ -25,6 +25,8 @@ public class ItemBuilder {
 	private static final Glow GLOW = new Glow(new NamespacedKey(ItemEdit.get(), ItemEdit.get().getDescription().getName()));
 
 	private Player editingPlayer = null;
+	private String newName = null;
+
 	private ItemStack item;
 	private Tags tags;
 
@@ -59,9 +61,6 @@ public class ItemBuilder {
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
-			String name = ChatColor.stripColor(meta.getDisplayName());
-			updateDisplayName(item, name);
-
 			// Check if any of our tags have been updated, and if so, update them.
 			boolean tagsUpdate = false;
 
@@ -116,7 +115,8 @@ public class ItemBuilder {
 	 * @param name Set the name for this builder to the given string.
 	 */
 	public void setName(String name) {
-		updateDisplayName(item, name);
+		this.newName = name;
+		updateTags(item);
 	}
 
 	/**
@@ -307,49 +307,6 @@ public class ItemBuilder {
 
 	//// PRIVATE ////
 	/**
-	 * Updates the colour using the given item's existing name.
-	 * @param item The item to update.
-	 */
-	private void updateDisplayName(ItemStack item) {
-		String name = null;
-		if (item != null) {
-			ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				name = ChatColor.stripColor(ItemUtil.getDisplayName(item));
-			}
-		}
-
-		if (name != null) {
-			updateDisplayName(item, name);
-		}
-	}
-
-	/**
-	 * Update the display name of the given item, coloured based on the rarity of the item.
-	 * If the item doesn't have any tags on it, it adds the tags then tries to set the name
-	 * once again.
-	 * @param item The item to name.
-	 * @param name The name to use.
-	 */
-	private void updateDisplayName(ItemStack item, String name) {
-		if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
-			Tags tags = Tags.getTags(item);
-			ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				meta.setDisplayName(tags.getRarity().getColor() + name);
-				item.setItemMeta(meta);
-			}
-		} else {
-			ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				meta.setDisplayName(name);
-				item.setItemMeta(meta);
-			}
-			updateTags(item);
-		}
-	}
-
-	/**
 	 * Re-applies the tags with whatever is on it, or default.
 	 * @param item The item to apply basic tags too.
 	 */
@@ -393,11 +350,52 @@ public class ItemBuilder {
 				lore.add(tags.formatTags());
 				lore.add(createdText);
 			}
-
 			meta.setLore(lore);
 			item.setItemMeta(meta);
+
 			tags.applyTagToItem(item);
+			this.tags = tags;
+
 			updateDisplayName(item);
+		}
+	}
+
+	/**
+	 * Updates the colour using the given item's existing name.
+	 * @param item The item to update.
+	 */
+	private void updateDisplayName(ItemStack item) {
+		String name = null;
+		if (item != null) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				if (newName != null) {
+					name = newName;
+				} else {
+					name = ItemUtil.getDisplayName(item);
+				}
+			}
+		}
+
+		if (name != null) {
+			updateDisplayName(item, name);
+		}
+	}
+
+	/**
+	 * Update the display name of the given item, coloured based on the rarity of the item.
+	 * If the item doesn't have any tags on it, it adds the tags then tries to set the name
+	 * once again.
+	 * @param item The item to name.
+	 * @param name The name to use.
+	 */
+	private void updateDisplayName(ItemStack item, String name) {
+		String clearedName = ChatColor.stripColor(name);
+
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			meta.setDisplayName(this.tags.getRarity().getColor() + clearedName);
+			item.setItemMeta(meta);
 		}
 	}
 
@@ -512,19 +510,24 @@ public class ItemBuilder {
 				// Reset our arraylist and fill it in order.
 				int extraLines = 1; // Start with our approval format.
 				lore = new ArrayList<>();
+
+				// TAGS
 				if (tags != null) {
 					lore.add(tags);
 					extraLines++; // Don't count this towards the max lines limit.
 				}
+
+				// DESC
 				lore.addAll(finalDesc);
 
-				// Already accounted for above
+				// CREATED
 				if (editingPlayer != null) {
 					lore.add(Approval.DEFAULT.formatApproval(editingPlayer, false));
 				} else {
 					lore.add(Approval.PLUGIN.formatApproval(null, false));
 				}
 
+				// APPROVED
 				if (approved != null) {
 					lore.add("");
 					lore.add(approved);
@@ -547,6 +550,7 @@ public class ItemBuilder {
 										if (finalLore.size() <= maxLines.get() + finalExtraLines) {
 											meta.setLore(finalLore);
 											item.setItemMeta(meta);
+											updateDisplayName(item);
 										} else {
 											editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
 										}

@@ -52,19 +52,12 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
 				if (ableToEdit(p, item)) {
-					StringBuilder thisName = new StringBuilder();
-					for (String s : name) {
-						if (thisName.length() > 0) {
-							thisName.append(" ").append(s);
-						} else {
-							thisName.append(s);
-						}
-					}
-					validate(thisName.toString().length() <= ItemEdit.getMaxWidth(), nameTooLong);
+					String fullName = String.join(" ", name);
+					validate(fullName.length() <= ItemEdit.getMaxWidth(), nameTooLong);
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
 					builder.setEditingPlayer(p);
-					builder.setName(thisName.toString());
+					builder.setName(fullName);
 					finalizeEdit(p, item);
 				} else {
 					msg(APPROVED_ALREADY);
