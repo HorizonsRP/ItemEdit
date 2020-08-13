@@ -316,6 +316,9 @@ public class ItemBuilder {
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
 				name = ChatColor.stripColor(meta.getDisplayName());
+				if (name.isEmpty()) {
+					name = ItemUtil.getDisplayName(item);
+				}
 			}
 		}
 
