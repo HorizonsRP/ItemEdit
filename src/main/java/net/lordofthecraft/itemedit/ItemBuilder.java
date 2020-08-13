@@ -507,12 +507,17 @@ public class ItemBuilder {
 						@Override
 						public void run() {
 							if (complete.get()) {
-								if (finalLore.size() <= maxLines.get()) {
-									meta.setLore(finalLore);
-									item.setItemMeta(meta);
-								} else {
-									player.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get() - 1) + ItemEdit.PREFIX + " lines for a description.");
-								}
+								new BukkitRunnable() {
+									@Override
+									public void run() {
+										if (finalLore.size() <= maxLines.get()) {
+											meta.setLore(finalLore);
+											item.setItemMeta(meta);
+										} else {
+											player.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get() - 1) + ItemEdit.PREFIX + " lines for a description.");
+										}
+									}
+								}.runTask(ItemEdit.get());
 								this.cancel();
 							}
 						}
