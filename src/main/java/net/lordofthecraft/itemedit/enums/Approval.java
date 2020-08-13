@@ -14,9 +14,9 @@ public enum Approval {
 	PLUGIN("PLUGIN", ChatColor.DARK_GRAY,   "A Plugin",       ItemEdit.PERMISSION_START + ".plugin"),
 	ADMIN( "ADMIN",  ChatColor.DARK_RED,    "An Admin",       ItemEdit.PERMISSION_START + ".admin"),
 	MOD(   "MOD",    ChatColor.BLUE,        "A Moderator",    ItemEdit.PERMISSION_START + ".mod"),
-	TECH(  "TECH",   ChatColor.DARK_AQUA,   "A Technician",   ItemEdit.PERMISSION_START + ".tech"),
-	LORE(  "LORE",   ChatColor.DARK_GREEN,  "A Lore Herald",  ItemEdit.PERMISSION_START + ".lore"),
-	EVENT( "EVENT",  ChatColor.GREEN,       "An Event Actor", ItemEdit.PERMISSION_START + ".event"),
+	TECH(  "TECH",   ChatColor.GREEN,       "A Technician",   ItemEdit.PERMISSION_START + ".tech"),
+	LORE(  "LORE",   ChatColor.YELLOW,      "A Lore Herald",  ItemEdit.PERMISSION_START + ".lore"),
+	EVENT( "EVENT",  ChatColor.RED,         "An Event Runner", ItemEdit.PERMISSION_START + ".event"),
 	BUILD( "BUILD",  ChatColor.GOLD,        "A Builder",      ItemEdit.PERMISSION_START + ".build"),
 	DESIGN("DESIGN", ChatColor.DARK_PURPLE, "A Designer",     ItemEdit.PERMISSION_START + ".design"),
 	PLAYER("PLAYER", ChatColor.GRAY,        "A Player",       ItemEdit.PERMISSION_START + ".use");
@@ -42,8 +42,13 @@ public enum Approval {
 	 * @param player The player to reference in the approval. If null or type PLUGIN, no player is referenced.
 	 * @return Returns an approval string of this type for the given player.
 	 */
-	public String formatApproval(Player player) {
-		String output = DGRAY_ITALIC + "Created By " + this.aRank;
+	public String formatApproval(Player player, boolean approval) {
+		String output = DGRAY_ITALIC;
+		if (approval) {
+			output += "Approved By " + this.aRank;
+		} else {
+			output += "Created By " + this.aRank;
+		}
 		if (this != PLUGIN && player != null) {
 			output += " (" + this.color + ChatColor.ITALIC + player.getName() + DGRAY_ITALIC + ")";
 		}

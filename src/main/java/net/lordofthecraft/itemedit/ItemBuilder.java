@@ -12,9 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ItemBuilder {
 
@@ -191,7 +194,7 @@ public class ItemBuilder {
 		if (meta != null) {
 			List<String> lore = meta.getLore();
 			if (lore != null) {
-				String approvalString = approval.formatApproval(player);
+				String approvalString = approval.formatApproval(player, true);
 				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
 					lore.set(lore.size() - 1, approvalString);
 				} else {
@@ -480,8 +483,8 @@ public class ItemBuilder {
 				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG) && lore.size() > 0) {
 					tags = lore.get(0);
 				}
-				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG) && lore.size() > 0) {
-					approved = lore.get(lore.size()-1);
+				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG) && lore.size() > 2) {
+					approved = lore.get(lore.size()-2);
 				}
 
 				// Reset our arraylist and fill it in order.
@@ -490,21 +493,30 @@ public class ItemBuilder {
 					lore.add(tags);
 				}
 				lore.addAll(finalDesc);
+				lore.add(Approval.DEFAULT.formatApproval(player, false));
 				if (approved != null) {
 					lore.add("");
 					lore.add(approved);
 				}
 
-				int maxLines = Integer.MAX_VALUE;
-				if (player != null) {
-					maxLines = PermissionsUtil.getMaxPermission(player.getUniqueId(), ItemEdit.PERMISSION_START + ".length", ItemEdit.getMaxLines());
-				}
-
-				if (lore.size() <= maxLines) {
-					meta.setLore(lore);
-					item.setItemMeta(meta);
-				} else {
-					player.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines-1) + ItemEdit.PREFIX + " lines for a description.");
+				{
+					AtomicInteger maxLines = new AtomicInteger(ItemEdit.getMaxLines());
+					AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, player.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
+					List<String> finalLore = lore;
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							if (complete.get()) {
+								if (finalLore.size() <= maxLines.get()) {
+									meta.setLore(finalLore);
+									item.setItemMeta(meta);
+								} else {
+									player.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get() - 1) + ItemEdit.PREFIX + " lines for a description.");
+								}
+								this.cancel();
+							}
+						}
+					}.runTaskTimerAsynchronously(ItemEdit.get(), 0, 4);
 				}
 			}
 		}
