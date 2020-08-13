@@ -324,6 +324,8 @@ public class MainCommands extends BaseCommand {
 					start++;
 				}
 				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
+					end -= 3;
+				} else {
 					end -= 2;
 				}
 
