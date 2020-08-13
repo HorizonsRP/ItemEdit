@@ -369,20 +369,29 @@ public class ItemBuilder {
 		if (meta != null) {
 			List<String> lore = meta.getLore();
 
+			String createdText;
+			if (editingPlayer != null) {
+				createdText = Approval.DEFAULT.formatApproval(editingPlayer, false);
+			} else {
+				createdText = Approval.PLUGIN.formatApproval(null, false);
+			}
+
 			if (lore != null) {
 				if (lore.size() > 0) {
 					lore.set(0, tags.formatTags());
+					if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG) && lore.size() > 2) {
+						lore.set(lore.size()-2, createdText);
+					} else if (lore.size() > 1) {
+						lore.set(lore.size()-1, createdText);
+					}
 				} else {
 					lore.add(tags.formatTags());
+					lore.add(createdText);
 				}
 			} else {
 				lore = new ArrayList<>();
 				lore.add(tags.formatTags());
-				if (editingPlayer != null) {
-					lore.add(Approval.DEFAULT.formatApproval(editingPlayer, false));
-				} else {
-					lore.add(Approval.PLUGIN.formatApproval(null, false));
-				}
+				lore.add(createdText);
 			}
 
 			meta.setLore(lore);
