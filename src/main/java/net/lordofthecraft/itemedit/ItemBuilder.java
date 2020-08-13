@@ -24,6 +24,7 @@ public class ItemBuilder {
 	private static final String DESC_PREFIX = ChatColor.GRAY + "" + ChatColor.ITALIC;
 	private static final Glow GLOW = new Glow(new NamespacedKey(ItemEdit.get(), ItemEdit.get().getDescription().getName()));
 
+	private Player editingPlayer = null;
 	private ItemStack item;
 	private Tags tags;
 
@@ -119,6 +120,13 @@ public class ItemBuilder {
 	}
 
 	/**
+	 * @param player Set the player that will be marked as doing this edit.
+	 */
+	public void setEditingPlayer(Player player) {
+		this.editingPlayer = player;
+	}
+
+	/**
 	 * @param rarity Set the rarity tag for this builder to the given rarity.
 	 */
 	public void setRarity(Rarity rarity) {
@@ -169,9 +177,9 @@ public class ItemBuilder {
 	 * bulletpoints.
 	 * @param desc A description string.
 	 */
-	public void setDesc(Player player, String desc) {
+	public void setDesc(String desc) {
 		String fixedDesc = desc.replace("\n", " \n ");
-		setDesc(player, fixedDesc.split(" "));
+		setDesc(fixedDesc.split(" "));
 	}
 
 	/**
@@ -180,8 +188,8 @@ public class ItemBuilder {
 	 * highlight, or [*1], [*], [*4], and [**] being parsed as bulletpoints.
 	 * @param desc Array of words.
 	 */
-	public void setDesc(Player player, String[] desc) {
-		completeDesc(player, item, desc);
+	public void setDesc(String[] desc) {
+		completeDesc(item, desc);
 	}
 
 	/**
@@ -370,6 +378,11 @@ public class ItemBuilder {
 			} else {
 				lore = new ArrayList<>();
 				lore.add(tags.formatTags());
+				if (editingPlayer != null) {
+					lore.add(Approval.DEFAULT.formatApproval(editingPlayer, false));
+				} else {
+					lore.add(Approval.PLUGIN.formatApproval(null, false));
+				}
 			}
 
 			meta.setLore(lore);
@@ -440,7 +453,7 @@ public class ItemBuilder {
 	 * @param item The item to describe.
 	 * @param desc The list of pages as Strings.
 	 */
-	private void completeDesc(Player player, ItemStack item, String[] desc) {
+	private void completeDesc(ItemStack item, String[] desc) {
 		String highlight = tags.getQuality().getColor();
 		ChatColor bulletpoint = tags.getRarity().getRawColor();
 
@@ -495,16 +508,24 @@ public class ItemBuilder {
 					extraLines++; // Don't count this towards the max lines limit.
 				}
 				lore.addAll(finalDesc);
-				lore.add(Approval.DEFAULT.formatApproval(player, false)); // Already accounted for above
+
+				// Already accounted for above
+				if (editingPlayer != null) {
+					lore.add(Approval.DEFAULT.formatApproval(editingPlayer, false));
+				} else {
+					lore.add(Approval.PLUGIN.formatApproval(null, false));
+				}
+
 				if (approved != null) {
 					lore.add("");
 					lore.add(approved);
 					extraLines++; // Don't count this towards the max lines limit.
 				}
 
+				// Check our atomic boolean async, then run our actual item edits sync once PermissionsUtil is complete.
 				{
 					AtomicInteger maxLines = new AtomicInteger(ItemEdit.getMaxLines());
-					AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, player.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
+					AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, editingPlayer.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
 					List<String> finalLore = lore;
 					int finalExtraLines = extraLines;
 					new BukkitRunnable() {
@@ -518,7 +539,7 @@ public class ItemBuilder {
 											meta.setLore(finalLore);
 											item.setItemMeta(meta);
 										} else {
-											player.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
+											editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
 										}
 									}
 								}.runTask(ItemEdit.get());
