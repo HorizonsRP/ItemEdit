@@ -523,40 +523,36 @@ public class ItemBuilder {
 				}
 
 				// Check our atomic boolean async, then run our actual item edits sync once PermissionsUtil is complete.
-				{
+				AtomicInteger maxLines = new AtomicInteger(ItemEdit.getMaxLines());
+				AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, editingPlayer.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
+
+				while (!complete.get()) {}
+				if (lore.size() <= (maxLines.get() + extraLines)) {
+					meta.setLore(lore);
+					item.setItemMeta(meta);
+				} else {
+					editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
+				}
+
+				/*List<String> finalLore = lore;
+				int finalExtraLines = extraLines;
+				new BukkitRunnable() {
 					AtomicInteger maxLines = new AtomicInteger(ItemEdit.getMaxLines());
 					AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, editingPlayer.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
-					//List<String> finalLore = lore;
-					//int finalExtraLines = extraLines;
 
-					while (!complete.get()) {
-					}
-
-					if (lore.size() <= (maxLines.get() + extraLines)) {
-						meta.setLore(lore);
-						item.setItemMeta(meta);
-					} else {
-						editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
-					}
-
-					/*new BukkitRunnable() {
-						@Override
-						public void run() {
-							if (!this.isCancelled() && complete.get()) {
-								if (finalLore.size() <= (maxLines.get() + finalExtraLines)) {
-									meta.setLore(finalLore);
-									item.setItemMeta(meta);
-									if (ItemEdit.DEBUGGING) {
-										ItemEdit.get().getLogger().info("Set new item description.");
-									}
-								} else {
-									editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
-								}
-								this.cancel();
+					@Override
+					public void run() {
+						if (!this.isCancelled() && complete.get()) {
+							if (finalLore.size() <= (maxLines.get() + finalExtraLines)) {
+								meta.setLore(finalLore);
+								item.setItemMeta(meta);
+							} else {
+								editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
 							}
+							this.cancel();
 						}
-					}.runTaskTimer(ItemEdit.get(), 0, 4);*/
-				}
+					}
+				}.runTaskTimer(ItemEdit.get(), 0, 4);*/
 			}
 		}
 	}
