@@ -330,7 +330,7 @@ public class ItemBuilder {
 					lore.set(0, tags.formatTags());
 					if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
 						if (lore.size() > 2) {
-							lore.set(lore.size() - 2, getApprovalLines().get(1));
+							lore.set(lore.size()-2, getApprovalLines().get(1));
 						}
 					} else if (lore.size() > 1) {
 						lore.set(lore.size()-1, getApprovalLines().get(1));
