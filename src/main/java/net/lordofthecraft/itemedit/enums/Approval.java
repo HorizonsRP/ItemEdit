@@ -16,7 +16,7 @@ public enum Approval {
 	MOD(   "MOD",    ChatColor.BLUE,        "A Moderator",    ItemEdit.PERMISSION_START + ".mod"),
 	TECH(  "TECH",   ChatColor.GREEN,       "A Technician",   ItemEdit.PERMISSION_START + ".tech"),
 	LORE(  "LORE",   ChatColor.YELLOW,      "A Lore Herald",  ItemEdit.PERMISSION_START + ".lore"),
-	EVENT( "EVENT",  ChatColor.RED,         "An Event Runner", ItemEdit.PERMISSION_START + ".event"),
+	EVENT( "EVENT",  ChatColor.RED,         "An Event Host",  ItemEdit.PERMISSION_START + ".event"),
 	BUILD( "BUILD",  ChatColor.GOLD,        "A Builder",      ItemEdit.PERMISSION_START + ".build"),
 	DESIGN("DESIGN", ChatColor.DARK_PURPLE, "A Designer",     ItemEdit.PERMISSION_START + ".design"),
 	PLAYER("PLAYER", ChatColor.GRAY,        "A Player",       ItemEdit.PERMISSION_START + ".use");
