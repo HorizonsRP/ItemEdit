@@ -189,6 +189,7 @@ public class ItemBuilder {
 	 * @param desc Array of words.
 	 */
 	public void setDesc(String[] desc) {
+		updateTags(item);
 		completeDesc(item, desc);
 	}
 
@@ -206,7 +207,6 @@ public class ItemBuilder {
 				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
 					lore.set(lore.size() - 1, approvalString);
 				} else {
-					lore.add("");
 					lore.add(approvalString);
 				}
 				meta.setLore(lore);
@@ -461,7 +461,7 @@ public class ItemBuilder {
 	 * @param desc The list of pages as Strings.
 	 */
 	private void completeDesc(ItemStack item, String[] desc) {
-		String highlight = tags.getQuality().getColor();
+		String highlight = tags.getQuality().getColor() + ChatColor.ITALIC;
 		ChatColor bulletpoint = tags.getRarity().getRawColor();
 
 		for (int i = 0; i < desc.length; i++) {
@@ -477,7 +477,7 @@ public class ItemBuilder {
 					desc[i] = desc[i].substring(0, desc[i].length()-1);
 				}
 
-				desc[i] = (highlight + ChatColor.ITALIC + desc[i] + DESC_PREFIX);
+				desc[i] = (highlight + desc[i] + DESC_PREFIX);
 			}
 
 			// Replace bulletpoints.
@@ -489,26 +489,19 @@ public class ItemBuilder {
 			}
 		}
 
-		// Update the tags just in case, then format our description into a set of lore.
-		updateTags(item);
-		List<String> finalDesc = formatDesc(desc);
-
 		// Grab our current data as it exists then put it back in with the description included.
 		ItemMeta meta = item.getItemMeta();
+		List<String> finalDesc = formatDesc(desc);
 		if (meta != null) {
 			List<String> lore = meta.getLore();
 			if (lore != null) {
 				String tags = null;
-				String approved = null;
 				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG) && lore.size() > 0) {
 					tags = lore.get(0);
 				}
-				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG) && lore.size() > 2) {
-					approved = lore.get(lore.size()-2);
-				}
 
 				// Reset our arraylist and fill it in order.
-				int extraLines = 1; // Start with our approval format.
+				int extraLines = 0;
 				lore = new ArrayList<>();
 
 				// TAGS
@@ -521,45 +514,48 @@ public class ItemBuilder {
 				lore.addAll(finalDesc);
 
 				// CREATED
+				lore.add("");
+				extraLines += 2; // Don't count the blank line or the created line towards the max lines limit.
 				if (editingPlayer != null) {
 					lore.add(Approval.DEFAULT.formatApproval(editingPlayer, false));
 				} else {
 					lore.add(Approval.PLUGIN.formatApproval(null, false));
 				}
 
-				// APPROVED
-				if (approved != null) {
-					lore.add("");
-					lore.add(approved);
-					extraLines++; // Don't count this towards the max lines limit.
-				}
-
 				// Check our atomic boolean async, then run our actual item edits sync once PermissionsUtil is complete.
 				{
 					AtomicInteger maxLines = new AtomicInteger(ItemEdit.getMaxLines());
 					AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, editingPlayer.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
-					List<String> finalLore = lore;
-					int finalExtraLines = extraLines;
-					new BukkitRunnable() {
+					//List<String> finalLore = lore;
+					//int finalExtraLines = extraLines;
+
+					while (!complete.get()) {
+					}
+
+					if (lore.size() <= (maxLines.get() + extraLines)) {
+						meta.setLore(lore);
+						item.setItemMeta(meta);
+					} else {
+						editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
+					}
+
+					/*new BukkitRunnable() {
 						@Override
 						public void run() {
-							if (complete.get()) {
-								new BukkitRunnable() {
-									@Override
-									public void run() {
-										if (finalLore.size() <= maxLines.get() + finalExtraLines) {
-											meta.setLore(finalLore);
-											item.setItemMeta(meta);
-											updateDisplayName(item);
-										} else {
-											editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
-										}
+							if (!this.isCancelled() && complete.get()) {
+								if (finalLore.size() <= (maxLines.get() + finalExtraLines)) {
+									meta.setLore(finalLore);
+									item.setItemMeta(meta);
+									if (ItemEdit.DEBUGGING) {
+										ItemEdit.get().getLogger().info("Set new item description.");
 									}
-								}.runTask(ItemEdit.get());
+								} else {
+									editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
+								}
 								this.cancel();
 							}
 						}
-					}.runTaskTimerAsynchronously(ItemEdit.get(), 0, 4);
+					}.runTaskTimer(ItemEdit.get(), 0, 4);*/
 				}
 			}
 		}
