@@ -315,10 +315,7 @@ public class ItemBuilder {
 		if (item != null) {
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
-				name = ChatColor.stripColor(meta.getDisplayName());
-				if (name.isEmpty()) {
-					name = ItemUtil.getDisplayName(item);
-				}
+				name = ChatColor.stripColor(ItemUtil.getDisplayName(item));
 			}
 		}
 

@@ -4,6 +4,7 @@ import co.lotc.core.bukkit.util.ItemUtil;
 import net.lordofthecraft.itemedit.ItemEdit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class Tags {
 
@@ -186,8 +187,11 @@ public class Tags {
 	 * @param item The item to apply the tag to.
 	 */
 	public void applyTagToItem(ItemStack item) {
-		ItemUtil.setCustomTag(item, ItemEdit.INFO_TAG, this.toString());
-		// TODO - If updated to 1.14+, store this ID in #setCustomModelData(id) for use with resource packs.
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			ItemUtil.setCustomTag(meta, ItemEdit.INFO_TAG, this.toString());
+			meta.setCustomModelData(itemID);
+		}
 	}
 
 }
