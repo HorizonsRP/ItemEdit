@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -330,19 +329,19 @@ public class ItemBuilder {
 					lore.set(0, tags.formatTags());
 					if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
 						if (lore.size() > 2) {
-							lore.set(lore.size()-2, getApprovalLines().get(1));
+							lore.set(lore.size()-2, getCreatedLines().get(1));
 						}
 					} else if (lore.size() > 1) {
-						lore.set(lore.size()-1, getApprovalLines().get(1));
+						lore.set(lore.size()-1, getCreatedLines().get(1));
 					}
 				} else {
 					lore.add(tags.formatTags());
-					lore.addAll(getApprovalLines());
+					lore.addAll(getCreatedLines());
 				}
 			} else {
 				lore = new ArrayList<>();
 				lore.add(tags.formatTags());
-				lore.addAll(getApprovalLines());
+				lore.addAll(getCreatedLines());
 			}
 			meta.setLore(lore);
 			item.setItemMeta(meta);
@@ -508,7 +507,7 @@ public class ItemBuilder {
 				lore.addAll(finalDesc);
 
 				// CREATED
-				lore.addAll(getApprovalLines());
+				lore.addAll(getCreatedLines());
 				extraLines += 2; // Don't count the blank line or the created line towards the max lines limit.
 
 				// Check for the max allowed lines. If it's good then we update the item.
@@ -550,9 +549,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * @return Returns the line break and the approval formatting for the current editing player.
+	 * @return Returns the line break and the created formatting for the current editing player.
 	 */
-	private List<String> getApprovalLines() {
+	private List<String> getCreatedLines() {
 		List<String> output = new ArrayList<>();
 		output.add("");
 		if (editingPlayer != null) {
