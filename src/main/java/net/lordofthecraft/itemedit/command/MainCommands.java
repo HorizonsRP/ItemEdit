@@ -256,9 +256,9 @@ public class MainCommands extends BaseCommand {
 
 	@Cmd(value="Edit the colour of a potion bottle.", permission=ItemEdit.PERMISSION_START + ".potion")
 	public void potionraw(CommandSender sender,
-						  @Arg(value="Red") @Range(min=0, max=255) int red,
-						  @Arg(value="Green") @Range(min=0, max=255) int green,
-						  @Arg(value="Blue") @Range(min=0, max=255) int blue) {
+						  @Arg(value="Red") @Range(min=0, max=255) @Default(value="0") int red,
+						  @Arg(value="Green") @Range(min=0, max=255) @Default(value="96") int green,
+						  @Arg(value="Blue") @Range(min=0, max=255) @Default(value="255") int blue) {
 		if (sender instanceof Player) {
 			potion(sender, Color.fromRGB(red, green, blue));
 		}
