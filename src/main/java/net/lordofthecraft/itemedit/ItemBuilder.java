@@ -510,15 +510,17 @@ public class ItemBuilder {
 				lore.addAll(getCreatedLines());
 				extraLines += 2; // Don't count the blank line or the created line towards the max lines limit.
 
-				// Check for the max allowed lines. If it's good then we update the item.
+				// Check for the max allowed lines if we have a player. If it's good then we update the item.
 				AtomicInteger maxLines = new AtomicInteger(ItemEdit.getMaxLines());
 				if (editingPlayer != null) {
 					AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, editingPlayer.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
-					while (!complete.get()) {}
-				} else {
-					maxLines.set(Integer.MAX_VALUE);
+					while (!complete.get()) {
+						// Won't update an item properly in a Bukkit Runnable, so we have to wait syncronously. :(
+					}
 				}
-				if (lore.size() <= (maxLines.get() + extraLines)) {
+
+				// Skip the line requirement if the player is null, otherwise check the lines.
+				if (editingPlayer == null || lore.size() <= (maxLines.get() + extraLines)) {
 					meta.setLore(lore);
 					item.setItemMeta(meta);
 				} else if (editingPlayer != null) {
