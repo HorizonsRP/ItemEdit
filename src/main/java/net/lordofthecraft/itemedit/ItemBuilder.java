@@ -513,12 +513,16 @@ public class ItemBuilder {
 
 				// Check for the max allowed lines. If it's good then we update the item.
 				AtomicInteger maxLines = new AtomicInteger(ItemEdit.getMaxLines());
-				AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, editingPlayer.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
-				while (!complete.get()) {}
+				if (editingPlayer != null) {
+					AtomicBoolean complete = PermissionsUtil.getMaxPermission(maxLines, editingPlayer.getUniqueId(), ItemEdit.PERMISSION_START + ".length");
+					while (!complete.get()) {}
+				} else {
+					maxLines.set(Integer.MAX_VALUE);
+				}
 				if (lore.size() <= (maxLines.get() + extraLines)) {
 					meta.setLore(lore);
 					item.setItemMeta(meta);
-				} else {
+				} else if (editingPlayer != null) {
 					editingPlayer.sendMessage(ItemEdit.PREFIX + "That description is too long! You only have access to " + ItemEdit.ALT_COLOR + (maxLines.get()) + ItemEdit.PREFIX + " lines for a description.");
 				}
 
