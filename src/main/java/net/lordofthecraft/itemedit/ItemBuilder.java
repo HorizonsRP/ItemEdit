@@ -315,7 +315,7 @@ public class ItemBuilder {
 		tags.put(ItemEdit.NO_PLACEMENT_TAG, false);
 
 		for (String tag : tags.keySet()) {
-			if (!ItemUtil.hasCustomTag(item, ItemEdit.MODERN_TAG)) {
+			if (!ItemUtil.getCustomTag(item, ItemEdit.MODERN_TAG).equals(ItemEdit.ITEM_VERSION)) {
 				tags.put(tag, true);
 				ItemUtil.getCustomTag(item, tag);
 			}
