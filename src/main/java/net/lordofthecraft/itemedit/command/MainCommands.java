@@ -52,9 +52,9 @@ public class MainCommands extends BaseCommand {
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null && item.getType() != Material.AIR) {
 				if (ableToEdit(p, item)) {
+					ItemBuilder builder = new ItemBuilder(item);
 					String fullName = String.join(" ", name);
 					validate(fullName.length() <= ItemEdit.getMaxWidth(), nameTooLong);
-					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
 					builder.setEditingPlayer(p);
 					builder.setName(fullName);
@@ -185,6 +185,8 @@ public class MainCommands extends BaseCommand {
 
 			if (item != null && !item.getType().equals(Material.AIR)) {
 				if (ableToEdit(p, item)) {
+					ItemBuilder builder = new ItemBuilder(item);
+
 					ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
 					BookMeta meta = (BookMeta) book.getItemMeta();
 					if (meta != null) {
@@ -192,7 +194,6 @@ public class MainCommands extends BaseCommand {
 					}
 					book.setItemMeta(meta);
 
-					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
 					builder.setEditingPlayer(p);
 
