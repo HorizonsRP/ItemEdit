@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -47,6 +48,7 @@ public class ItemBuilder {
 	 */
 	public ItemBuilder(ItemStack base) {
 		this.item = base;
+		legacyCheck();
 		this.tags = Tags.getTags(this.item);
 	}
 
@@ -67,7 +69,7 @@ public class ItemBuilder {
 			if (!originalTags.getRarity().equals(tags.getRarity())) {
 				String oldColor = originalTags.getRarity().getRawColor() + "";
 				String newColor = tags.getRarity().getRawColor() + "";
-				replaceWithinDesc(item, oldColor, newColor);
+				replaceWithinDesc(oldColor, newColor);
 
 				tagsUpdate = true;
 			}
@@ -76,7 +78,7 @@ public class ItemBuilder {
 			if (!originalTags.getQuality().equals(tags.getQuality())) {
 				String oldColor = originalTags.getQuality().getColor();
 				String newColor = tags.getQuality().getColor();
-				replaceWithinDesc(item, oldColor, newColor);
+				replaceWithinDesc(oldColor, newColor);
 
 				tagsUpdate = true;
 			}
@@ -84,9 +86,9 @@ public class ItemBuilder {
 			// Aura
 			if (!originalTags.getAura().equals(tags.getAura()) || originalTags.getAuraClass() != tags.getAuraClass()) {
 				if (tags.getAuraClass() > 0) {
-					updateGlow(item, true);
+					updateGlow(true);
 				} else {
-					updateGlow(item, false);
+					updateGlow(false);
 				}
 
 				tagsUpdate = true;
@@ -98,7 +100,7 @@ public class ItemBuilder {
 			}
 
 			if (tagsUpdate) {
-				updateTags(item, tags);
+				updateTags(tags);
 			}
 		}
 	}
@@ -115,7 +117,7 @@ public class ItemBuilder {
 	 */
 	public void setName(String name) {
 		this.newName = name;
-		updateTags(item);
+		updateTags();
 	}
 
 	/**
@@ -188,8 +190,8 @@ public class ItemBuilder {
 	 * @param desc Array of words.
 	 */
 	public void setDesc(String[] desc) {
-		updateTags(item);
-		completeDesc(item, desc);
+		updateTags();
+		completeDesc(desc);
 	}
 
 	/**
@@ -224,20 +226,18 @@ public class ItemBuilder {
 	 * Removes the approval tag from an item.
 	 */
 	public void removeApproval() {
-		if (item != null) {
-			if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
-				ItemMeta meta = item.getItemMeta();
-				if (meta != null) {
-					List<String> lore = meta.getLore();
-					if (lore != null) {
-						lore.remove(lore.size()-1);
-						lore.remove(lore.size()-1);
-						meta.setLore(lore);
-						item.setItemMeta(meta);
-					}
+		if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				List<String> lore = meta.getLore();
+				if (lore != null) {
+					lore.remove(lore.size() - 1);
+					lore.remove(lore.size() - 1);
+					meta.setLore(lore);
+					item.setItemMeta(meta);
 				}
-				ItemUtil.removeCustomTag(item, ItemEdit.APPROVED_TAG);
 			}
+			ItemUtil.removeCustomTag(item, ItemEdit.APPROVED_TAG);
 		}
 	}
 
@@ -306,21 +306,54 @@ public class ItemBuilder {
 
 	//// PRIVATE ////
 	/**
-	 * Re-applies the tags with whatever is on it, or default.
-	 * @param item The item to apply basic tags too.
+	 * Reformats legacy items so parsing the lore lines doesn't break anything.
 	 */
-	private void updateTags(ItemStack item) {
+	private void legacyCheck() {
+		ConcurrentHashMap<String, Boolean> tags = new ConcurrentHashMap<>();
+		tags.put(ItemEdit.INFO_TAG, false);
+		tags.put(ItemEdit.EDITED_TAG, false);
+		tags.put(ItemEdit.APPROVED_TAG, false);
+		tags.put(ItemEdit.NO_PLACEMENT_TAG, false);
+
+		for (String tag : tags.keySet()) {
+			if (ItemUtil.hasLegacyTag(item, tag)) {
+				tags.put(tag, true);
+				ItemUtil.getCustomTag(item, tag);
+			}
+		}
+
+		if (tags.get(ItemEdit.EDITED_TAG) || tags.get(ItemEdit.APPROVED_TAG)) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null && meta.hasLore()) {
+				List<String> lore = meta.getLore();
+				if (tags.get(ItemEdit.EDITED_TAG)) {
+					if (lore == null) {
+						lore = new ArrayList<>();
+					}
+					lore.add("");
+					if (!tags.get(ItemEdit.APPROVED_TAG)) {
+						lore.add("");
+					}
+				}
+			}
+			item.setItemMeta(meta);
+		}
+	}
+
+	/**
+	 * Re-applies the tags with whatever is on it, or default.
+	 */
+	private void updateTags() {
 		Tags tags = Tags.getTags(item);
-		updateTags(item, tags);
+		updateTags(tags);
 	}
 
 	/**
 	 * Apply a tag set to the given item. If it has no tags it gives it the default. If a description exists it will
 	 * be pushed down by one line.
-	 * @param item The item to tag.
 	 * @param tags The tags to apply.
 	 */
-	private void updateTags(ItemStack item, Tags tags) {
+	private void updateTags(Tags tags) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			List<String> lore = meta.getLore();
@@ -349,15 +382,14 @@ public class ItemBuilder {
 			tags.applyTagToItem(item);
 			this.tags = tags;
 
-			updateDisplayName(item);
+			updateDisplayName();
 		}
 	}
 
 	/**
 	 * Updates the colour using the given item's existing name.
-	 * @param item The item to update.
 	 */
-	private void updateDisplayName(ItemStack item) {
+	private void updateDisplayName() {
 		String name = null;
 		if (item != null) {
 			ItemMeta meta = item.getItemMeta();
@@ -371,7 +403,7 @@ public class ItemBuilder {
 		}
 
 		if (name != null) {
-			updateDisplayName(item, name);
+			updateDisplayName(name);
 		}
 	}
 
@@ -379,10 +411,9 @@ public class ItemBuilder {
 	 * Update the display name of the given item, coloured based on the rarity of the item.
 	 * If the item doesn't have any tags on it, it adds the tags then tries to set the name
 	 * once again.
-	 * @param item The item to name.
 	 * @param name The name to use.
 	 */
-	private void updateDisplayName(ItemStack item, String name) {
+	private void updateDisplayName(String name) {
 		String clearedName = ChatColor.stripColor(name);
 
 		ItemMeta meta = item.getItemMeta();
@@ -394,10 +425,9 @@ public class ItemBuilder {
 
 	/**
 	 * Toggle glow on or off.
-	 * @param item Item to glow.
 	 * @param enable Whether to glow or not.
 	 */
-	private void updateGlow(ItemStack item, boolean enable) {
+	private void updateGlow(boolean enable) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			if (enable) {
@@ -416,11 +446,10 @@ public class ItemBuilder {
 	/**
 	 * Replaces any instance of previousColor within the description with newColor. This
 	 * is generally used for updating the highlight colours after the fact.
-	 * @param item The item to update.
 	 * @param previousColor The string to search for.
 	 * @param newColor The string to replace it with.
 	 */
-	private void replaceWithinDesc(ItemStack item, String previousColor, String newColor) {
+	private void replaceWithinDesc(String previousColor, String newColor) {
 		if (item != null) {
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null) {
@@ -450,10 +479,9 @@ public class ItemBuilder {
 	 * Take a list of strings from an MC book and convert them into
 	 * a description of the appropriate width, then apply said desc
 	 * to the given item following format standards.
-	 * @param item The item to describe.
 	 * @param desc The list of pages as Strings.
 	 */
-	private void completeDesc(ItemStack item, String[] desc) {
+	private void completeDesc(String[] desc) {
 		String highlight = tags.getQuality().getColor() + ChatColor.ITALIC;
 		ChatColor bulletpoint = tags.getRarity().getRawColor();
 

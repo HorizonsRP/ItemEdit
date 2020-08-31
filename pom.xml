@@ -6,7 +6,7 @@
 
     <groupId>net.lordofthecraft</groupId>
     <artifactId>ItemEdit</artifactId>
-    <version>1.16.0.3</version>
+    <version>1.16.2.1</version>
     <packaging>jar</packaging>
 
     <name>ItemEdit</name>
@@ -26,13 +26,13 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.1-R0.1-SNAPSHOT</version>
+            <version>1.16.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>co.lotc</groupId>
             <artifactId>tythan-bukkit</artifactId>
-            <version>0.7.9</version>
+            <version>1.16.2.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
