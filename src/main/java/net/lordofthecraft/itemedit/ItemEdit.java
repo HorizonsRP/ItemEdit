@@ -33,9 +33,10 @@ public final class ItemEdit extends JavaPlugin {
 	public static final boolean DEBUGGING = true;
 
 	// Tags set by Tythan for identification
+	public static final String INFO_TAG = "item-data";
 	public static final String EDITED_TAG = "editor-uuid";
 	public static final String APPROVED_TAG = "signed-uuid";
-	public static final String INFO_TAG = "item-data";
+	public static final String MODERN_TAG = "edit-modern";
 	public static final String NO_PLACEMENT_TAG = "item-unplaceable";
 
 	private static int maxWidth;

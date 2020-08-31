@@ -324,13 +324,17 @@ public class MainCommands extends BaseCommand {
 			if (lore != null) {
 				int start = 0;
 				int end = lore.size();
-				if (ItemUtil.hasCustomTag(item, ItemEdit.INFO_TAG)) {
+				if (ItemUtil.hasCustomTag(meta, ItemEdit.INFO_TAG)) {
 					start++;
 				}
-				if (ItemUtil.hasCustomTag(item, ItemEdit.APPROVED_TAG)) {
-					end -= 3;
-				} else {
-					end -= 2;
+
+				if (ItemUtil.hasCustomTag(meta, ItemEdit.EDITED_TAG) && end >= 2) {
+					plugin.getLogger().info("Has been edited.");
+					end = end - 2;
+					if (ItemUtil.hasCustomTag(meta, ItemEdit.APPROVED_TAG) && end >= 1) {
+						plugin.getLogger().info("Has been approved.");
+						end = end - 1;
+					}
 				}
 
 				StringBuilder fullStringBuilder = new StringBuilder();

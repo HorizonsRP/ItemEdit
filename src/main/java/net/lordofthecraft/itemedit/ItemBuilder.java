@@ -232,7 +232,6 @@ public class ItemBuilder {
 				List<String> lore = meta.getLore();
 				if (lore != null) {
 					lore.remove(lore.size() - 1);
-					lore.remove(lore.size() - 1);
 					meta.setLore(lore);
 					item.setItemMeta(meta);
 				}
@@ -316,28 +315,28 @@ public class ItemBuilder {
 		tags.put(ItemEdit.NO_PLACEMENT_TAG, false);
 
 		for (String tag : tags.keySet()) {
-			if (ItemUtil.hasLegacyTag(item, tag)) {
+			if (!ItemUtil.hasCustomTag(item, ItemEdit.MODERN_TAG)) {
 				tags.put(tag, true);
 				ItemUtil.getCustomTag(item, tag);
 			}
 		}
 
-		if (tags.get(ItemEdit.EDITED_TAG) || tags.get(ItemEdit.APPROVED_TAG)) {
-			ItemMeta meta = item.getItemMeta();
-			if (meta != null && meta.hasLore()) {
-				if (tags.get(ItemEdit.EDITED_TAG)) {
-					List<String> lore = meta.getLore();
-					if (lore == null) {
-						lore = new ArrayList<>();
-					}
-					lore.add("");
-					if (!tags.get(ItemEdit.APPROVED_TAG)) {
-						lore.add("");
-					}
-					meta.setLore(lore);
+		ItemUtil.setCustomTag(item, ItemEdit.MODERN_TAG, "!");
+
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null && meta.hasLore()) {
+			if (tags.get(ItemEdit.EDITED_TAG)) {
+				List<String> lore = meta.getLore();
+				if (lore == null) {
+					lore = new ArrayList<>();
 				}
+				lore.add("");
+				if (!tags.get(ItemEdit.APPROVED_TAG)) {
+					lore.add("");
+				}
+				meta.setLore(lore);
+				item.setItemMeta(meta);
 			}
-			item.setItemMeta(meta);
 		}
 	}
 
