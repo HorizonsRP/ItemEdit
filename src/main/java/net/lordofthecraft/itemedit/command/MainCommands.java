@@ -397,6 +397,7 @@ public class MainCommands extends BaseCommand {
 			preString = ItemUtil.getCustomTag(item, ItemEdit.EDITED_TAG) + "/";
 		}
 		ItemUtil.setCustomTag(item, ItemEdit.EDITED_TAG, preString + player.getUniqueId().toString() + ":" + System.currentTimeMillis());
+		ItemUtil.setCustomTag(item, ItemEdit.MODERN_TAG, "!");
 	}
 
 }
