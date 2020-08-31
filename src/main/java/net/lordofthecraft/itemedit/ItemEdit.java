@@ -36,8 +36,10 @@ public final class ItemEdit extends JavaPlugin {
 	public static final String INFO_TAG = "item-data";
 	public static final String EDITED_TAG = "editor-uuid";
 	public static final String APPROVED_TAG = "signed-uuid";
-	public static final String MODERN_TAG = "edit-modern";
+	public static final String MODERN_TAG = "edit-version";
 	public static final String NO_PLACEMENT_TAG = "item-unplaceable";
+
+	public static final String ITEM_VERSION = "1.16.2.2";
 
 	private static int maxWidth;
 	public static int getMaxWidth() {

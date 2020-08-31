@@ -321,7 +321,7 @@ public class ItemBuilder {
 			}
 		}
 
-		ItemUtil.setCustomTag(item, ItemEdit.MODERN_TAG, "!");
+		ItemUtil.setCustomTag(item, ItemEdit.MODERN_TAG, ItemEdit.ITEM_VERSION);
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null && meta.hasLore()) {
