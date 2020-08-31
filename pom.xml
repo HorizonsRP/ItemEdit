@@ -6,7 +6,7 @@
 
     <groupId>net.lordofthecraft</groupId>
     <artifactId>ItemEdit</artifactId>
-    <version>1.16.2.1</version>
+    <version>1.16.2.2</version>
     <packaging>jar</packaging>
 
     <name>ItemEdit</name>
