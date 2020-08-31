@@ -325,8 +325,8 @@ public class ItemBuilder {
 		if (tags.get(ItemEdit.EDITED_TAG) || tags.get(ItemEdit.APPROVED_TAG)) {
 			ItemMeta meta = item.getItemMeta();
 			if (meta != null && meta.hasLore()) {
-				List<String> lore = meta.getLore();
 				if (tags.get(ItemEdit.EDITED_TAG)) {
+					List<String> lore = meta.getLore();
 					if (lore == null) {
 						lore = new ArrayList<>();
 					}
@@ -334,6 +334,7 @@ public class ItemBuilder {
 					if (!tags.get(ItemEdit.APPROVED_TAG)) {
 						lore.add("");
 					}
+					meta.setLore(lore);
 				}
 			}
 			item.setItemMeta(meta);
