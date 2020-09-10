@@ -226,6 +226,7 @@ public class MainCommands extends BaseCommand {
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
 					builder.setEditingPlayerStyle(approval);
+					builder.applyTags();
 					finalizeEdit(p, item);
 				} else {
 					msg(APPROVED_ALREADY);
