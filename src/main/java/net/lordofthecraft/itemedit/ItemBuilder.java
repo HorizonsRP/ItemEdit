@@ -25,6 +25,7 @@ public class ItemBuilder {
 	private static final Glow GLOW = new Glow(new NamespacedKey(ItemEdit.get(), ItemEdit.get().getDescription().getName()));
 
 	private Player editingPlayer = null;
+	private Approval editingStyle = Approval.DEFAULT;
 	private String newName = null;
 
 	private ItemStack item;
@@ -125,6 +126,10 @@ public class ItemBuilder {
 	 */
 	public void setEditingPlayer(Player player) {
 		this.editingPlayer = player;
+	}
+
+	public void setEditingPlayerStyle(Approval style) {
+		this.editingStyle = style;
 	}
 
 	/**
@@ -586,7 +591,7 @@ public class ItemBuilder {
 		List<String> output = new ArrayList<>();
 		output.add("");
 		if (editingPlayer != null) {
-			output.add(Approval.DEFAULT.formatApproval(editingPlayer, false));
+			output.add(editingStyle.formatApproval(editingPlayer, false));
 		} else {
 			output.add(Approval.PLUGIN.formatApproval(null, false));
 		}

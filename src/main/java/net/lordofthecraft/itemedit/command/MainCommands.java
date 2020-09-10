@@ -215,6 +215,27 @@ public class MainCommands extends BaseCommand {
 		msg(NO_ITEM);
 	}
 
+	@Cmd(value="Set the style for the created by message.", permission=ItemEdit.PERMISSION_START + ".created")
+	public void created(CommandSender sender, @Default("PLAYER") Approval approval) {
+		if (sender instanceof Player && approval != null) {
+			Player p = (Player) sender;
+			validate(p.hasPermission(approval.permission + ".use"), NO_APPROVAL_PERM);
+			ItemStack item = ItemEdit.getItemInHand(p);
+			if (item != null && item.getType() != Material.AIR) {
+				if (ableToEdit(p, item)) {
+					ItemBuilder builder = new ItemBuilder(item);
+					builder.removeApproval();
+					builder.setEditingPlayerStyle(approval);
+					finalizeEdit(p, item);
+				} else {
+					msg(APPROVED_ALREADY);
+				}
+				return;
+			}
+		}
+		msg(NO_ITEM);
+	}
+
 	@Cmd(value="Approve an item to lock in the information. Can be cleared later if needed.", permission=ItemEdit.PERMISSION_START + ".approve")
 	public void approve(CommandSender sender, @Default("PLAYER") Approval approval) {
 		if (sender instanceof Player && approval != null) {
