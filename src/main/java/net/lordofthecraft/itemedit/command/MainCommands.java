@@ -7,7 +7,6 @@ import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
 import co.lotc.core.command.annotate.Range;
-import net.lordofthecraft.itemedit.Glow;
 import net.lordofthecraft.itemedit.ItemBuilder;
 import net.lordofthecraft.itemedit.ItemEdit;
 import net.lordofthecraft.itemedit.enums.*;
@@ -225,6 +224,7 @@ public class MainCommands extends BaseCommand {
 				if (ableToEdit(p, item)) {
 					ItemBuilder builder = new ItemBuilder(item);
 					builder.removeApproval();
+					builder.setEditingPlayer(p);
 					builder.setEditingPlayerStyle(approval);
 					builder.applyTags();
 					finalizeEdit(p, item);

@@ -102,6 +102,8 @@ public class ItemBuilder {
 
 			if (tagsUpdate) {
 				updateTags(tags);
+			} else if (editingStyle != Approval.DEFAULT) {
+				updateTags();
 			}
 		}
 	}
