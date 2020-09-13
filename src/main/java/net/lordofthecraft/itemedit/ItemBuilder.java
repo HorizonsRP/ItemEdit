@@ -294,7 +294,7 @@ public class ItemBuilder {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			setUnbreakable(!meta.isUnbreakable());
-			return meta.isUnbreakable();
+			return item.getItemMeta().isUnbreakable();
 		}
 		return false;
 	}
