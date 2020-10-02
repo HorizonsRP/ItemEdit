@@ -369,22 +369,7 @@ public class MainCommands extends BaseCommand {
 					}
 				}
 
-				String fullString = fullStringBuilder.toString();
-				fullString = fullString.replace("･", "[*1]");
-				fullString = fullString.replace("•", "[*]");
-				fullString = fullString.replace("●", "[*4]");
-				fullString = fullString.replace("❖", "[**]");
-
-				int pages = (int) Math.ceil(fullString.length()/255d);
-				for (int i = 1; i <= pages; i++) {
-					int j = (i-1)*255;
-					int k = i*255;
-
-					if (fullString.length() < k) {
-						k = fullString.length();
-					}
-					output.add(fullString.substring(j, k));
-				}
+				output = BookUtil.getPagesForString(fullStringBuilder.toString());
 			}
 		}
 		return output;
