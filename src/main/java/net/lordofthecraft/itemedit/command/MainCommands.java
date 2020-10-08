@@ -369,7 +369,7 @@ public class MainCommands extends BaseCommand {
 					}
 				}
 
-				output = BookUtil.getPagesForString(fullStringBuilder.toString());
+				output = BookUtil.getStringAsPages(fullStringBuilder.toString());
 			}
 		}
 		return output;

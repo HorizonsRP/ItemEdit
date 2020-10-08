@@ -1,8 +1,9 @@
 package net.lordofthecraft.itemedit.enums;
 
 import co.lotc.core.agnostic.Sender;
+import co.lotc.core.util.ColorUtil;
 import net.lordofthecraft.itemedit.ItemEdit;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -11,15 +12,15 @@ import java.util.List;
 public enum Approval {
 
 	// STAFF AND DEFAULT SIGNATURES
-	PLUGIN("PLUGIN", ChatColor.DARK_GRAY,   "A Plugin",       ItemEdit.PERMISSION_START + ".plugin"),
-	ADMIN( "ADMIN",  ChatColor.DARK_RED,    "An Admin",       ItemEdit.PERMISSION_START + ".admin"),
-	MOD(   "MOD",    ChatColor.BLUE,        "A Moderator",    ItemEdit.PERMISSION_START + ".mod"),
-	TECH(  "TECH",   ChatColor.GREEN,       "A Technician",   ItemEdit.PERMISSION_START + ".tech"),
-	LORE(  "LORE",   ChatColor.YELLOW,      "A Lore Herald",  ItemEdit.PERMISSION_START + ".lore"),
-	EVENT( "EVENT",  ChatColor.RED,         "An Event Host",  ItemEdit.PERMISSION_START + ".event"),
-	BUILD( "BUILD",  ChatColor.GOLD,        "A Builder",      ItemEdit.PERMISSION_START + ".build"),
-	DESIGN("DESIGN", ChatColor.DARK_PURPLE, "A Designer",     ItemEdit.PERMISSION_START + ".design"),
-	PLAYER("PLAYER", ChatColor.GRAY,        "A Player",       ItemEdit.PERMISSION_START + ".use");
+	PLUGIN("PLUGIN", ChatColor.DARK_GRAY,                           "A Plugin",       ItemEdit.PERMISSION_START + ".plugin"),
+	ADMIN( "ADMIN",  ChatColor.of(ColorUtil.hexToColor("#1abc9c")), "A Team Lead",    ItemEdit.PERMISSION_START + ".admin"),
+	MOD(   "MOD",    ChatColor.of(ColorUtil.hexToColor("#1a67ed")), "A Moderator",    ItemEdit.PERMISSION_START + ".mod"),
+	TECH(  "TECH",   ChatColor.of(ColorUtil.hexToColor("#95de16")), "A Technician",   ItemEdit.PERMISSION_START + ".tech"),
+	LORE(  "LORE",   ChatColor.of(ColorUtil.hexToColor("#fae36e")), "A Lore Herald",  ItemEdit.PERMISSION_START + ".lore"),
+	EVENT( "EVENT",  ChatColor.of(ColorUtil.hexToColor("#cf0606")), "An Event Host",  ItemEdit.PERMISSION_START + ".event"),
+	BUILD( "BUILD",  ChatColor.of(ColorUtil.hexToColor("#ec9706")), "A Builder",      ItemEdit.PERMISSION_START + ".build"),
+	DESIGN("DESIGN", ChatColor.of(ColorUtil.hexToColor("#8634b3")), "A Designer",     ItemEdit.PERMISSION_START + ".design"),
+	PLAYER("PLAYER", ChatColor.GRAY,                                "A Player",       ItemEdit.PERMISSION_START + ".use");
 
 	// Permissions note: Add .use to use, and .edit to be able to edit over.
 	// e.g. Mods having PERM.mod.use, PERM.mod.edit, PERM.lore.edit, PERM.event.edit
