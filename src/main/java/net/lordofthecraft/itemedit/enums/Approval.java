@@ -13,15 +13,15 @@ import java.util.List;
 public enum Approval {
 
 	// STAFF AND DEFAULT SIGNATURES
-	PLUGIN("PLUGIN", ChatColor.DARK_GRAY,                           "A Plugin",       ItemEdit.PERMISSION_START + ".plugin"),
-	ADMIN("ADMIN",   ChatColor.of(Color.decode("#1abc9c")), "A Team Lead", ItemEdit.PERMISSION_START + ".admin"),
+	PLUGIN("PLUGIN", ChatColor.DARK_GRAY,                   "A Plugin",       ItemEdit.PERMISSION_START + ".plugin"),
+	ADMIN( "ADMIN",  ChatColor.of(Color.decode("#1abc9c")), "A Team Lead",    ItemEdit.PERMISSION_START + ".admin"),
 	MOD(   "MOD",    ChatColor.of(Color.decode("#1a67ed")), "A Moderator",    ItemEdit.PERMISSION_START + ".mod"),
 	TECH(  "TECH",   ChatColor.of(Color.decode("#95de16")), "A Technician",   ItemEdit.PERMISSION_START + ".tech"),
 	LORE(  "LORE",   ChatColor.of(Color.decode("#fae36e")), "A Lore Herald",  ItemEdit.PERMISSION_START + ".lore"),
 	EVENT( "EVENT",  ChatColor.of(Color.decode("#cf0606")), "An Event Host",  ItemEdit.PERMISSION_START + ".event"),
 	BUILD( "BUILD",  ChatColor.of(Color.decode("#ec9706")), "A Builder",      ItemEdit.PERMISSION_START + ".build"),
 	DESIGN("DESIGN", ChatColor.of(Color.decode("#8634b3")), "A Designer",     ItemEdit.PERMISSION_START + ".design"),
-	PLAYER("PLAYER", ChatColor.GRAY,                                "A Player",       ItemEdit.PERMISSION_START + ".use");
+	PLAYER("PLAYER", ChatColor.GRAY,                        "A Player",       ItemEdit.PERMISSION_START + ".use");
 
 	// Permissions note: Add .use to use, and .edit to be able to edit over.
 	// e.g. Mods having PERM.mod.use, PERM.mod.edit, PERM.lore.edit, PERM.event.edit
