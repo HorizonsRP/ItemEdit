@@ -33,7 +33,7 @@ public class MainCommands extends BaseCommand {
 	private static final String COLOR_ERROR = ItemEdit.PREFIX + "You do not have permission to use this color type.";
 	private static final String APPROVED_ALREADY = ItemEdit.PREFIX + "This item has already been signed!";
 	private static final String SIGNED_OTHERWISE = ItemEdit.PREFIX + "You were not the one to sign this item!";
-	private static final String NO_APPROVAL_PERM = ItemEdit.PREFIX + "You do not have permission to use that signature.";
+	private static final String NO_APPROVAL_PERM = ItemEdit.PREFIX + "You do not have permission to use that value.";
 	private static final String MAX_LENGTH = ItemEdit.PREFIX + "You have reached the maximum length on that item.";
 	private static String nameTooLong; // This one is based on Max Width so it's set on instance creation.
 
