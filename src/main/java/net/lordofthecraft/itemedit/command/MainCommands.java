@@ -71,6 +71,7 @@ public class MainCommands extends BaseCommand {
 	public void rarity(CommandSender sender, Rarity rarity) {
 		if (sender instanceof Player && rarity != null) {
 			Player p = (Player) sender;
+			validate(p.hasPermission(rarity.permission + ".use"), NO_APPROVAL_PERM);
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
@@ -93,6 +94,7 @@ public class MainCommands extends BaseCommand {
 	public void quality(CommandSender sender, Quality quality) {
 		if (sender instanceof Player && quality != null) {
 			Player p = (Player) sender;
+			validate(p.hasPermission(quality.permission + ".use"), NO_APPROVAL_PERM);
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
@@ -115,6 +117,7 @@ public class MainCommands extends BaseCommand {
 	public void aura(CommandSender sender, Aura aura, @Default(value="0")int auraClass) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
+			validate(p.hasPermission(aura.permission + ".use"), NO_APPROVAL_PERM);
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
@@ -137,6 +140,7 @@ public class MainCommands extends BaseCommand {
 	public void type(CommandSender sender, Type type) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
+			validate(p.hasPermission(type.permission + ".use"), NO_APPROVAL_PERM);
 			ItemStack item = ItemEdit.getItemInHand(p);
 			if (item != null) {
 				if (ableToEdit(p, item)) {
